@@ -12,7 +12,7 @@
 
 This project contains the following programs:
 
-- [Mpl Whitelist](./programs/whitelist/README.md) `TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW`
+- [Whitelist](./programs/whitelist/README.md) `TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW`
 
 You will need a Rust version compatible with BPF to compile the program, currently we recommend using Rust 1.68.0.
 
