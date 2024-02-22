@@ -1,6 +1,12 @@
-# Mpl Whitelist
-
-Verify your collection on-chain
+<h1 align="center">
+  Tensor Whitelist
+</h1>
+<p align="center">
+  <img width="400" alt="Tensor Whitelist" src="https://github.com/tensor-foundation/whitelist/assets/729235/d159b3cd-19f8-4aca-8915-5a63e3a6d62f" />
+</p>
+<p align="center">
+  Verify your collection on-chain.
+</p>
 
 ## Programs
 
