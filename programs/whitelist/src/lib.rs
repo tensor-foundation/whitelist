@@ -19,7 +19,8 @@ mod instructions;
 mod state;
 
 use anchor_lang::prelude::*;
-use instructions::*;
+pub use instructions::*;
+pub use state::*;
 
 declare_id!("TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW");
 
