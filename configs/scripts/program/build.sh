@@ -25,7 +25,7 @@ PROGRAMS=$(echo ${PROGRAMS} | jq -c '.[]' | sed 's/"//g')
 
 # creates the output directory if it doesn't exist
 if [ ! -d ${OUTPUT} ]; then
-    mkdir ${OUTPUT}
+    mkdir -p ${OUTPUT}
 fi
 
 WORKING_DIR=$(pwd)
