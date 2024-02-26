@@ -1,9 +1,9 @@
 const path = require("path");
 
-const programDir = path.join(__dirname, "..", "programs");
+const targetDir = path.join(__dirname, "..", "target");
 
 function getProgram(programBinary) {
-  return path.join(programDir, ".bin", programBinary);
+  return path.join(targetDir, "external", programBinary);
 }
 
 module.exports = {
