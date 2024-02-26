@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-OUTPUT="./programs/.bin"
+OUTPUT="./target/external"
 # saves external programs binaries to the output directory
 source ${SCRIPT_DIR}/dump.sh ${OUTPUT}
 # go to parent folder
@@ -25,13 +25,13 @@ PROGRAMS=$(echo ${PROGRAMS} | jq -c '.[]' | sed 's/"//g')
 
 # creates the output directory if it doesn't exist
 if [ ! -d ${OUTPUT} ]; then
-    mkdir ${OUTPUT}
+    mkdir -p ${OUTPUT}
 fi
 
 WORKING_DIR=$(pwd)
 export SBF_OUT_DIR="${WORKING_DIR}/${OUTPUT}"
 
 for p in ${PROGRAMS[@]}; do
-    cd ${WORKING_DIR}/programs/${p}
+    cd ${WORKING_DIR}/${p}
     cargo build-sbf --sbf-out-dir ${WORKING_DIR}/${OUTPUT} $ARGS
 done

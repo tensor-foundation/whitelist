@@ -55,7 +55,7 @@ jobs:
         if: env.CACHE == 'true'
         uses: tensor-foundation/actions/cache-crate@v1
         with:
-          folder: ./programs
+          folder: '.'
           key: programs
 
       - name: Build programs
@@ -69,6 +69,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: program-builds
-          # First wildcard ensures exported paths are consistently under the programs folder.
-          path: ./program*/.bin/*.so
+          # First wildcard ensures exported paths are consistently under the target folder.
+          path: ./targe*/external/*.so
           if-no-files-found: error

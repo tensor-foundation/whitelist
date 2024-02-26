@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-PROGRAMS_OUTPUT="./programs/.bin"
+PROGRAMS_OUTPUT="./target/external"
 # go to parent folder
 cd $(dirname $(dirname $(dirname $SCRIPT_DIR)))
 
