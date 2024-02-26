@@ -25,6 +25,11 @@ jobs:
         with:
           key: ${{ secrets.TOOLBOX_KEY }}
 
+      - name: Setup SSH agent
+        uses: tensor-foundation/actions/ssh-agent@v1
+        with:
+          key: ${{ secrets.TOOLBOX_KEY }}
+
       - name: Load environment variables
         run: cat .github/.env >> $GITHUB_ENV
 
