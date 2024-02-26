@@ -3,6 +3,7 @@ use mpl_token_metadata::{
     accounts::Metadata,
     types::{Collection, Creator},
 };
+use tensor_toolbox::validate_proof;
 use vipers::throw_err;
 
 use crate::{
@@ -47,7 +48,7 @@ impl Whitelist {
             match proof {
                 Some(proof) => {
                     //bad proof verification? fail
-                    if !merkle_proof::verify_proof(proof.proof, self.root_hash, proof.leaf) {
+                    if !validate_proof(&self.root_hash, &proof.leaf, &proof.proof) {
                         throw_err!(ErrorCode::FailedMerkleProofVerification);
                     }
                 }

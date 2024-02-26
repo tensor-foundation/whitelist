@@ -2040,6 +2040,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kaigan"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e623cca1f0e2a0919032c1bdabbf81dd9aa34658d5066aca7bb90d608317ab91"
+dependencies = [
+ "borsh 0.10.3",
+]
+
+[[package]]
 name = "keccak"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2205,14 +2214,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "merkle_proof"
-version = "0.1.0"
-source = "git+ssh://git@github.com/tensor-hq/tensor-common-rs.git?rev=85e9ba019516659ff891428ff517424474dc2cba#85e9ba019516659ff891428ff517424474dc2cba"
-dependencies = [
- "anchor-lang",
-]
-
-[[package]]
 name = "merlin"
 version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2275,6 +2276,20 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "mpl-bubblegum"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3cbca5deb859e66a1a21ada94f2eaab3eb5caa4584c0c8ade0efac29a5414b8"
+dependencies = [
+ "borsh 0.9.3",
+ "kaigan",
+ "num-derive 0.3.3",
+ "num-traits",
+ "solana-program",
+ "thiserror",
 ]
 
 [[package]]
@@ -4666,6 +4681,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "spl-account-compression"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "85c43bd4455d9fb29b9e4f83c087ccffa2f6f41fecfc0549932ae391d00f3378"
+dependencies = [
+ "anchor-lang",
+ "bytemuck",
+ "spl-concurrent-merkle-tree",
+ "spl-noop",
+]
+
+[[package]]
 name = "spl-associated-token-account"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4678,6 +4705,17 @@ dependencies = [
  "solana-program",
  "spl-token",
  "spl-token-2022 1.0.0",
+ "thiserror",
+]
+
+[[package]]
+name = "spl-concurrent-merkle-tree"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "141eaea58588beae81b71d101373a53f096737739873de42d6b1368bc2b8fc30"
+dependencies = [
+ "bytemuck",
+ "solana-program",
  "thiserror",
 ]
 
@@ -4721,6 +4759,15 @@ name = "spl-memo"
 version = "4.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0f180b03318c3dbab3ef4e1e4d46d5211ae3c780940dd0a28695aba4b59a75a"
+dependencies = [
+ "solana-program",
+]
+
+[[package]]
+name = "spl-noop"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6dd67ea3d0070a12ff141f5da46f9695f49384a03bce1203a5608f5739437950"
 dependencies = [
  "solana-program",
 ]
@@ -5093,6 +5140,22 @@ dependencies = [
  "fastrand",
  "rustix",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "tensor-toolbox"
+version = "0.0.1"
+source = "git+ssh://git@github.com/tensor-foundation/toolbox.git#47620ea66f187378f04bfa0ad20617815d191881"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "bytemuck",
+ "mpl-bubblegum",
+ "mpl-token-metadata",
+ "spl-account-compression",
+ "spl-noop",
+ "spl-token-metadata-interface",
+ "vipers",
 ]
 
 [[package]]
@@ -5614,7 +5677,7 @@ checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 [[package]]
 name = "vipers"
 version = "2.0.6"
-source = "git+ssh://git@github.com/tensor-hq/tensor-common-rs.git?rev=85e9ba019516659ff891428ff517424474dc2cba#85e9ba019516659ff891428ff517424474dc2cba"
+source = "git+ssh://git@github.com/tensor-foundation/toolbox.git#47620ea66f187378f04bfa0ad20617815d191881"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -5755,9 +5818,9 @@ version = "0.0.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "merkle_proof",
  "mpl-token-metadata",
  "solana-program",
+ "tensor-toolbox",
  "vipers",
 ]
 

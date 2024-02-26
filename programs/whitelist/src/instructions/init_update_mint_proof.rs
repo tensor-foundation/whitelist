@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token_interface::Mint;
+use tensor_toolbox::validate_proof;
 use vipers::{throw_err, unwrap_int};
 
 use crate::{
@@ -50,7 +51,7 @@ pub fn process_init_update_mint_proof(
     }
 
     require!(
-        merkle_proof::verify_proof(proof.to_vec(), ctx.accounts.whitelist.root_hash, leaf.0),
+        validate_proof(&ctx.accounts.whitelist.root_hash, &leaf.0, &proof),
         ErrorCode::FailedMerkleProofVerification,
     );
 
