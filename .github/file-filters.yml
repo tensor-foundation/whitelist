@@ -13,7 +13,7 @@ program_common: &program_common
 
 whitelist_program: &whitelist_program
   - *program_common
-  - "programs/whitelist/**"
+  - "program/**"
 
 programs: &programs
   - *whitelist_program

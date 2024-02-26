@@ -3,7 +3,7 @@ const k = require("@metaplex-foundation/kinobi");
 
 // Paths.
 const clientDir = path.join(__dirname, "..", "clients");
-const idlDir = path.join(__dirname, "..", "whitelist", "idl");
+const idlDir = path.join(__dirname, "..", "program", "idl");
 
 // Instanciate Kinobi.
 const kinobi = k.createFromIdls([path.join(idlDir, "whitelist_program.json")]);
