@@ -131,13 +131,12 @@ export const getBalance = async (client: Client, address: Address) =>
   (await client.rpc.getBalance(address, { commitment: 'confirmed' }).send())
     .value;
 
-    export const setupSigners = async (client: Client) => {
-      const cosigner = await createKeyPairSigner(client, new Uint8Array(COSIGNER));
-      await fundWalletWithSol(client, cosigner.address, 10_000_000_000n);
-    
-      const owner = await createKeyPairSigner(client, new Uint8Array(OWNER));
-      await fundWalletWithSol(client, owner.address, 10_000_000_000n);
-    
-      return { cosigner, owner };
-    };
-    
+export const setupSigners = async (client: Client) => {
+  const cosigner = await createKeyPairSigner(client, new Uint8Array(COSIGNER));
+  await fundWalletWithSol(client, cosigner.address, 10_000_000_000n);
+
+  const owner = await createKeyPairSigner(client, new Uint8Array(OWNER));
+  await fundWalletWithSol(client, owner.address, 10_000_000_000n);
+
+  return { cosigner, owner };
+};
