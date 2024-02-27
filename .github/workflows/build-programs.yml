@@ -60,7 +60,7 @@ jobs:
 
       - name: Build programs
         shell: bash
-        working-directory: configs/scripts/program
+        working-directory: scripts/program
         run: ./build.sh
         env:
           PROGRAMS: ${{ env.PROGRAMS }}

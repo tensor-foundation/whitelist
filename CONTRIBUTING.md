@@ -19,10 +19,10 @@ You will then have access to the following commands.
 - `pnpm clients:rust:test` -  Run the Rust client tests.
 - `pnpm clients:js:test` -  Run the JS client tests.
 - `pnpm generate` - Shortcut for `pnpm generate:idls && pnpm generate:clients`.
-- `pnpm generate:idls` - Generate IDLs for all programs, as configured in the `configs/shank.cjs` file.
-- `pnpm generate:clients` - Generate clients using Kinobi, as configured in the `configs/kinobi.cjs` file.
-- `pnpm validator` - Start a local validator using Amman, as configured in the `configs/validator.cjs` file.
-- `pnpm validator:debug` - Start a local validator using Amman with logs enabled, as configured in the `configs/validator.cjs` file.
+- `pnpm generate:idls` - Generate IDLs for all programs, as configured in the `scripts/generate-idls.cjs` file.
+- `pnpm generate:clients` - Generate clients using Kinobi, as configured in the `scripts/generate-clients.cjs` file.
+- `pnpm validator` - Start a local validator using Amman, as configured in the `scripts/validator.cjs` file.
+- `pnpm validator:debug` - Start a local validator using Amman with logs enabled, as configured in the `scripts/validator.cjs` file.
 - `pnpm validator:stop` - Stop the local validator.
 - `pnpm validator:logs` - Show the logs of the local validator.
 
