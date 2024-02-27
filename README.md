@@ -8,13 +8,13 @@
   Verify your collection on-chain.
 </p>
 
-## Programs
+## Program
 
-This project contains the following programs:
+This project contains the following program:
 
-- [Whitelist](./programs/whitelist/README.md) `TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW`
+- [Whitelist](./program/README.md) `TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW`
 
-You will need a Rust version compatible with BPF to compile the program, currently we recommend using Rust 1.68.0.
+You will need a Rust version compatible with BPF to compile the program, currently we recommend using Rust 1.75.0.
 
 ## Clients
 
@@ -26,3 +26,19 @@ This project contains the following clients:
 ## Contributing
 
 Check out the [Contributing Guide](./CONTRIBUTING.md) the learn more about how to contribute to this project.
+
+## License
+
+Copyright (c) 2024 Tensor Protocol Foundation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

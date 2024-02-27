@@ -11,12 +11,12 @@ program_common: &program_common
   - ".github/file-filters.yml"
   - ".github/.env"
 
-whitelist_program: &whitelist_program
+program_binary: &program_binary
   - *program_common
-  - "programs/whitelist/**"
+  - "program/**"
 
 programs: &programs
-  - *whitelist_program
+  - *program_binary
 
 # Clients.
 
