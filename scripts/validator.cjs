@@ -3,7 +3,7 @@ const path = require("path");
 const targetDir = path.join(__dirname, "..", "target");
 
 function getProgram(programBinary) {
-  return path.join(targetDir, "external", programBinary);
+  return path.join(targetDir, "deploy", programBinary);
 }
 
 module.exports = {

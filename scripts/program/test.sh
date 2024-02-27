@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-OUTPUT="./target/external"
+OUTPUT="./target/deploy"
 # saves external programs binaries to the output directory
 source ${SCRIPT_DIR}/dump.sh ${OUTPUT}
 # go to parent folder
@@ -29,14 +29,13 @@ PROGRAMS=$(echo $PROGRAMS | jq -c '.[]' | sed 's/"//g')
 
 WORKING_DIR=$(pwd)
 SOLFMT="solfmt"
-export SBF_OUT_DIR="${WORKING_DIR}/${OUTPUT}"
 
 for p in ${PROGRAMS[@]}; do
     cd ${WORKING_DIR}/${p}
 
     if [ ! "$(command -v $SOLFMT)" = "" ]; then
-        CARGO_TERM_COLOR=always cargo test-sbf --sbf-out-dir ${WORKING_DIR}/${OUTPUT} ${ARGS} 2>&1 | ${SOLFMT}
+        CARGO_TERM_COLOR=always cargo test-sbf ${ARGS} 2>&1 | ${SOLFMT}
     else
-        RUST_LOG=error cargo test-sbf --sbf-out-dir ${WORKING_DIR}/${OUTPUT} ${ARGS}
+        RUST_LOG=error cargo test-sbf ${ARGS}
     fi
 done

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-OUTPUT="./target/external"
+OUTPUT="./target/deploy"
 # saves external programs binaries to the output directory
 source ${SCRIPT_DIR}/dump.sh ${OUTPUT}
 # go to parent folder
@@ -29,9 +29,8 @@ if [ ! -d ${OUTPUT} ]; then
 fi
 
 WORKING_DIR=$(pwd)
-export SBF_OUT_DIR="${WORKING_DIR}/${OUTPUT}"
 
 for p in ${PROGRAMS[@]}; do
     cd ${WORKING_DIR}/${p}
-    cargo build-sbf --sbf-out-dir ${WORKING_DIR}/${OUTPUT} $ARGS
+    cargo build-sbf $ARGS
 done
