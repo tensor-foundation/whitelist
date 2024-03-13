@@ -58,6 +58,9 @@ devDependencies:
   '@solana/webcrypto-ed25519-polyfill':
     specifier: 2.0.0-experimental.dbe6a73
     version: 2.0.0-experimental.dbe6a73
+  '@types/node':
+    specifier: ^20.11.26
+    version: 20.11.26
   '@types/uuid':
     specifier: 9.0.8
     version: 9.0.8
