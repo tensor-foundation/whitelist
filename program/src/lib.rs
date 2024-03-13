@@ -73,4 +73,14 @@ pub mod whitelist_program {
     pub fn unfreeze_whitelist(ctx: Context<UnfreezeWhitelist>) -> Result<()> {
         instructions::process_unfreeze_whitelist(ctx)
     }
+
+    /* ------WhitelistV2------ */
+
+    pub fn create_whitelist_v2(
+        ctx: Context<CreateWhitelistV2>,
+        conditions: [Condition; WHITELIST_V2_CONDITIONS_LENGTH],
+        uuid: [u8; 32],
+    ) -> Result<()> {
+        instructions::process_create_whitelist_v2(ctx, conditions, uuid)
+    }
 }

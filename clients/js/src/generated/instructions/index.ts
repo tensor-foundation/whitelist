@@ -6,6 +6,7 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
+export * from './createWhitelistV2';
 export * from './freezeWhitelist';
 export * from './initUpdateAuthority';
 export * from './initUpdateMintProof';

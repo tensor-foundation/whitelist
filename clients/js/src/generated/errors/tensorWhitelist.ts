@@ -25,6 +25,8 @@ export const enum TensorWhitelistProgramErrorCode {
   FAILED_FVC_VERIFICATION = 0x1777, // 6007
   /** FailedMerkleProofVerification: failed merkle proof verification */
   FAILED_MERKLE_PROOF_VERIFICATION = 0x1778, // 6008
+  /** NoConditions: no whitelist conditions provided */
+  NO_CONDITIONS = 0x1779, // 6009
 }
 
 export class TensorWhitelistProgramError extends Error {
@@ -86,6 +88,10 @@ if (__DEV__) {
     [TensorWhitelistProgramErrorCode.FAILED_MERKLE_PROOF_VERIFICATION]: [
       'FailedMerkleProofVerification',
       `failed merkle proof verification`,
+    ],
+    [TensorWhitelistProgramErrorCode.NO_CONDITIONS]: [
+      'NoConditions',
+      `no whitelist conditions provided`,
     ],
   };
 }

@@ -34,20 +34,25 @@ import {
   WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
-import { findMintProofPda } from '../pdas';
+import { findWhitelistPda } from '../pdas';
 import {
   ResolvedAccount,
   accountMetaWithDefault,
-  expectAddress,
+  expectSome,
   getAccountMetasWithSigners,
 } from '../shared';
+import {
+  Condition,
+  ConditionArgs,
+  getConditionDecoder,
+  getConditionEncoder,
+} from '../types';
 
-export type InitUpdateMintProofInstruction<
+export type CreateWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TAccountPayer extends string | IAccountMeta<string> = string,
+  TAccountAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TAccountMint extends string | IAccountMeta<string> = string,
-  TAccountMintProof extends string | IAccountMeta<string> = string,
-  TAccountUser extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
@@ -56,18 +61,15 @@ export type InitUpdateMintProofInstruction<
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
     [
+      TAccountPayer extends string
+        ? WritableSignerAccount<TAccountPayer>
+        : TAccountPayer,
+      TAccountAuthority extends string
+        ? WritableSignerAccount<TAccountAuthority>
+        : TAccountAuthority,
       TAccountWhitelist extends string
-        ? ReadonlyAccount<TAccountWhitelist>
+        ? WritableAccount<TAccountWhitelist>
         : TAccountWhitelist,
-      TAccountMint extends string
-        ? ReadonlyAccount<TAccountMint>
-        : TAccountMint,
-      TAccountMintProof extends string
-        ? WritableAccount<TAccountMintProof>
-        : TAccountMintProof,
-      TAccountUser extends string
-        ? WritableSignerAccount<TAccountUser>
-        : TAccountUser,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
@@ -75,12 +77,11 @@ export type InitUpdateMintProofInstruction<
     ]
   >;
 
-export type InitUpdateMintProofInstructionWithSigners<
+export type CreateWhitelistV2InstructionWithSigners<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TAccountPayer extends string | IAccountMeta<string> = string,
+  TAccountAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TAccountMint extends string | IAccountMeta<string> = string,
-  TAccountMintProof extends string | IAccountMeta<string> = string,
-  TAccountUser extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
@@ -89,18 +90,17 @@ export type InitUpdateMintProofInstructionWithSigners<
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
     [
+      TAccountPayer extends string
+        ? WritableSignerAccount<TAccountPayer> &
+            IAccountSignerMeta<TAccountPayer>
+        : TAccountPayer,
+      TAccountAuthority extends string
+        ? WritableSignerAccount<TAccountAuthority> &
+            IAccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
       TAccountWhitelist extends string
-        ? ReadonlyAccount<TAccountWhitelist>
+        ? WritableAccount<TAccountWhitelist>
         : TAccountWhitelist,
-      TAccountMint extends string
-        ? ReadonlyAccount<TAccountMint>
-        : TAccountMint,
-      TAccountMintProof extends string
-        ? WritableAccount<TAccountMintProof>
-        : TAccountMintProof,
-      TAccountUser extends string
-        ? WritableSignerAccount<TAccountUser> & IAccountSignerMeta<TAccountUser>
-        : TAccountUser,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
@@ -108,138 +108,136 @@ export type InitUpdateMintProofInstructionWithSigners<
     ]
   >;
 
-export type InitUpdateMintProofInstructionData = {
+export type CreateWhitelistV2InstructionData = {
   discriminator: Array<number>;
-  proof: Array<Uint8Array>;
+  conditions: Array<Condition>;
+  uuid: Uint8Array;
 };
 
-export type InitUpdateMintProofInstructionDataArgs = {
-  proof: Array<Uint8Array>;
+export type CreateWhitelistV2InstructionDataArgs = {
+  conditions: Array<ConditionArgs>;
+  uuid: Uint8Array;
 };
 
-export function getInitUpdateMintProofInstructionDataEncoder() {
+export function getCreateWhitelistV2InstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: Array<number>;
-      proof: Array<Uint8Array>;
+      conditions: Array<ConditionArgs>;
+      uuid: Uint8Array;
     }>([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
-      ['proof', getArrayEncoder(getBytesEncoder({ size: 32 }))],
+      ['conditions', getArrayEncoder(getConditionEncoder(), { size: 5 })],
+      ['uuid', getBytesEncoder({ size: 32 })],
     ]),
-    (value) => ({ ...value, discriminator: [30, 77, 123, 9, 191, 37, 52, 159] })
-  ) satisfies Encoder<InitUpdateMintProofInstructionDataArgs>;
+    (value) => ({
+      ...value,
+      discriminator: [31, 207, 213, 77, 105, 13, 127, 98],
+    })
+  ) satisfies Encoder<CreateWhitelistV2InstructionDataArgs>;
 }
 
-export function getInitUpdateMintProofInstructionDataDecoder() {
-  return getStructDecoder<InitUpdateMintProofInstructionData>([
+export function getCreateWhitelistV2InstructionDataDecoder() {
+  return getStructDecoder<CreateWhitelistV2InstructionData>([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-    ['proof', getArrayDecoder(getBytesDecoder({ size: 32 }))],
-  ]) satisfies Decoder<InitUpdateMintProofInstructionData>;
+    ['conditions', getArrayDecoder(getConditionDecoder(), { size: 5 })],
+    ['uuid', getBytesDecoder({ size: 32 })],
+  ]) satisfies Decoder<CreateWhitelistV2InstructionData>;
 }
 
-export function getInitUpdateMintProofInstructionDataCodec(): Codec<
-  InitUpdateMintProofInstructionDataArgs,
-  InitUpdateMintProofInstructionData
+export function getCreateWhitelistV2InstructionDataCodec(): Codec<
+  CreateWhitelistV2InstructionDataArgs,
+  CreateWhitelistV2InstructionData
 > {
   return combineCodec(
-    getInitUpdateMintProofInstructionDataEncoder(),
-    getInitUpdateMintProofInstructionDataDecoder()
+    getCreateWhitelistV2InstructionDataEncoder(),
+    getCreateWhitelistV2InstructionDataDecoder()
   );
 }
 
-export type InitUpdateMintProofAsyncInput<
+export type CreateWhitelistV2AsyncInput<
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
   TAccountWhitelist extends string,
-  TAccountMint extends string,
-  TAccountMintProof extends string,
-  TAccountUser extends string,
   TAccountSystemProgram extends string
 > = {
-  whitelist: Address<TAccountWhitelist>;
-  mint: Address<TAccountMint>;
-  mintProof?: Address<TAccountMintProof>;
-  user: Address<TAccountUser>;
+  payer: Address<TAccountPayer>;
+  authority: Address<TAccountAuthority>;
+  whitelist?: Address<TAccountWhitelist>;
   systemProgram?: Address<TAccountSystemProgram>;
-  proof: InitUpdateMintProofInstructionDataArgs['proof'];
+  conditions: CreateWhitelistV2InstructionDataArgs['conditions'];
+  uuid: CreateWhitelistV2InstructionDataArgs['uuid'];
 };
 
-export type InitUpdateMintProofAsyncInputWithSigners<
+export type CreateWhitelistV2AsyncInputWithSigners<
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
   TAccountWhitelist extends string,
-  TAccountMint extends string,
-  TAccountMintProof extends string,
-  TAccountUser extends string,
   TAccountSystemProgram extends string
 > = {
-  whitelist: Address<TAccountWhitelist>;
-  mint: Address<TAccountMint>;
-  mintProof?: Address<TAccountMintProof>;
-  user: TransactionSigner<TAccountUser>;
+  payer: TransactionSigner<TAccountPayer>;
+  authority: TransactionSigner<TAccountAuthority>;
+  whitelist?: Address<TAccountWhitelist>;
   systemProgram?: Address<TAccountSystemProgram>;
-  proof: InitUpdateMintProofInstructionDataArgs['proof'];
+  conditions: CreateWhitelistV2InstructionDataArgs['conditions'];
+  uuid: CreateWhitelistV2InstructionDataArgs['uuid'];
 };
 
-export async function getInitUpdateMintProofInstructionAsync<
+export async function getCreateWhitelistV2InstructionAsync<
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
   TAccountWhitelist extends string,
-  TAccountMint extends string,
-  TAccountMintProof extends string,
-  TAccountUser extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
-  input: InitUpdateMintProofAsyncInputWithSigners<
+  input: CreateWhitelistV2AsyncInputWithSigners<
+    TAccountPayer,
+    TAccountAuthority,
     TAccountWhitelist,
-    TAccountMint,
-    TAccountMintProof,
-    TAccountUser,
     TAccountSystemProgram
   >
 ): Promise<
-  InitUpdateMintProofInstructionWithSigners<
+  CreateWhitelistV2InstructionWithSigners<
     TProgram,
+    TAccountPayer,
+    TAccountAuthority,
     TAccountWhitelist,
-    TAccountMint,
-    TAccountMintProof,
-    TAccountUser,
     TAccountSystemProgram
   >
 >;
-export async function getInitUpdateMintProofInstructionAsync<
+export async function getCreateWhitelistV2InstructionAsync<
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
   TAccountWhitelist extends string,
-  TAccountMint extends string,
-  TAccountMintProof extends string,
-  TAccountUser extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
-  input: InitUpdateMintProofAsyncInput<
+  input: CreateWhitelistV2AsyncInput<
+    TAccountPayer,
+    TAccountAuthority,
     TAccountWhitelist,
-    TAccountMint,
-    TAccountMintProof,
-    TAccountUser,
     TAccountSystemProgram
   >
 ): Promise<
-  InitUpdateMintProofInstruction<
+  CreateWhitelistV2Instruction<
     TProgram,
+    TAccountPayer,
+    TAccountAuthority,
     TAccountWhitelist,
-    TAccountMint,
-    TAccountMintProof,
-    TAccountUser,
     TAccountSystemProgram
   >
 >;
-export async function getInitUpdateMintProofInstructionAsync<
+export async function getCreateWhitelistV2InstructionAsync<
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
   TAccountWhitelist extends string,
-  TAccountMint extends string,
-  TAccountMintProof extends string,
-  TAccountUser extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
-  input: InitUpdateMintProofAsyncInput<
+  input: CreateWhitelistV2AsyncInput<
+    TAccountPayer,
+    TAccountAuthority,
     TAccountWhitelist,
-    TAccountMint,
-    TAccountMintProof,
-    TAccountUser,
     TAccountSystemProgram
   >
 ): Promise<IInstruction> {
@@ -249,20 +247,18 @@ export async function getInitUpdateMintProofInstructionAsync<
 
   // Original accounts.
   type AccountMetas = Parameters<
-    typeof getInitUpdateMintProofInstructionRaw<
+    typeof getCreateWhitelistV2InstructionRaw<
       TProgram,
+      TAccountPayer,
+      TAccountAuthority,
       TAccountWhitelist,
-      TAccountMint,
-      TAccountMintProof,
-      TAccountUser,
       TAccountSystemProgram
     >
   >[0];
   const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
-    whitelist: { value: input.whitelist ?? null, isWritable: false },
-    mint: { value: input.mint ?? null, isWritable: false },
-    mintProof: { value: input.mintProof ?? null, isWritable: true },
-    user: { value: input.user ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: true },
+    whitelist: { value: input.whitelist ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
 
@@ -270,10 +266,9 @@ export async function getInitUpdateMintProofInstructionAsync<
   const args = { ...input };
 
   // Resolve default values.
-  if (!accounts.mintProof.value) {
-    accounts.mintProof.value = await findMintProofPda({
-      mint: expectAddress(accounts.mint.value),
-      whitelist: expectAddress(accounts.whitelist.value),
+  if (!accounts.whitelist.value) {
+    accounts.whitelist.value = await findWhitelistPda({
+      uuid: expectSome(args.uuid),
     });
   }
   if (!accounts.systemProgram.value) {
@@ -288,104 +283,94 @@ export async function getInitUpdateMintProofInstructionAsync<
     programAddress
   );
 
-  const instruction = getInitUpdateMintProofInstructionRaw(
+  const instruction = getCreateWhitelistV2InstructionRaw(
     accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    args as InitUpdateMintProofInstructionDataArgs,
+    args as CreateWhitelistV2InstructionDataArgs,
     programAddress
   );
 
   return instruction;
 }
 
-export type InitUpdateMintProofInput<
+export type CreateWhitelistV2Input<
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
   TAccountWhitelist extends string,
-  TAccountMint extends string,
-  TAccountMintProof extends string,
-  TAccountUser extends string,
   TAccountSystemProgram extends string
 > = {
+  payer: Address<TAccountPayer>;
+  authority: Address<TAccountAuthority>;
   whitelist: Address<TAccountWhitelist>;
-  mint: Address<TAccountMint>;
-  mintProof: Address<TAccountMintProof>;
-  user: Address<TAccountUser>;
   systemProgram?: Address<TAccountSystemProgram>;
-  proof: InitUpdateMintProofInstructionDataArgs['proof'];
+  conditions: CreateWhitelistV2InstructionDataArgs['conditions'];
+  uuid: CreateWhitelistV2InstructionDataArgs['uuid'];
 };
 
-export type InitUpdateMintProofInputWithSigners<
+export type CreateWhitelistV2InputWithSigners<
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
   TAccountWhitelist extends string,
-  TAccountMint extends string,
-  TAccountMintProof extends string,
-  TAccountUser extends string,
   TAccountSystemProgram extends string
 > = {
+  payer: TransactionSigner<TAccountPayer>;
+  authority: TransactionSigner<TAccountAuthority>;
   whitelist: Address<TAccountWhitelist>;
-  mint: Address<TAccountMint>;
-  mintProof: Address<TAccountMintProof>;
-  user: TransactionSigner<TAccountUser>;
   systemProgram?: Address<TAccountSystemProgram>;
-  proof: InitUpdateMintProofInstructionDataArgs['proof'];
+  conditions: CreateWhitelistV2InstructionDataArgs['conditions'];
+  uuid: CreateWhitelistV2InstructionDataArgs['uuid'];
 };
 
-export function getInitUpdateMintProofInstruction<
+export function getCreateWhitelistV2Instruction<
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
   TAccountWhitelist extends string,
-  TAccountMint extends string,
-  TAccountMintProof extends string,
-  TAccountUser extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
-  input: InitUpdateMintProofInputWithSigners<
+  input: CreateWhitelistV2InputWithSigners<
+    TAccountPayer,
+    TAccountAuthority,
     TAccountWhitelist,
-    TAccountMint,
-    TAccountMintProof,
-    TAccountUser,
     TAccountSystemProgram
   >
-): InitUpdateMintProofInstructionWithSigners<
+): CreateWhitelistV2InstructionWithSigners<
   TProgram,
+  TAccountPayer,
+  TAccountAuthority,
   TAccountWhitelist,
-  TAccountMint,
-  TAccountMintProof,
-  TAccountUser,
   TAccountSystemProgram
 >;
-export function getInitUpdateMintProofInstruction<
+export function getCreateWhitelistV2Instruction<
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
   TAccountWhitelist extends string,
-  TAccountMint extends string,
-  TAccountMintProof extends string,
-  TAccountUser extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
-  input: InitUpdateMintProofInput<
+  input: CreateWhitelistV2Input<
+    TAccountPayer,
+    TAccountAuthority,
     TAccountWhitelist,
-    TAccountMint,
-    TAccountMintProof,
-    TAccountUser,
     TAccountSystemProgram
   >
-): InitUpdateMintProofInstruction<
+): CreateWhitelistV2Instruction<
   TProgram,
+  TAccountPayer,
+  TAccountAuthority,
   TAccountWhitelist,
-  TAccountMint,
-  TAccountMintProof,
-  TAccountUser,
   TAccountSystemProgram
 >;
-export function getInitUpdateMintProofInstruction<
+export function getCreateWhitelistV2Instruction<
+  TAccountPayer extends string,
+  TAccountAuthority extends string,
   TAccountWhitelist extends string,
-  TAccountMint extends string,
-  TAccountMintProof extends string,
-  TAccountUser extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
-  input: InitUpdateMintProofInput<
+  input: CreateWhitelistV2Input<
+    TAccountPayer,
+    TAccountAuthority,
     TAccountWhitelist,
-    TAccountMint,
-    TAccountMintProof,
-    TAccountUser,
     TAccountSystemProgram
   >
 ): IInstruction {
@@ -395,20 +380,18 @@ export function getInitUpdateMintProofInstruction<
 
   // Original accounts.
   type AccountMetas = Parameters<
-    typeof getInitUpdateMintProofInstructionRaw<
+    typeof getCreateWhitelistV2InstructionRaw<
       TProgram,
+      TAccountPayer,
+      TAccountAuthority,
       TAccountWhitelist,
-      TAccountMint,
-      TAccountMintProof,
-      TAccountUser,
       TAccountSystemProgram
     >
   >[0];
   const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
-    whitelist: { value: input.whitelist ?? null, isWritable: false },
-    mint: { value: input.mint ?? null, isWritable: false },
-    mintProof: { value: input.mintProof ?? null, isWritable: true },
-    user: { value: input.user ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: true },
+    whitelist: { value: input.whitelist ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
 
@@ -428,49 +411,48 @@ export function getInitUpdateMintProofInstruction<
     programAddress
   );
 
-  const instruction = getInitUpdateMintProofInstructionRaw(
+  const instruction = getCreateWhitelistV2InstructionRaw(
     accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    args as InitUpdateMintProofInstructionDataArgs,
+    args as CreateWhitelistV2InstructionDataArgs,
     programAddress
   );
 
   return instruction;
 }
 
-export function getInitUpdateMintProofInstructionRaw<
+export function getCreateWhitelistV2InstructionRaw<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TAccountPayer extends string | IAccountMeta<string> = string,
+  TAccountAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TAccountMint extends string | IAccountMeta<string> = string,
-  TAccountMintProof extends string | IAccountMeta<string> = string,
-  TAccountUser extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 >(
   accounts: {
+    payer: TAccountPayer extends string
+      ? Address<TAccountPayer>
+      : TAccountPayer;
+    authority: TAccountAuthority extends string
+      ? Address<TAccountAuthority>
+      : TAccountAuthority;
     whitelist: TAccountWhitelist extends string
       ? Address<TAccountWhitelist>
       : TAccountWhitelist;
-    mint: TAccountMint extends string ? Address<TAccountMint> : TAccountMint;
-    mintProof: TAccountMintProof extends string
-      ? Address<TAccountMintProof>
-      : TAccountMintProof;
-    user: TAccountUser extends string ? Address<TAccountUser> : TAccountUser;
     systemProgram?: TAccountSystemProgram extends string
       ? Address<TAccountSystemProgram>
       : TAccountSystemProgram;
   },
-  args: InitUpdateMintProofInstructionDataArgs,
+  args: CreateWhitelistV2InstructionDataArgs,
   programAddress: Address<TProgram> = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<TProgram>,
   remainingAccounts?: TRemainingAccounts
 ) {
   return {
     accounts: [
-      accountMetaWithDefault(accounts.whitelist, AccountRole.READONLY),
-      accountMetaWithDefault(accounts.mint, AccountRole.READONLY),
-      accountMetaWithDefault(accounts.mintProof, AccountRole.WRITABLE),
-      accountMetaWithDefault(accounts.user, AccountRole.WRITABLE_SIGNER),
+      accountMetaWithDefault(accounts.payer, AccountRole.WRITABLE_SIGNER),
+      accountMetaWithDefault(accounts.authority, AccountRole.WRITABLE_SIGNER),
+      accountMetaWithDefault(accounts.whitelist, AccountRole.WRITABLE),
       accountMetaWithDefault(
         accounts.systemProgram ??
           ('11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>),
@@ -478,43 +460,41 @@ export function getInitUpdateMintProofInstructionRaw<
       ),
       ...(remainingAccounts ?? []),
     ],
-    data: getInitUpdateMintProofInstructionDataEncoder().encode(args),
+    data: getCreateWhitelistV2InstructionDataEncoder().encode(args),
     programAddress,
-  } as InitUpdateMintProofInstruction<
+  } as CreateWhitelistV2Instruction<
     TProgram,
+    TAccountPayer,
+    TAccountAuthority,
     TAccountWhitelist,
-    TAccountMint,
-    TAccountMintProof,
-    TAccountUser,
     TAccountSystemProgram,
     TRemainingAccounts
   >;
 }
 
-export type ParsedInitUpdateMintProofInstruction<
+export type ParsedCreateWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
 > = {
   programAddress: Address<TProgram>;
   accounts: {
-    whitelist: TAccountMetas[0];
-    mint: TAccountMetas[1];
-    mintProof: TAccountMetas[2];
-    user: TAccountMetas[3];
-    systemProgram: TAccountMetas[4];
+    payer: TAccountMetas[0];
+    authority: TAccountMetas[1];
+    whitelist: TAccountMetas[2];
+    systemProgram: TAccountMetas[3];
   };
-  data: InitUpdateMintProofInstructionData;
+  data: CreateWhitelistV2InstructionData;
 };
 
-export function parseInitUpdateMintProofInstruction<
+export function parseCreateWhitelistV2Instruction<
   TProgram extends string,
   TAccountMetas extends readonly IAccountMeta[]
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &
     IInstructionWithData<Uint8Array>
-): ParsedInitUpdateMintProofInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 5) {
+): ParsedCreateWhitelistV2Instruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 4) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -527,14 +507,11 @@ export function parseInitUpdateMintProofInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
+      payer: getNextAccount(),
+      authority: getNextAccount(),
       whitelist: getNextAccount(),
-      mint: getNextAccount(),
-      mintProof: getNextAccount(),
-      user: getNextAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getInitUpdateMintProofInstructionDataDecoder().decode(
-      instruction.data
-    ),
+    data: getCreateWhitelistV2InstructionDataDecoder().decode(instruction.data),
   };
 }

@@ -46,6 +46,8 @@
     "@solana/webcrypto-ed25519-polyfill": "2.0.0-experimental.dbe6a73",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.46.1",
+    "@types/node": "^20.11.26",
+    "@types/uuid": "9.0.8",
     "ava": "^5.1.0",
     "eslint": "^8.0.1",
     "eslint-config-airbnb-typescript": "^17.0.0",
@@ -58,10 +60,13 @@
     "typedoc-plugin-expand-object-like-types": "^0.1.1",
     "typedoc-plugin-missing-exports": "^1.0.0",
     "typescript": "^4.6.2",
+    "uuid": "^9.0.1",
     "vercel": "^28.16.0"
   },
   "ava": {
-    "require": ["./test/_globals.js"],
+    "require": [
+      "./test/_globals.js"
+    ],
     "typescript": {
       "compile": false,
       "rewritePaths": {

@@ -5,49 +5,54 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
+use crate::generated::types::Condition;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 use solana_program::pubkey::Pubkey;
 
+/// Seeds: ["whitelist", <authority>, <uuid>]
+
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct MintProof {
+pub struct WhitelistV2 {
     pub discriminator: [u8; 8],
-    pub proof_len: u8,
-    pub proof: [[u8; 32]; 28],
+    pub version: u8,
+    pub bump: u8,
+    pub uuid: [u8; 32],
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
+    pub authority: Pubkey,
+    pub conditions: [Condition; 5],
 }
 
-impl MintProof {
-    pub const LEN: usize = 28;
+impl WhitelistV2 {
+    pub const LEN: usize = 239;
 
     /// Prefix values used to generate a PDA for this account.
     ///
     /// Values are positional and appear in the following order:
     ///
-    ///   0. `MintProof::PREFIX`
-    ///   1. mint (`Pubkey`)
-    ///   2. whitelist (`Pubkey`)
-    pub const PREFIX: &'static [u8] = "mint_proof".as_bytes();
+    ///   0. `WhitelistV2::PREFIX`
+    ///   1. authority (`Pubkey`)
+    ///   2. uuid (`[u8; 32]`)
+    pub const PREFIX: &'static [u8] = "whitelist".as_bytes();
 
     pub fn create_pda(
-        mint: Pubkey,
-        whitelist: Pubkey,
+        authority: Pubkey,
+        uuid: [u8; 32],
         bump: u8,
     ) -> Result<solana_program::pubkey::Pubkey, solana_program::pubkey::PubkeyError> {
         solana_program::pubkey::Pubkey::create_program_address(
-            &[
-                "mint_proof".as_bytes(),
-                mint.as_ref(),
-                whitelist.as_ref(),
-                &[bump],
-            ],
+            &["whitelist".as_bytes(), authority.as_ref(), &uuid, &[bump]],
             &crate::TENSOR_WHITELIST_ID,
         )
     }
 
-    pub fn find_pda(mint: &Pubkey, whitelist: &Pubkey) -> (solana_program::pubkey::Pubkey, u8) {
+    pub fn find_pda(authority: &Pubkey, uuid: [u8; 32]) -> (solana_program::pubkey::Pubkey, u8) {
         solana_program::pubkey::Pubkey::find_program_address(
-            &["mint_proof".as_bytes(), mint.as_ref(), whitelist.as_ref()],
+            &["whitelist".as_bytes(), authority.as_ref(), &uuid],
             &crate::TENSOR_WHITELIST_ID,
         )
     }
@@ -59,7 +64,7 @@ impl MintProof {
     }
 }
 
-impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for MintProof {
+impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for WhitelistV2 {
     type Error = std::io::Error;
 
     fn try_from(

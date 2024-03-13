@@ -12,17 +12,18 @@ import {
   getAddressEncoder,
   getProgramDerivedAddress,
 } from '@solana/addresses';
+import { getBytesEncoder } from '@solana/codecs-data-structures';
 import { getStringEncoder } from '@solana/codecs-strings';
 
-export type MintProofSeeds = {
-  /** The address of the mint account */
-  mint: Address;
-  /** The address of the whitelist pda */
-  whitelist: Address;
+export type WhitelistV2Seeds = {
+  /** The address of the whitelist authority */
+  authority: Address;
+  /** UUID of the whitelist */
+  uuid: Uint8Array;
 };
 
-export async function findMintProofPda(
-  seeds: MintProofSeeds,
+export async function findWhitelistV2Pda(
+  seeds: WhitelistV2Seeds,
   config: { programAddress?: Address | undefined } = {}
 ): Promise<ProgramDerivedAddress> {
   const {
@@ -31,9 +32,9 @@ export async function findMintProofPda(
   return getProgramDerivedAddress({
     programAddress,
     seeds: [
-      getStringEncoder({ size: 'variable' }).encode('mint_proof'),
-      getAddressEncoder().encode(seeds.mint),
-      getAddressEncoder().encode(seeds.whitelist),
+      getStringEncoder({ size: 'variable' }).encode('whitelist'),
+      getAddressEncoder().encode(seeds.authority),
+      getBytesEncoder({ size: 32 }).encode(seeds.uuid),
     ],
   });
 }

@@ -5,6 +5,7 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
+pub(crate) mod r#create_whitelist_v2;
 pub(crate) mod r#freeze_whitelist;
 pub(crate) mod r#init_update_authority;
 pub(crate) mod r#init_update_mint_proof;
@@ -13,6 +14,7 @@ pub(crate) mod r#realloc_authority;
 pub(crate) mod r#realloc_whitelist;
 pub(crate) mod r#unfreeze_whitelist;
 
+pub use self::r#create_whitelist_v2::*;
 pub use self::r#freeze_whitelist::*;
 pub use self::r#init_update_authority::*;
 pub use self::r#init_update_mint_proof::*;

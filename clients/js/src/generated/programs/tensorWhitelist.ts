@@ -38,6 +38,7 @@ export function getTensorWhitelistProgram(): TensorWhitelistProgram {
 export enum TensorWhitelistAccount {
   Authority,
   MintProof,
+  WhitelistV2,
   Whitelist,
 }
 
@@ -52,6 +53,9 @@ export function identifyTensorWhitelistAccount(
     memcmp(data, new Uint8Array([227, 131, 106, 240, 190, 48, 219, 228]), 0)
   ) {
     return TensorWhitelistAccount.MintProof;
+  }
+  if (memcmp(data, new Uint8Array([136, 184, 45, 191, 85, 203, 191, 119]), 0)) {
+    return TensorWhitelistAccount.WhitelistV2;
   }
   if (memcmp(data, new Uint8Array([204, 176, 52, 79, 146, 121, 54, 247]), 0)) {
     return TensorWhitelistAccount.Whitelist;
@@ -69,6 +73,7 @@ export enum TensorWhitelistInstruction {
   ReallocAuthority,
   ReallocWhitelist,
   UnfreezeWhitelist,
+  CreateWhitelistV2,
 }
 
 export function identifyTensorWhitelistInstruction(
@@ -96,6 +101,9 @@ export function identifyTensorWhitelistInstruction(
   }
   if (memcmp(data, new Uint8Array([215, 119, 9, 92, 160, 139, 226, 253]), 0)) {
     return TensorWhitelistInstruction.UnfreezeWhitelist;
+  }
+  if (memcmp(data, new Uint8Array([31, 207, 213, 77, 105, 13, 127, 98]), 0)) {
+    return TensorWhitelistInstruction.CreateWhitelistV2;
   }
   throw new Error(
     'The provided instruction could not be identified as a tensorWhitelist instruction.'

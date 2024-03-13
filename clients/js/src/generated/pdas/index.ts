@@ -9,3 +9,4 @@
 export * from './authority';
 export * from './mintProof';
 export * from './whitelist';
+export * from './whitelistV2';

@@ -17,6 +17,20 @@
       "value": "8 + (32 * 28) + 1"
     },
     {
+      "name": "WHITELIST_V2_SIZE",
+      "type": {
+        "defined": "usize"
+      },
+      "value": "8 + 1 + 1 + 32 + 32 + 5 * 33"
+    },
+    {
+      "name": "WHITELIST_V2_CONDITIONS_LENGTH",
+      "type": {
+        "defined": "usize"
+      },
+      "value": "5"
+    },
+    {
       "name": "WHITELIST_SIZE",
       "type": {
         "defined": "usize"
@@ -307,6 +321,53 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "createWhitelistV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "conditions",
+          "type": {
+            "array": [
+              {
+                "defined": "Condition"
+              },
+              5
+            ]
+          }
+        },
+        {
+          "name": "uuid",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -366,6 +427,49 @@
                   ]
                 },
                 28
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistV2",
+      "docs": [
+        "Seeds: [\"whitelist\", <authority>, <uuid>]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "uuid",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "array": [
+                {
+                  "defined": "Condition"
+                },
+                5
               ]
             }
           }
@@ -479,6 +583,44 @@
           }
         ]
       }
+    },
+    {
+      "name": "Condition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mode",
+            "type": {
+              "defined": "Mode"
+            }
+          },
+          {
+            "name": "value",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Mode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Empty"
+          },
+          {
+            "name": "VOC"
+          },
+          {
+            "name": "FVC"
+          },
+          {
+            "name": "MerkleProof"
+          }
+        ]
+      }
     }
   ],
   "errors": [
@@ -526,6 +668,11 @@
       "code": 6008,
       "name": "FailedMerkleProofVerification",
       "msg": "failed merkle proof verification"
+    },
+    {
+      "code": 6009,
+      "name": "NoConditions",
+      "msg": "no whitelist conditions provided"
     }
   ],
   "metadata": {

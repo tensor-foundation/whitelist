@@ -37,6 +37,9 @@ pub enum TensorWhitelistError {
     /// 6008 (0x1778) - failed merkle proof verification
     #[error("failed merkle proof verification")]
     FailedMerkleProofVerification,
+    /// 6009 (0x1779) - no whitelist conditions provided
+    #[error("no whitelist conditions provided")]
+    NoConditions,
 }
 
 impl solana_program::program_error::PrintProgramError for TensorWhitelistError {

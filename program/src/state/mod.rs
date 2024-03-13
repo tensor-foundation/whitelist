@@ -2,11 +2,13 @@ mod authority;
 mod full_merkle_proof;
 mod mint_proof;
 mod whitelist;
+mod whitelist_v2;
 
 pub use authority::*;
 pub use full_merkle_proof::*;
 pub use mint_proof::*;
 pub use whitelist::*;
+pub use whitelist_v2::*;
 
 use anchor_lang::{prelude::*, AccountDeserialize};
 use solana_program::{account_info::AccountInfo, pubkey::Pubkey};

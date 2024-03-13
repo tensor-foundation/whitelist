@@ -70,7 +70,7 @@ export const createKeyPairSigner = async (
     crypto.subtle.importKey('raw', publicKeyBytes, 'Ed25519', true, ['verify']),
     createPrivateKeyFromBytes(privateKeyBytes),
   ]);
-  return createSignerFromKeyPair({ privateKey, publicKey } as CryptoKeyPair);
+  return createSignerFromKeyPair({ privateKey, publicKey });
 };
 
 export const generateKeyPairSignerWithSol = async (
