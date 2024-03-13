@@ -46,7 +46,6 @@
     "@solana/webcrypto-ed25519-polyfill": "2.0.0-experimental.dbe6a73",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.46.1",
-    "@types/node": "^20.11.26",
     "@types/uuid": "9.0.8",
     "ava": "^5.1.0",
     "eslint": "^8.0.1",
