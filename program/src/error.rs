@@ -31,4 +31,7 @@ pub enum ErrorCode {
 
     #[msg("no whitelist conditions provided")]
     NoConditions = 9,
+
+    #[msg("invalid authority")]
+    InvalidAuthority = 10,
 }

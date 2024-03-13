@@ -78,9 +78,16 @@ pub mod whitelist_program {
 
     pub fn create_whitelist_v2(
         ctx: Context<CreateWhitelistV2>,
-        conditions: [Condition; WHITELIST_V2_CONDITIONS_LENGTH],
         uuid: [u8; 32],
+        conditions: [Condition; WHITELIST_V2_CONDITIONS_LENGTH],
     ) -> Result<()> {
-        instructions::process_create_whitelist_v2(ctx, conditions, uuid)
+        instructions::process_create_whitelist_v2(ctx, uuid, conditions)
+    }
+
+    pub fn edit_whitelist_v2(
+        ctx: Context<EditWhitelistV2>,
+        conditions: [Condition; WHITELIST_V2_CONDITIONS_LENGTH],
+    ) -> Result<()> {
+        instructions::process_edit_whitelist_v2(ctx, conditions)
     }
 }

@@ -40,6 +40,9 @@ pub enum TensorWhitelistError {
     /// 6009 (0x1779) - no whitelist conditions provided
     #[error("no whitelist conditions provided")]
     NoConditions,
+    /// 6010 (0x177A) - invalid authority
+    #[error("invalid authority")]
+    InvalidAuthority,
 }
 
 impl solana_program::program_error::PrintProgramError for TensorWhitelistError {

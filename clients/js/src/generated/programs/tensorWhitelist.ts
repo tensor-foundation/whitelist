@@ -74,6 +74,7 @@ export enum TensorWhitelistInstruction {
   ReallocWhitelist,
   UnfreezeWhitelist,
   CreateWhitelistV2,
+  EditWhitelistV2,
 }
 
 export function identifyTensorWhitelistInstruction(
@@ -104,6 +105,9 @@ export function identifyTensorWhitelistInstruction(
   }
   if (memcmp(data, new Uint8Array([31, 207, 213, 77, 105, 13, 127, 98]), 0)) {
     return TensorWhitelistInstruction.CreateWhitelistV2;
+  }
+  if (memcmp(data, new Uint8Array([64, 183, 223, 226, 136, 69, 83, 11]), 0)) {
+    return TensorWhitelistInstruction.EditWhitelistV2;
   }
   throw new Error(
     'The provided instruction could not be identified as a tensorWhitelist instruction.'

@@ -27,6 +27,8 @@ export const enum TensorWhitelistProgramErrorCode {
   FAILED_MERKLE_PROOF_VERIFICATION = 0x1778, // 6008
   /** NoConditions: no whitelist conditions provided */
   NO_CONDITIONS = 0x1779, // 6009
+  /** InvalidAuthority: invalid authority */
+  INVALID_AUTHORITY = 0x177a, // 6010
 }
 
 export class TensorWhitelistProgramError extends Error {
@@ -92,6 +94,10 @@ if (__DEV__) {
     [TensorWhitelistProgramErrorCode.NO_CONDITIONS]: [
       'NoConditions',
       `no whitelist conditions provided`,
+    ],
+    [TensorWhitelistProgramErrorCode.INVALID_AUTHORITY]: [
+      'InvalidAuthority',
+      `invalid authority`,
     ],
   };
 }

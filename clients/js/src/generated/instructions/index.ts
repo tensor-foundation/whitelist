@@ -7,6 +7,7 @@
  */
 
 export * from './createWhitelistV2';
+export * from './editWhitelistV2';
 export * from './freezeWhitelist';
 export * from './initUpdateAuthority';
 export * from './initUpdateMintProof';

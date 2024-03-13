@@ -4,7 +4,7 @@ use crate::{
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
-#[instruction(conditions: [Condition; WHITELIST_V2_CONDITIONS_LENGTH], uuid: [u8; 32])]
+#[instruction(uuid: [u8; 32])]
 pub struct CreateWhitelistV2<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -30,8 +30,8 @@ pub struct CreateWhitelistV2<'info> {
 
 pub fn process_create_whitelist_v2(
     ctx: Context<CreateWhitelistV2>,
-    conditions: [Condition; WHITELIST_V2_CONDITIONS_LENGTH],
     uuid: [u8; 32],
+    conditions: [Condition; WHITELIST_V2_CONDITIONS_LENGTH],
 ) -> Result<()> {
     let whitelist = &mut ctx.accounts.whitelist;
 

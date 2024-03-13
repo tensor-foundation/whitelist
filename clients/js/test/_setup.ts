@@ -41,7 +41,7 @@ export const OWNER = [
   244, 247, 186, 156, 108, 203, 60, 119, 143, 8, 131, 121, 22,
 ];
 
-type Client = {
+export type Client = {
   rpc: ReturnType<typeof createSolanaRpc>;
   rpcSubscriptions: ReturnType<typeof createSolanaRpcSubscriptions>;
 };

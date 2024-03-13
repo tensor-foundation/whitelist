@@ -348,6 +348,15 @@
       ],
       "args": [
         {
+          "name": "uuid",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
           "name": "conditions",
           "type": {
             "array": [
@@ -357,13 +366,37 @@
               5
             ]
           }
+        }
+      ]
+    },
+    {
+      "name": "editWhitelistV2",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
         },
         {
-          "name": "uuid",
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "conditions",
           "type": {
             "array": [
-              "u8",
-              32
+              {
+                "defined": "Condition"
+              },
+              5
             ]
           }
         }
@@ -673,6 +706,11 @@
       "code": 6009,
       "name": "NoConditions",
       "msg": "no whitelist conditions provided"
+    },
+    {
+      "code": 6010,
+      "name": "InvalidAuthority",
+      "msg": "invalid authority"
     }
   ],
   "metadata": {
