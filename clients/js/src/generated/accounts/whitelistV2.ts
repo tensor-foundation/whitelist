@@ -44,8 +44,12 @@ import { WhitelistV2Seeds, findWhitelistV2Pda } from '../pdas';
 import {
   Condition,
   ConditionArgs,
+  State,
+  StateArgs,
   getConditionDecoder,
   getConditionEncoder,
+  getStateDecoder,
+  getStateEncoder,
 } from '../types';
 
 export type WhitelistV2<TAddress extends string = string> = Account<
@@ -63,7 +67,10 @@ export type WhitelistV2AccountData = {
   version: number;
   bump: number;
   uuid: Uint8Array;
-  authority: Address;
+  state: State;
+  updateAuthority: Address;
+  namespace: Address;
+  freezeAuthority: Address;
   conditions: Array<Condition>;
 };
 
@@ -71,7 +78,10 @@ export type WhitelistV2AccountDataArgs = {
   version: number;
   bump: number;
   uuid: Uint8Array;
-  authority: Address;
+  state: StateArgs;
+  updateAuthority: Address;
+  namespace: Address;
+  freezeAuthority: Address;
   conditions: Array<ConditionArgs>;
 };
 
@@ -82,15 +92,21 @@ export function getWhitelistV2AccountDataEncoder() {
       version: number;
       bump: number;
       uuid: Uint8Array;
-      authority: Address;
+      state: StateArgs;
+      updateAuthority: Address;
+      namespace: Address;
+      freezeAuthority: Address;
       conditions: Array<ConditionArgs>;
     }>([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['version', getU8Encoder()],
       ['bump', getU8Encoder()],
       ['uuid', getBytesEncoder({ size: 32 })],
-      ['authority', getAddressEncoder()],
-      ['conditions', getArrayEncoder(getConditionEncoder(), { size: 5 })],
+      ['state', getStateEncoder()],
+      ['updateAuthority', getAddressEncoder()],
+      ['namespace', getAddressEncoder()],
+      ['freezeAuthority', getAddressEncoder()],
+      ['conditions', getArrayEncoder(getConditionEncoder())],
     ]),
     (value) => ({
       ...value,
@@ -105,8 +121,11 @@ export function getWhitelistV2AccountDataDecoder() {
     ['version', getU8Decoder()],
     ['bump', getU8Decoder()],
     ['uuid', getBytesDecoder({ size: 32 })],
-    ['authority', getAddressDecoder()],
-    ['conditions', getArrayDecoder(getConditionDecoder(), { size: 5 })],
+    ['state', getStateDecoder()],
+    ['updateAuthority', getAddressDecoder()],
+    ['namespace', getAddressDecoder()],
+    ['freezeAuthority', getAddressDecoder()],
+    ['conditions', getArrayDecoder(getConditionDecoder())],
   ]) satisfies Decoder<WhitelistV2AccountData>;
 }
 

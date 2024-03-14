@@ -16,8 +16,8 @@ import { getBytesEncoder } from '@solana/codecs-data-structures';
 import { getStringEncoder } from '@solana/codecs-strings';
 
 export type WhitelistV2Seeds = {
-  /** The address of the whitelist authority */
-  authority: Address;
+  /** The namespace address */
+  namespace: Address;
   /** UUID of the whitelist */
   uuid: Uint8Array;
 };
@@ -33,7 +33,7 @@ export async function findWhitelistV2Pda(
     programAddress,
     seeds: [
       getStringEncoder({ size: 'variable' }).encode('whitelist'),
-      getAddressEncoder().encode(seeds.authority),
+      getAddressEncoder().encode(seeds.namespace),
       getBytesEncoder({ size: 32 }).encode(seeds.uuid),
     ],
   });

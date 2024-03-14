@@ -6,6 +6,7 @@
 //!
 
 use crate::generated::types::Condition;
+use crate::generated::types::State;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 use solana_program::pubkey::Pubkey;
@@ -19,12 +20,23 @@ pub struct WhitelistV2 {
     pub version: u8,
     pub bump: u8,
     pub uuid: [u8; 32],
+    pub state: State,
     #[cfg_attr(
         feature = "serde",
         serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
     )]
-    pub authority: Pubkey,
-    pub conditions: [Condition; 5],
+    pub update_authority: Pubkey,
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
+    pub namespace: Pubkey,
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
+    pub freeze_authority: Pubkey,
+    pub conditions: Vec<Condition>,
 }
 
 impl WhitelistV2 {
@@ -35,24 +47,24 @@ impl WhitelistV2 {
     /// Values are positional and appear in the following order:
     ///
     ///   0. `WhitelistV2::PREFIX`
-    ///   1. authority (`Pubkey`)
+    ///   1. namespace (`Pubkey`)
     ///   2. uuid (`[u8; 32]`)
     pub const PREFIX: &'static [u8] = "whitelist".as_bytes();
 
     pub fn create_pda(
-        authority: Pubkey,
+        namespace: Pubkey,
         uuid: [u8; 32],
         bump: u8,
     ) -> Result<solana_program::pubkey::Pubkey, solana_program::pubkey::PubkeyError> {
         solana_program::pubkey::Pubkey::create_program_address(
-            &["whitelist".as_bytes(), authority.as_ref(), &uuid, &[bump]],
+            &["whitelist".as_bytes(), namespace.as_ref(), &uuid, &[bump]],
             &crate::TENSOR_WHITELIST_ID,
         )
     }
 
-    pub fn find_pda(authority: &Pubkey, uuid: [u8; 32]) -> (solana_program::pubkey::Pubkey, u8) {
+    pub fn find_pda(namespace: &Pubkey, uuid: [u8; 32]) -> (solana_program::pubkey::Pubkey, u8) {
         solana_program::pubkey::Pubkey::find_program_address(
-            &["whitelist".as_bytes(), authority.as_ref(), &uuid],
+            &["whitelist".as_bytes(), namespace.as_ref(), &uuid],
             &crate::TENSOR_WHITELIST_ID,
         )
     }

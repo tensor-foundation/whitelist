@@ -30,7 +30,14 @@ import {
   ReadonlyAccount,
   ReadonlySignerAccount,
   WritableAccount,
+  WritableSignerAccount,
 } from '@solana/instructions';
+import {
+  Option,
+  OptionOrNullable,
+  getOptionDecoder,
+  getOptionEncoder,
+} from '@solana/options';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import {
   ResolvedAccount,
@@ -40,13 +47,18 @@ import {
 import {
   Condition,
   ConditionArgs,
+  Toggle,
+  ToggleArgs,
   getConditionDecoder,
   getConditionEncoder,
+  getToggleDecoder,
+  getToggleEncoder,
 } from '../types';
 
 export type EditWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountAuthority extends string | IAccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
+  TAccountNewAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
@@ -56,9 +68,12 @@ export type EditWhitelistV2Instruction<
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
     [
-      TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority>
-        : TAccountAuthority,
+      TAccountUpdateAuthority extends string
+        ? WritableSignerAccount<TAccountUpdateAuthority>
+        : TAccountUpdateAuthority,
+      TAccountNewAuthority extends string
+        ? ReadonlySignerAccount<TAccountNewAuthority>
+        : TAccountNewAuthority,
       TAccountWhitelist extends string
         ? WritableAccount<TAccountWhitelist>
         : TAccountWhitelist,
@@ -71,7 +86,8 @@ export type EditWhitelistV2Instruction<
 
 export type EditWhitelistV2InstructionWithSigners<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountAuthority extends string | IAccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
+  TAccountNewAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
@@ -81,10 +97,14 @@ export type EditWhitelistV2InstructionWithSigners<
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
     [
-      TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> &
-            IAccountSignerMeta<TAccountAuthority>
-        : TAccountAuthority,
+      TAccountUpdateAuthority extends string
+        ? WritableSignerAccount<TAccountUpdateAuthority> &
+            IAccountSignerMeta<TAccountUpdateAuthority>
+        : TAccountUpdateAuthority,
+      TAccountNewAuthority extends string
+        ? ReadonlySignerAccount<TAccountNewAuthority> &
+            IAccountSignerMeta<TAccountNewAuthority>
+        : TAccountNewAuthority,
       TAccountWhitelist extends string
         ? WritableAccount<TAccountWhitelist>
         : TAccountWhitelist,
@@ -97,21 +117,25 @@ export type EditWhitelistV2InstructionWithSigners<
 
 export type EditWhitelistV2InstructionData = {
   discriminator: Array<number>;
-  conditions: Array<Condition>;
+  freezeAuthority: Toggle;
+  conditions: Option<Array<Condition>>;
 };
 
 export type EditWhitelistV2InstructionDataArgs = {
-  conditions: Array<ConditionArgs>;
+  freezeAuthority: ToggleArgs;
+  conditions: OptionOrNullable<Array<ConditionArgs>>;
 };
 
 export function getEditWhitelistV2InstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: Array<number>;
-      conditions: Array<ConditionArgs>;
+      freezeAuthority: ToggleArgs;
+      conditions: OptionOrNullable<Array<ConditionArgs>>;
     }>([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
-      ['conditions', getArrayEncoder(getConditionEncoder(), { size: 5 })],
+      ['freezeAuthority', getToggleEncoder()],
+      ['conditions', getOptionEncoder(getArrayEncoder(getConditionEncoder()))],
     ]),
     (value) => ({
       ...value,
@@ -123,7 +147,8 @@ export function getEditWhitelistV2InstructionDataEncoder() {
 export function getEditWhitelistV2InstructionDataDecoder() {
   return getStructDecoder<EditWhitelistV2InstructionData>([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-    ['conditions', getArrayDecoder(getConditionDecoder(), { size: 5 })],
+    ['freezeAuthority', getToggleDecoder()],
+    ['conditions', getOptionDecoder(getArrayDecoder(getConditionDecoder()))],
   ]) satisfies Decoder<EditWhitelistV2InstructionData>;
 }
 
@@ -138,69 +163,83 @@ export function getEditWhitelistV2InstructionDataCodec(): Codec<
 }
 
 export type EditWhitelistV2Input<
-  TAccountAuthority extends string,
+  TAccountUpdateAuthority extends string,
+  TAccountNewAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string
 > = {
-  authority: Address<TAccountAuthority>;
+  updateAuthority: Address<TAccountUpdateAuthority>;
+  newAuthority?: Address<TAccountNewAuthority>;
   whitelist: Address<TAccountWhitelist>;
   systemProgram?: Address<TAccountSystemProgram>;
+  freezeAuthority: EditWhitelistV2InstructionDataArgs['freezeAuthority'];
   conditions: EditWhitelistV2InstructionDataArgs['conditions'];
 };
 
 export type EditWhitelistV2InputWithSigners<
-  TAccountAuthority extends string,
+  TAccountUpdateAuthority extends string,
+  TAccountNewAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string
 > = {
-  authority: TransactionSigner<TAccountAuthority>;
+  updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
+  newAuthority?: TransactionSigner<TAccountNewAuthority>;
   whitelist: Address<TAccountWhitelist>;
   systemProgram?: Address<TAccountSystemProgram>;
+  freezeAuthority: EditWhitelistV2InstructionDataArgs['freezeAuthority'];
   conditions: EditWhitelistV2InstructionDataArgs['conditions'];
 };
 
 export function getEditWhitelistV2Instruction<
-  TAccountAuthority extends string,
+  TAccountUpdateAuthority extends string,
+  TAccountNewAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: EditWhitelistV2InputWithSigners<
-    TAccountAuthority,
+    TAccountUpdateAuthority,
+    TAccountNewAuthority,
     TAccountWhitelist,
     TAccountSystemProgram
   >
 ): EditWhitelistV2InstructionWithSigners<
   TProgram,
-  TAccountAuthority,
+  TAccountUpdateAuthority,
+  TAccountNewAuthority,
   TAccountWhitelist,
   TAccountSystemProgram
 >;
 export function getEditWhitelistV2Instruction<
-  TAccountAuthority extends string,
+  TAccountUpdateAuthority extends string,
+  TAccountNewAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: EditWhitelistV2Input<
-    TAccountAuthority,
+    TAccountUpdateAuthority,
+    TAccountNewAuthority,
     TAccountWhitelist,
     TAccountSystemProgram
   >
 ): EditWhitelistV2Instruction<
   TProgram,
-  TAccountAuthority,
+  TAccountUpdateAuthority,
+  TAccountNewAuthority,
   TAccountWhitelist,
   TAccountSystemProgram
 >;
 export function getEditWhitelistV2Instruction<
-  TAccountAuthority extends string,
+  TAccountUpdateAuthority extends string,
+  TAccountNewAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: EditWhitelistV2Input<
-    TAccountAuthority,
+    TAccountUpdateAuthority,
+    TAccountNewAuthority,
     TAccountWhitelist,
     TAccountSystemProgram
   >
@@ -213,13 +252,15 @@ export function getEditWhitelistV2Instruction<
   type AccountMetas = Parameters<
     typeof getEditWhitelistV2InstructionRaw<
       TProgram,
-      TAccountAuthority,
+      TAccountUpdateAuthority,
+      TAccountNewAuthority,
       TAccountWhitelist,
       TAccountSystemProgram
     >
   >[0];
   const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
-    authority: { value: input.authority ?? null, isWritable: false },
+    updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
+    newAuthority: { value: input.newAuthority ?? null, isWritable: false },
     whitelist: { value: input.whitelist ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
@@ -251,7 +292,8 @@ export function getEditWhitelistV2Instruction<
 
 export function getEditWhitelistV2InstructionRaw<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountAuthority extends string | IAccountMeta<string> = string,
+  TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
+  TAccountNewAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
@@ -259,9 +301,12 @@ export function getEditWhitelistV2InstructionRaw<
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 >(
   accounts: {
-    authority: TAccountAuthority extends string
-      ? Address<TAccountAuthority>
-      : TAccountAuthority;
+    updateAuthority: TAccountUpdateAuthority extends string
+      ? Address<TAccountUpdateAuthority>
+      : TAccountUpdateAuthority;
+    newAuthority?: TAccountNewAuthority extends string
+      ? Address<TAccountNewAuthority>
+      : TAccountNewAuthority;
     whitelist: TAccountWhitelist extends string
       ? Address<TAccountWhitelist>
       : TAccountWhitelist;
@@ -275,7 +320,18 @@ export function getEditWhitelistV2InstructionRaw<
 ) {
   return {
     accounts: [
-      accountMetaWithDefault(accounts.authority, AccountRole.READONLY_SIGNER),
+      accountMetaWithDefault(
+        accounts.updateAuthority,
+        AccountRole.WRITABLE_SIGNER
+      ),
+      accountMetaWithDefault(
+        accounts.newAuthority ?? {
+          address:
+            'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>,
+          role: AccountRole.READONLY,
+        },
+        AccountRole.READONLY_SIGNER
+      ),
       accountMetaWithDefault(accounts.whitelist, AccountRole.WRITABLE),
       accountMetaWithDefault(
         accounts.systemProgram ??
@@ -288,7 +344,8 @@ export function getEditWhitelistV2InstructionRaw<
     programAddress,
   } as EditWhitelistV2Instruction<
     TProgram,
-    TAccountAuthority,
+    TAccountUpdateAuthority,
+    TAccountNewAuthority,
     TAccountWhitelist,
     TAccountSystemProgram,
     TRemainingAccounts
@@ -301,9 +358,10 @@ export type ParsedEditWhitelistV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
-    authority: TAccountMetas[0];
-    whitelist: TAccountMetas[1];
-    systemProgram: TAccountMetas[2];
+    updateAuthority: TAccountMetas[0];
+    newAuthority?: TAccountMetas[1] | undefined;
+    whitelist: TAccountMetas[2];
+    systemProgram: TAccountMetas[3];
   };
   data: EditWhitelistV2InstructionData;
 };
@@ -316,7 +374,7 @@ export function parseEditWhitelistV2Instruction<
     IInstructionWithAccounts<TAccountMetas> &
     IInstructionWithData<Uint8Array>
 ): ParsedEditWhitelistV2Instruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 3) {
+  if (instruction.accounts.length < 4) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -326,10 +384,17 @@ export function parseEditWhitelistV2Instruction<
     accountIndex += 1;
     return accountMeta;
   };
+  const getNextOptionalAccount = () => {
+    const accountMeta = getNextAccount();
+    return accountMeta.address === 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+      ? undefined
+      : accountMeta;
+  };
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      authority: getNextAccount(),
+      updateAuthority: getNextAccount(),
+      newAuthority: getNextOptionalAccount(),
       whitelist: getNextAccount(),
       systemProgram: getNextAccount(),
     },

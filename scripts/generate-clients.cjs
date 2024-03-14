@@ -51,9 +51,9 @@ kinobi.update(
       seeds: [
         k.constantPdaSeedNodeFromString("whitelist"),
         k.variablePdaSeedNode(
-          "authority",
+          "namespace",
           k.publicKeyTypeNode(),
-          "The address of the whitelist authority"
+          "The namespace address"
         ),
         k.variablePdaSeedNode(
           "uuid",

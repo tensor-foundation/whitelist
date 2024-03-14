@@ -8,15 +8,17 @@ use crate::{error::ErrorCode, state::FullMerkleProof};
 // (!) INCLUSIVE of discriminator (8 bytes)
 #[constant]
 #[allow(clippy::identity_op)]
-pub const WHITELIST_V2_SIZE: usize = 8 // discriminator
-    + 1 // version
-    + 1 // bump
-    + 32 // uuid
-    + 32 // authority
-    + 5 * 33; // conditions
+pub const WHITELIST_V2_BASE_SIZE: usize = 8 // discriminator
+    + 1   // version
+    + 1   // bump
+    + 32  // uuid
+    + 1   // state: unfrozen/frozen
+    + 32  // update_authority
+    + 32  // namespace
+    + 32; // freeze_authority
 
 #[constant]
-pub const WHITELIST_V2_CONDITIONS_LENGTH: usize = 5;
+pub const WHITELIST_V2_CONDITIONS_LENGTH: usize = 7;
 
 /// Seeds: ["whitelist", <authority>, <uuid>]
 #[account]
@@ -24,12 +26,36 @@ pub struct WhitelistV2 {
     pub version: u8,
     pub bump: u8,
     pub uuid: [u8; 32],
-    pub authority: Pubkey,
-    pub conditions: [Condition; WHITELIST_V2_CONDITIONS_LENGTH],
+    pub state: State,
+    pub update_authority: Pubkey,
+    pub namespace: Pubkey,
+    pub freeze_authority: Pubkey,
+    pub conditions: Vec<Condition>,
 }
 
 impl WhitelistV2 {
-    pub const SIZE: usize = WHITELIST_V2_SIZE;
+    pub const BASE_SIZE: usize = WHITELIST_V2_BASE_SIZE;
+    // 33 bytes for Mode + Pubkey
+    pub const CONDITION_SIZE: usize = std::mem::size_of::<u8>() + std::mem::size_of::<Pubkey>();
+
+    // Limit the number of conditions to control compute usage.
+    pub fn validate_conditions(conditions: &[Condition]) -> Result<()> {
+        if conditions.len() > WHITELIST_V2_CONDITIONS_LENGTH {
+            throw_err!(ErrorCode::TooManyConditions);
+        }
+
+        // Only one merkle proof per whitelist allowed.
+        let merkle_proofs = conditions
+            .iter()
+            .filter(|c| c.mode == Mode::MerkleProof)
+            .count();
+
+        if merkle_proofs > 1 {
+            throw_err!(ErrorCode::TooManyMerkleProofs);
+        }
+
+        Ok(())
+    }
 
     /// Whitelists are made up of a set of conditions of which at least one must be met.
     pub fn verify_whitelist(
@@ -43,7 +69,7 @@ impl WhitelistV2 {
         let pass = self
             .conditions
             .iter()
-            .all(|condition| condition.validate(&collection, &creators, &proof).is_ok());
+            .any(|condition| condition.validate(&collection, &creators, &proof).is_ok());
 
         // If none pass, then the whitelist is invalid, but we want to return the specific error that failed.
         if !pass {
@@ -58,6 +84,13 @@ impl WhitelistV2 {
 
         Ok(())
     }
+}
+
+#[repr(u8)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, PartialEq)]
+pub enum State {
+    Unfrozen,
+    Frozen,
 }
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, PartialEq)]

@@ -34,4 +34,16 @@ pub enum ErrorCode {
 
     #[msg("invalid authority")]
     InvalidAuthority = 10,
+
+    #[msg("condition at index not a merkle root")]
+    NotMerkleRoot = 11,
+
+    #[msg("invalid whitelist index")]
+    InvalidWhitelistIndex = 12,
+
+    #[msg("too many conditions")]
+    TooManyConditions = 13,
+
+    #[msg("too many merkle proofs")]
+    TooManyMerkleProofs = 14,
 }

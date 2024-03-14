@@ -37,6 +37,7 @@ export function getTensorWhitelistProgram(): TensorWhitelistProgram {
 
 export enum TensorWhitelistAccount {
   Authority,
+  MintProofV2,
   MintProof,
   WhitelistV2,
   Whitelist,
@@ -48,6 +49,9 @@ export function identifyTensorWhitelistAccount(
   const data = account instanceof Uint8Array ? account : account.data;
   if (memcmp(data, new Uint8Array([36, 108, 254, 18, 167, 144, 27, 36]), 0)) {
     return TensorWhitelistAccount.Authority;
+  }
+  if (memcmp(data, new Uint8Array([22, 197, 150, 178, 249, 225, 183, 75]), 0)) {
+    return TensorWhitelistAccount.MintProofV2;
   }
   if (
     memcmp(data, new Uint8Array([227, 131, 106, 240, 190, 48, 219, 228]), 0)

@@ -6,12 +6,15 @@
 //!
 
 use crate::generated::types::Condition;
+use crate::generated::types::Toggle;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
 pub struct EditWhitelistV2 {
-    pub authority: solana_program::pubkey::Pubkey,
+    pub update_authority: solana_program::pubkey::Pubkey,
+
+    pub new_authority: Option<solana_program::pubkey::Pubkey>,
 
     pub whitelist: solana_program::pubkey::Pubkey,
 
@@ -31,11 +34,22 @@ impl EditWhitelistV2 {
         args: EditWhitelistV2InstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            self.authority,
+        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            self.update_authority,
             true,
         ));
+        if let Some(new_authority) = self.new_authority {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                new_authority,
+                true,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::TENSOR_WHITELIST_ID,
+                false,
+            ));
+        }
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.whitelist,
             false,
@@ -73,22 +87,26 @@ impl EditWhitelistV2InstructionData {
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EditWhitelistV2InstructionArgs {
-    pub conditions: [Condition; 5],
+    pub freeze_authority: Toggle,
+    pub conditions: Option<Vec<Condition>>,
 }
 
 /// Instruction builder for `EditWhitelistV2`.
 ///
 /// ### Accounts:
 ///
-///   0. `[signer]` authority
-///   1. `[writable]` whitelist
-///   2. `[optional]` system_program (default to `11111111111111111111111111111111`)
+///   0. `[writable, signer]` update_authority
+///   1. `[signer, optional]` new_authority
+///   2. `[writable]` whitelist
+///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Default)]
 pub struct EditWhitelistV2Builder {
-    authority: Option<solana_program::pubkey::Pubkey>,
+    update_authority: Option<solana_program::pubkey::Pubkey>,
+    new_authority: Option<solana_program::pubkey::Pubkey>,
     whitelist: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
-    conditions: Option<[Condition; 5]>,
+    freeze_authority: Option<Toggle>,
+    conditions: Option<Vec<Condition>>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
@@ -97,8 +115,20 @@ impl EditWhitelistV2Builder {
         Self::default()
     }
     #[inline(always)]
-    pub fn authority(&mut self, authority: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.authority = Some(authority);
+    pub fn update_authority(
+        &mut self,
+        update_authority: solana_program::pubkey::Pubkey,
+    ) -> &mut Self {
+        self.update_authority = Some(update_authority);
+        self
+    }
+    /// `[optional account]`
+    #[inline(always)]
+    pub fn new_authority(
+        &mut self,
+        new_authority: Option<solana_program::pubkey::Pubkey>,
+    ) -> &mut Self {
+        self.new_authority = new_authority;
         self
     }
     #[inline(always)]
@@ -113,7 +143,13 @@ impl EditWhitelistV2Builder {
         self
     }
     #[inline(always)]
-    pub fn conditions(&mut self, conditions: [Condition; 5]) -> &mut Self {
+    pub fn freeze_authority(&mut self, freeze_authority: Toggle) -> &mut Self {
+        self.freeze_authority = Some(freeze_authority);
+        self
+    }
+    /// `[optional argument]`
+    #[inline(always)]
+    pub fn conditions(&mut self, conditions: Vec<Condition>) -> &mut Self {
         self.conditions = Some(conditions);
         self
     }
@@ -138,14 +174,19 @@ impl EditWhitelistV2Builder {
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         let accounts = EditWhitelistV2 {
-            authority: self.authority.expect("authority is not set"),
+            update_authority: self.update_authority.expect("update_authority is not set"),
+            new_authority: self.new_authority,
             whitelist: self.whitelist.expect("whitelist is not set"),
             system_program: self
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
         let args = EditWhitelistV2InstructionArgs {
-            conditions: self.conditions.clone().expect("conditions is not set"),
+            freeze_authority: self
+                .freeze_authority
+                .clone()
+                .expect("freeze_authority is not set"),
+            conditions: self.conditions.clone(),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
@@ -154,7 +195,9 @@ impl EditWhitelistV2Builder {
 
 /// `edit_whitelist_v2` CPI accounts.
 pub struct EditWhitelistV2CpiAccounts<'a, 'b> {
-    pub authority: &'b solana_program::account_info::AccountInfo<'a>,
+    pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
+
+    pub new_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
 
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
 
@@ -166,7 +209,9 @@ pub struct EditWhitelistV2Cpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
 
-    pub authority: &'b solana_program::account_info::AccountInfo<'a>,
+    pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
+
+    pub new_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
 
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
 
@@ -183,7 +228,8 @@ impl<'a, 'b> EditWhitelistV2Cpi<'a, 'b> {
     ) -> Self {
         Self {
             __program: program,
-            authority: accounts.authority,
+            update_authority: accounts.update_authority,
+            new_authority: accounts.new_authority,
             whitelist: accounts.whitelist,
             system_program: accounts.system_program,
             __args: args,
@@ -222,11 +268,22 @@ impl<'a, 'b> EditWhitelistV2Cpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            *self.authority.key,
+        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            *self.update_authority.key,
             true,
         ));
+        if let Some(new_authority) = self.new_authority {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                *new_authority.key,
+                true,
+            ));
+        } else {
+            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+                crate::TENSOR_WHITELIST_ID,
+                false,
+            ));
+        }
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.whitelist.key,
             false,
@@ -251,9 +308,12 @@ impl<'a, 'b> EditWhitelistV2Cpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(3 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(4 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
-        account_infos.push(self.authority.clone());
+        account_infos.push(self.update_authority.clone());
+        if let Some(new_authority) = self.new_authority {
+            account_infos.push(new_authority.clone());
+        }
         account_infos.push(self.whitelist.clone());
         account_infos.push(self.system_program.clone());
         remaining_accounts
@@ -272,9 +332,10 @@ impl<'a, 'b> EditWhitelistV2Cpi<'a, 'b> {
 ///
 /// ### Accounts:
 ///
-///   0. `[signer]` authority
-///   1. `[writable]` whitelist
-///   2. `[]` system_program
+///   0. `[writable, signer]` update_authority
+///   1. `[signer, optional]` new_authority
+///   2. `[writable]` whitelist
+///   3. `[]` system_program
 pub struct EditWhitelistV2CpiBuilder<'a, 'b> {
     instruction: Box<EditWhitelistV2CpiBuilderInstruction<'a, 'b>>,
 }
@@ -283,20 +344,31 @@ impl<'a, 'b> EditWhitelistV2CpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(EditWhitelistV2CpiBuilderInstruction {
             __program: program,
-            authority: None,
+            update_authority: None,
+            new_authority: None,
             whitelist: None,
             system_program: None,
+            freeze_authority: None,
             conditions: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
     }
     #[inline(always)]
-    pub fn authority(
+    pub fn update_authority(
         &mut self,
-        authority: &'b solana_program::account_info::AccountInfo<'a>,
+        update_authority: &'b solana_program::account_info::AccountInfo<'a>,
     ) -> &mut Self {
-        self.instruction.authority = Some(authority);
+        self.instruction.update_authority = Some(update_authority);
+        self
+    }
+    /// `[optional account]`
+    #[inline(always)]
+    pub fn new_authority(
+        &mut self,
+        new_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    ) -> &mut Self {
+        self.instruction.new_authority = new_authority;
         self
     }
     #[inline(always)]
@@ -316,7 +388,13 @@ impl<'a, 'b> EditWhitelistV2CpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn conditions(&mut self, conditions: [Condition; 5]) -> &mut Self {
+    pub fn freeze_authority(&mut self, freeze_authority: Toggle) -> &mut Self {
+        self.instruction.freeze_authority = Some(freeze_authority);
+        self
+    }
+    /// `[optional argument]`
+    #[inline(always)]
+    pub fn conditions(&mut self, conditions: Vec<Condition>) -> &mut Self {
         self.instruction.conditions = Some(conditions);
         self
     }
@@ -362,16 +440,22 @@ impl<'a, 'b> EditWhitelistV2CpiBuilder<'a, 'b> {
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
         let args = EditWhitelistV2InstructionArgs {
-            conditions: self
+            freeze_authority: self
                 .instruction
-                .conditions
+                .freeze_authority
                 .clone()
-                .expect("conditions is not set"),
+                .expect("freeze_authority is not set"),
+            conditions: self.instruction.conditions.clone(),
         };
         let instruction = EditWhitelistV2Cpi {
             __program: self.instruction.__program,
 
-            authority: self.instruction.authority.expect("authority is not set"),
+            update_authority: self
+                .instruction
+                .update_authority
+                .expect("update_authority is not set"),
+
+            new_authority: self.instruction.new_authority,
 
             whitelist: self.instruction.whitelist.expect("whitelist is not set"),
 
@@ -390,10 +474,12 @@ impl<'a, 'b> EditWhitelistV2CpiBuilder<'a, 'b> {
 
 struct EditWhitelistV2CpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
-    authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    new_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     whitelist: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    conditions: Option<[Condition; 5]>,
+    freeze_authority: Option<Toggle>,
+    conditions: Option<Vec<Condition>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

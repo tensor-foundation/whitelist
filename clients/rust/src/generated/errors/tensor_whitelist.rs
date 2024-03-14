@@ -43,6 +43,18 @@ pub enum TensorWhitelistError {
     /// 6010 (0x177A) - invalid authority
     #[error("invalid authority")]
     InvalidAuthority,
+    /// 6011 (0x177B) - condition at index not a merkle root
+    #[error("condition at index not a merkle root")]
+    NotMerkleRoot,
+    /// 6012 (0x177C) - invalid whitelist index
+    #[error("invalid whitelist index")]
+    InvalidWhitelistIndex,
+    /// 6013 (0x177D) - too many conditions
+    #[error("too many conditions")]
+    TooManyConditions,
+    /// 6014 (0x177E) - too many merkle proofs
+    #[error("too many merkle proofs")]
+    TooManyMerkleProofs,
 }
 
 impl solana_program::program_error::PrintProgramError for TensorWhitelistError {

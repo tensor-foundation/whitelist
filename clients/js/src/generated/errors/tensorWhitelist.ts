@@ -29,6 +29,14 @@ export const enum TensorWhitelistProgramErrorCode {
   NO_CONDITIONS = 0x1779, // 6009
   /** InvalidAuthority: invalid authority */
   INVALID_AUTHORITY = 0x177a, // 6010
+  /** NotMerkleRoot: condition at index not a merkle root */
+  NOT_MERKLE_ROOT = 0x177b, // 6011
+  /** InvalidWhitelistIndex: invalid whitelist index */
+  INVALID_WHITELIST_INDEX = 0x177c, // 6012
+  /** TooManyConditions: too many conditions */
+  TOO_MANY_CONDITIONS = 0x177d, // 6013
+  /** TooManyMerkleProofs: too many merkle proofs */
+  TOO_MANY_MERKLE_PROOFS = 0x177e, // 6014
 }
 
 export class TensorWhitelistProgramError extends Error {
@@ -98,6 +106,22 @@ if (__DEV__) {
     [TensorWhitelistProgramErrorCode.INVALID_AUTHORITY]: [
       'InvalidAuthority',
       `invalid authority`,
+    ],
+    [TensorWhitelistProgramErrorCode.NOT_MERKLE_ROOT]: [
+      'NotMerkleRoot',
+      `condition at index not a merkle root`,
+    ],
+    [TensorWhitelistProgramErrorCode.INVALID_WHITELIST_INDEX]: [
+      'InvalidWhitelistIndex',
+      `invalid whitelist index`,
+    ],
+    [TensorWhitelistProgramErrorCode.TOO_MANY_CONDITIONS]: [
+      'TooManyConditions',
+      `too many conditions`,
+    ],
+    [TensorWhitelistProgramErrorCode.TOO_MANY_MERKLE_PROOFS]: [
+      'TooManyMerkleProofs',
+      `too many merkle proofs`,
     ],
   };
 }

@@ -10,6 +10,13 @@
       "value": "8 + 1 + (32 * 2) + 64"
     },
     {
+      "name": "MINT_PROOF_V2_SIZE",
+      "type": {
+        "defined": "usize"
+      },
+      "value": "8 + (32 * 28) + 8 + 32"
+    },
+    {
       "name": "MINT_PROOF_SIZE",
       "type": {
         "defined": "usize"
@@ -17,18 +24,18 @@
       "value": "8 + (32 * 28) + 1"
     },
     {
-      "name": "WHITELIST_V2_SIZE",
+      "name": "WHITELIST_V2_BASE_SIZE",
       "type": {
         "defined": "usize"
       },
-      "value": "8 + 1 + 1 + 32 + 32 + 5 * 33"
+      "value": "8 + 1 + 1 + 32 + 1 + 32 + 32 + 32"
     },
     {
       "name": "WHITELIST_V2_CONDITIONS_LENGTH",
       "type": {
         "defined": "usize"
       },
-      "value": "5"
+      "value": "7"
     },
     {
       "name": "WHITELIST_SIZE",
@@ -331,8 +338,13 @@
           "isSigner": true
         },
         {
-          "name": "authority",
+          "name": "updateAuthority",
           "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "namespace",
+          "isMut": false,
           "isSigner": true
         },
         {
@@ -348,23 +360,9 @@
       ],
       "args": [
         {
-          "name": "uuid",
+          "name": "args",
           "type": {
-            "array": [
-              "u8",
-              32
-            ]
-          }
-        },
-        {
-          "name": "conditions",
-          "type": {
-            "array": [
-              {
-                "defined": "Condition"
-              },
-              5
-            ]
+            "defined": "CreateWhitelistV2Args"
           }
         }
       ]
@@ -373,9 +371,15 @@
       "name": "editWhitelistV2",
       "accounts": [
         {
-          "name": "authority",
-          "isMut": false,
+          "name": "updateAuthority",
+          "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "newAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true
         },
         {
           "name": "whitelist",
@@ -390,14 +394,9 @@
       ],
       "args": [
         {
-          "name": "conditions",
+          "name": "args",
           "type": {
-            "array": [
-              {
-                "defined": "Condition"
-              },
-              5
-            ]
+            "defined": "EditWhitelistV2Args"
           }
         }
       ]
@@ -436,6 +435,43 @@
                 64
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintProofV2",
+      "docs": [
+        "Seeds: [\"mint_proof\", mint, whitelist]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "proofLen",
+            "type": "u8"
+          },
+          {
+            "name": "proof",
+            "type": {
+              "array": [
+                {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                },
+                28
+              ]
+            }
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "authority",
+            "type": "publicKey"
           }
         ]
       }
@@ -492,18 +528,29 @@
             }
           },
           {
-            "name": "authority",
+            "name": "state",
+            "type": {
+              "defined": "State"
+            }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "namespace",
+            "type": "publicKey"
+          },
+          {
+            "name": "freezeAuthority",
             "type": "publicKey"
           },
           {
             "name": "conditions",
             "type": {
-              "array": [
-                {
-                  "defined": "Condition"
-                },
-                5
-              ]
+              "vec": {
+                "defined": "Condition"
+              }
             }
           }
         ]
@@ -590,6 +637,61 @@
   ],
   "types": [
     {
+      "name": "CreateWhitelistV2Args",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "uuid",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "freezeAuthority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "vec": {
+                "defined": "Condition"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EditWhitelistV2Args",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "freezeAuthority",
+            "type": {
+              "defined": "Toggle"
+            }
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "option": {
+                "vec": {
+                  "defined": "Condition"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "FullMerkleProof",
       "type": {
         "kind": "struct",
@@ -631,6 +733,40 @@
           {
             "name": "value",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Toggle",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None"
+          },
+          {
+            "name": "Clear"
+          },
+          {
+            "name": "Set",
+            "fields": [
+              "publicKey"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "State",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unfrozen"
+          },
+          {
+            "name": "Frozen"
           }
         ]
       }
@@ -711,6 +847,26 @@
       "code": 6010,
       "name": "InvalidAuthority",
       "msg": "invalid authority"
+    },
+    {
+      "code": 6011,
+      "name": "NotMerkleRoot",
+      "msg": "condition at index not a merkle root"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidWhitelistIndex",
+      "msg": "invalid whitelist index"
+    },
+    {
+      "code": 6013,
+      "name": "TooManyConditions",
+      "msg": "too many conditions"
+    },
+    {
+      "code": 6014,
+      "name": "TooManyMerkleProofs",
+      "msg": "too many merkle proofs"
     }
   ],
   "metadata": {

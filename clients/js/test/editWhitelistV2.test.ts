@@ -12,41 +12,43 @@ import {
   WhitelistV2,
   fetchWhitelistV2,
   getEditWhitelistV2Instruction,
+  toggle,
 } from '../src';
-import { createWhitelist, padConditions } from './_common';
+import { createWhitelist } from './_common';
 
 test('it can edit a whitelist v2', async (t) => {
   const client = createDefaultSolanaClient();
-  const authority = await generateKeyPairSignerWithSol(client);
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
   const voc = (await generateKeyPairSigner()).address;
 
   const { whitelist, uuid, conditions } = await createWhitelist(
     client,
-    authority
+    updateAuthority
   );
 
   t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
     address: whitelist,
     data: {
-      authority: authority.address,
+      updateAuthority: updateAuthority.address,
       uuid,
       conditions,
     },
   }));
 
-  const newConditions = padConditions([
+  const newConditions = [
     { mode: Mode.VOC, value: voc },
-    { mode: Mode.FVC, value: authority.address },
-  ]);
+    { mode: Mode.FVC, value: updateAuthority.address },
+  ];
 
   const editWhitelistIx = getEditWhitelistV2Instruction({
-    authority,
+    updateAuthority,
     whitelist,
     conditions: newConditions,
+    freezeAuthority: toggle('None'),
   });
 
   await pipe(
-    await createDefaultTransaction(client, authority.address),
+    await createDefaultTransaction(client, updateAuthority.address),
     (tx) => appendTransactionInstruction(editWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -54,7 +56,7 @@ test('it can edit a whitelist v2', async (t) => {
   t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
     address: whitelist,
     data: {
-      authority: authority.address,
+      updateAuthority: updateAuthority.address,
       uuid,
       conditions: newConditions,
     },
@@ -63,33 +65,34 @@ test('it can edit a whitelist v2', async (t) => {
 
 test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
   const client = createDefaultSolanaClient();
-  const authority = await generateKeyPairSignerWithSol(client);
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
   const wrongAuthority = await generateKeyPairSignerWithSol(client);
   const voc = (await generateKeyPairSigner()).address;
 
   const { whitelist, uuid, conditions } = await createWhitelist(
     client,
-    authority
+    updateAuthority
   );
 
   t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
     address: whitelist,
     data: {
-      authority: authority.address,
+      updateAuthority: updateAuthority.address,
       uuid,
       conditions,
     },
   }));
 
-  const newConditions = padConditions([
+  const newConditions = [
     { mode: Mode.VOC, value: voc },
-    { mode: Mode.FVC, value: authority.address },
-  ]);
+    { mode: Mode.FVC, value: updateAuthority.address },
+  ];
 
   const editWhitelistIx = getEditWhitelistV2Instruction({
-    authority: wrongAuthority,
+    updateAuthority: wrongAuthority,
     whitelist,
     conditions: newConditions,
+    freezeAuthority: toggle('None'),
   });
 
   const promise = pipe(
@@ -98,6 +101,6 @@ test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  // 0x7d6 - 2006 AnchorError: seeds constraint violated
-  await t.throwsAsync(promise, { message: /0x7d6/ });
+  // 0x177a - Error Number: 6010. Error Message: invalid authority.'
+  await t.throwsAsync(promise, { message: /0x177a/ });
 });
