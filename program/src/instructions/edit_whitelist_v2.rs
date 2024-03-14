@@ -79,6 +79,9 @@ pub fn process_edit_whitelist_v2(
 ) -> Result<()> {
     let whitelist = &mut ctx.accounts.whitelist;
 
+    msg!("current conditions: {:?}", whitelist.conditions);
+    msg!("new conditions: {:?}", args.conditions);
+
     // Update the freeze authority. If the Toggle is None, then there's nothing to do.
     if let Toggle::Set(authority) = args.freeze_authority {
         // Set
@@ -95,6 +98,7 @@ pub fn process_edit_whitelist_v2(
 
     // Set new conditions if they are present. Realloc happens in the account declaration.
     if let Some(conditions) = args.conditions {
+        msg!("updating conditions");
         whitelist.conditions = conditions;
     }
 
