@@ -79,6 +79,8 @@ export enum TensorWhitelistInstruction {
   UnfreezeWhitelist,
   CreateWhitelistV2,
   EditWhitelistV2,
+  CreateMintProofV2,
+  CloseMintProofV2,
 }
 
 export function identifyTensorWhitelistInstruction(
@@ -112,6 +114,12 @@ export function identifyTensorWhitelistInstruction(
   }
   if (memcmp(data, new Uint8Array([64, 183, 223, 226, 136, 69, 83, 11]), 0)) {
     return TensorWhitelistInstruction.EditWhitelistV2;
+  }
+  if (memcmp(data, new Uint8Array([219, 176, 21, 37, 145, 89, 154, 53]), 0)) {
+    return TensorWhitelistInstruction.CreateMintProofV2;
+  }
+  if (memcmp(data, new Uint8Array([237, 78, 8, 208, 47, 148, 145, 170]), 0)) {
+    return TensorWhitelistInstruction.CloseMintProofV2;
   }
   throw new Error(
     'The provided instruction could not be identified as a tensorWhitelist instruction.'

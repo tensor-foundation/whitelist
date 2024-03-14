@@ -58,9 +58,9 @@ pub struct EditWhitelistV2<'info> {
             &whitelist.uuid
         ],
         bump,
-        // realloc to new length; if no conditions passed in use the existing length--should be no-op
+        // Realloc to new length; if no conditions are passed in, use the existing length--which should be no-op.
         // args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() just get us either
-        // 1) the length of the passed in conditions, if any, or the length of the current conditions
+        // 1) the length of the passed in conditions, or the length of the current conditions
         realloc = WhitelistV2::BASE_SIZE + VEC_LENGTH + args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() * WhitelistV2::CONDITION_SIZE,
         realloc::zero = false,
         realloc::payer = update_authority,

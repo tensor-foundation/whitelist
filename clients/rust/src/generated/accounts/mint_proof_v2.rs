@@ -17,12 +17,12 @@ pub struct MintProofV2 {
     pub discriminator: [u8; 8],
     pub proof_len: u8,
     pub proof: [[u8; 32]; 28],
-    pub created_at: i64,
+    pub creation_slot: u64,
     #[cfg_attr(
         feature = "serde",
         serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
     )]
-    pub authority: Pubkey,
+    pub payer: Pubkey,
 }
 
 impl MintProofV2 {

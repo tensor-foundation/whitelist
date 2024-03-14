@@ -15,10 +15,12 @@ pub use realloc_whitelist::*;
 pub use unfreeze_whitelist::*;
 
 // V2
+mod close_mint_proof_v2;
 mod create_mint_proof_v2;
 mod create_whitelist_v2;
 mod edit_whitelist_v2;
 
+pub use close_mint_proof_v2::*;
 pub use create_mint_proof_v2::*;
 pub use create_whitelist_v2::*;
 pub use edit_whitelist_v2::*;

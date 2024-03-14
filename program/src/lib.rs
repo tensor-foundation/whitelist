@@ -89,4 +89,15 @@ pub mod whitelist_program {
     ) -> Result<()> {
         process_edit_whitelist_v2(ctx, args)
     }
+
+    pub fn create_mint_proof_v2(
+        ctx: Context<CreateMintProofV2>,
+        proof: Vec<[u8; 32]>,
+    ) -> Result<()> {
+        process_create_mint_proof_v2(ctx, proof)
+    }
+
+    pub fn close_mint_proof_v2(ctx: Context<CloseMintProofV2>) -> Result<()> {
+        process_close_mint_proof_v2(ctx)
+    }
 }

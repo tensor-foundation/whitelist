@@ -52,9 +52,6 @@ pub fn process_create_whitelist_v2(
         args.conditions.rotate_right(index + 1);
     }
 
-    msg!("conditions length {}", args.conditions.len());
-
-    msg!("getting whitelist");
     let whitelist = &mut ctx.accounts.whitelist;
 
     whitelist.version = CURRENT_WHITELIST_VERSION;
@@ -63,14 +60,12 @@ pub fn process_create_whitelist_v2(
     whitelist.update_authority = ctx.accounts.update_authority.key();
     whitelist.namespace = ctx.accounts.namespace.key();
 
-    msg!("checking freeze authority");
     if let Some(freeze_authority) = args.freeze_authority {
         whitelist.freeze_authority = freeze_authority;
     } else {
         whitelist.freeze_authority = Pubkey::default();
     }
 
-    msg!("about to serialize conditions");
     whitelist.conditions = args.conditions;
 
     Ok(())

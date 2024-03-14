@@ -14,7 +14,7 @@
       "type": {
         "defined": "usize"
       },
-      "value": "8 + (32 * 28) + 8 + 32"
+      "value": "8 + 1 + (32 * 28) + 8 + 32"
     },
     {
       "name": "MINT_PROOF_SIZE",
@@ -400,6 +400,75 @@
           }
         }
       ]
+    },
+    {
+      "name": "createMintProofV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelist",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintProof",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "proof",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "closeMintProofV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mintProof",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -466,11 +535,11 @@
             }
           },
           {
-            "name": "createdAt",
-            "type": "i64"
+            "name": "creationSlot",
+            "type": "u64"
           },
           {
-            "name": "authority",
+            "name": "payer",
             "type": "publicKey"
           }
         ]

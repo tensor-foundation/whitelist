@@ -8,14 +8,16 @@ use crate::{error::ErrorCode, state::FullMerkleProof};
 // (!) INCLUSIVE of discriminator (8 bytes)
 #[constant]
 #[allow(clippy::identity_op)]
-pub const WHITELIST_V2_BASE_SIZE: usize = 8 // discriminator
+pub const WHITELIST_V2_BASE_SIZE: usize =
+      8   // discriminator
     + 1   // version
     + 1   // bump
     + 32  // uuid
     + 1   // state: unfrozen/frozen
     + 32  // update_authority
     + 32  // namespace
-    + 32; // freeze_authority
+    + 32  // freeze_authority
+;
 
 #[constant]
 pub const WHITELIST_V2_CONDITIONS_LENGTH: usize = 7;

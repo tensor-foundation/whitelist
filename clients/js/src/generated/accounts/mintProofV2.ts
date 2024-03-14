@@ -40,8 +40,8 @@ import {
   getStructEncoder,
 } from '@solana/codecs-data-structures';
 import {
-  getI64Decoder,
-  getI64Encoder,
+  getU64Decoder,
+  getU64Encoder,
   getU8Decoder,
   getU8Encoder,
 } from '@solana/codecs-numbers';
@@ -60,15 +60,15 @@ export type MintProofV2AccountData = {
   discriminator: Array<number>;
   proofLen: number;
   proof: Array<Uint8Array>;
-  createdAt: bigint;
-  authority: Address;
+  creationSlot: bigint;
+  payer: Address;
 };
 
 export type MintProofV2AccountDataArgs = {
   proofLen: number;
   proof: Array<Uint8Array>;
-  createdAt: number | bigint;
-  authority: Address;
+  creationSlot: number | bigint;
+  payer: Address;
 };
 
 export function getMintProofV2AccountDataEncoder() {
@@ -77,14 +77,14 @@ export function getMintProofV2AccountDataEncoder() {
       discriminator: Array<number>;
       proofLen: number;
       proof: Array<Uint8Array>;
-      createdAt: number | bigint;
-      authority: Address;
+      creationSlot: number | bigint;
+      payer: Address;
     }>([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['proofLen', getU8Encoder()],
       ['proof', getArrayEncoder(getBytesEncoder({ size: 32 }), { size: 28 })],
-      ['createdAt', getI64Encoder()],
-      ['authority', getAddressEncoder()],
+      ['creationSlot', getU64Encoder()],
+      ['payer', getAddressEncoder()],
     ]),
     (value) => ({
       ...value,
@@ -98,8 +98,8 @@ export function getMintProofV2AccountDataDecoder() {
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['proofLen', getU8Decoder()],
     ['proof', getArrayDecoder(getBytesDecoder({ size: 32 }), { size: 28 })],
-    ['createdAt', getI64Decoder()],
-    ['authority', getAddressDecoder()],
+    ['creationSlot', getU64Decoder()],
+    ['payer', getAddressDecoder()],
   ]) satisfies Decoder<MintProofV2AccountData>;
 }
 
