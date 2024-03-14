@@ -45,16 +45,30 @@ impl WhitelistV2 {
     }
 
     // Limit the number of conditions to control compute usage.
-    pub fn validate_conditions(conditions: &[Condition]) -> Result<()> {
+    pub fn validate_conditions(conditions: &mut [Condition]) -> Result<()> {
         if conditions.len() > WHITELIST_V2_CONDITIONS_LENGTH {
             throw_err!(ErrorCode::TooManyConditions);
         }
+
+        // Limiting to one merkle proof and ensuring it's the first index makes
+        // it easier to validate the proof. You create the whitelist once and maybe
+        // edit it a few times but validate the proof many times.
 
         // Only one merkle proof per whitelist allowed.
         let merkle_proofs = conditions
             .iter()
             .filter(|c| c.mode == Mode::MerkleProof)
             .count();
+
+        // Ensure the merkle proof is the first item in the vector, if it exists.
+        if let Some(index) = conditions
+            .iter()
+            .enumerate()
+            .find(|(_, c)| c.mode == Mode::MerkleProof)
+            .map(|(index, _)| index)
+        {
+            conditions.rotate_left(index);
+        }
 
         if merkle_proofs > 1 {
             throw_err!(ErrorCode::TooManyMerkleProofs);

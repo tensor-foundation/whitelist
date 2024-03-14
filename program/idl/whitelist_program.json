@@ -376,7 +376,7 @@
           "isSigner": true
         },
         {
-          "name": "newAuthority",
+          "name": "newUpdateAuthority",
           "isMut": false,
           "isSigner": true,
           "isOptional": true

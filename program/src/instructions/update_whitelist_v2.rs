@@ -48,7 +48,7 @@ pub struct UpdateWhitelistV2<'info> {
     pub update_authority: Signer<'info>,
 
     // New update authority must be a signer, if present, to prevent mistakes.
-    pub new_authority: Option<Signer<'info>>,
+    pub new_update_authority: Option<Signer<'info>>,
 
     #[account(
         mut,
@@ -71,12 +71,12 @@ pub struct UpdateWhitelistV2<'info> {
     pub system_program: Program<'info, System>,
 }
 
-//  TODO: Add access control
-// #[access_control(WhitelistV2::validate_conditions(&args.conditions.unwrap_or(vec![])))]
 pub fn process_update_whitelist_v2(
     ctx: Context<UpdateWhitelistV2>,
-    args: UpdateWhitelistV2Args,
+    mut args: UpdateWhitelistV2Args,
 ) -> Result<()> {
+    WhitelistV2::validate_conditions(args.conditions.as_mut().unwrap_or(&mut vec![]))?;
+
     let whitelist = &mut ctx.accounts.whitelist;
 
     // Check if the whitelist is frozen; cannot update if it is.
@@ -96,7 +96,7 @@ pub fn process_update_whitelist_v2(
     }
 
     // Change the update authority.
-    if let Some(new_update_authority) = &ctx.accounts.new_authority {
+    if let Some(new_update_authority) = &ctx.accounts.new_update_authority {
         whitelist.update_authority = new_update_authority.key();
     }
 

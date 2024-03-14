@@ -23,12 +23,14 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
   const updateAuthority = await generateKeyPairSignerWithSol(client);
   const freezeAuthority = await generateKeyPairSignerWithSol(client);
 
+  // Create a whitelist with a freeze authority set.
   const { whitelist, uuid, conditions } = await createWhitelist({
     client,
     updateAuthority,
     freezeAuthority: freezeAuthority.address,
   });
 
+  // It was created correctly, and is unfrozen.
   t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
     address: whitelist,
     data: {
@@ -92,12 +94,14 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
   const voc = (await generateKeyPairSignerWithSol(client)).address;
   const freezeAuthority = await generateKeyPairSignerWithSol(client);
 
+  // Create a whitelist with a freeze authority set.
   const { whitelist, uuid, conditions } = await createWhitelist({
     client,
     updateAuthority,
     freezeAuthority: freezeAuthority.address,
   });
 
+  // It was created correctly, and is unfrozen.
   t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
     address: whitelist,
     data: {
@@ -136,6 +140,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
     { mode: Mode.FVC, value: updateAuthority.address },
   ];
 
+  // Try to update
   const editWhitelistIx = getUpdateWhitelistV2Instruction({
     updateAuthority,
     whitelist,

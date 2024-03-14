@@ -1,4 +1,4 @@
-use crate::{state::WhitelistV2, Condition, Mode, State, CURRENT_WHITELIST_VERSION, VEC_LENGTH};
+use crate::{state::WhitelistV2, Condition, State, CURRENT_WHITELIST_VERSION, VEC_LENGTH};
 use anchor_lang::prelude::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -23,6 +23,8 @@ pub struct CreateWhitelistV2<'info> {
     #[account(
         init,
         payer = payer,
+        // Allocate the account to the actual size we need given the number of conditions.
+        // Borsh represents vectors with a 4 byte size prefix, which is what VEC_LENGTH accounts for.
         space = WhitelistV2::BASE_SIZE + VEC_LENGTH + args.conditions.len() * WhitelistV2::CONDITION_SIZE,
         seeds = [
             b"whitelist",
@@ -36,21 +38,11 @@ pub struct CreateWhitelistV2<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[access_control(WhitelistV2::validate_conditions(&args.conditions))]
 pub fn process_create_whitelist_v2(
     ctx: Context<CreateWhitelistV2>,
     mut args: CreateWhitelistV2Args,
 ) -> Result<()> {
-    // Ensure the merkle proof is the first item in the vector, if it exists.
-    if let Some(index) = args
-        .conditions
-        .iter()
-        .enumerate()
-        .find(|(_, c)| c.mode == Mode::MerkleProof)
-        .map(|(index, _)| index)
-    {
-        args.conditions.rotate_right(index + 1);
-    }
+    WhitelistV2::validate_conditions(&mut args.conditions)?;
 
     let whitelist = &mut ctx.accounts.whitelist;
 

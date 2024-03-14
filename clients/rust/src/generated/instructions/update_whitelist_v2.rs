@@ -14,7 +14,7 @@ use borsh::BorshSerialize;
 pub struct UpdateWhitelistV2 {
     pub update_authority: solana_program::pubkey::Pubkey,
 
-    pub new_authority: Option<solana_program::pubkey::Pubkey>,
+    pub new_update_authority: Option<solana_program::pubkey::Pubkey>,
 
     pub whitelist: solana_program::pubkey::Pubkey,
 
@@ -39,9 +39,9 @@ impl UpdateWhitelistV2 {
             self.update_authority,
             true,
         ));
-        if let Some(new_authority) = self.new_authority {
+        if let Some(new_update_authority) = self.new_update_authority {
             accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                new_authority,
+                new_update_authority,
                 true,
             ));
         } else {
@@ -98,13 +98,13 @@ pub struct UpdateWhitelistV2InstructionArgs {
 /// ### Accounts:
 ///
 ///   0. `[writable, signer]` update_authority
-///   1. `[signer, optional]` new_authority
+///   1. `[signer, optional]` new_update_authority
 ///   2. `[writable]` whitelist
 ///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Default)]
 pub struct UpdateWhitelistV2Builder {
     update_authority: Option<solana_program::pubkey::Pubkey>,
-    new_authority: Option<solana_program::pubkey::Pubkey>,
+    new_update_authority: Option<solana_program::pubkey::Pubkey>,
     whitelist: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
     freeze_authority: Option<Toggle>,
@@ -126,11 +126,11 @@ impl UpdateWhitelistV2Builder {
     }
     /// `[optional account]`
     #[inline(always)]
-    pub fn new_authority(
+    pub fn new_update_authority(
         &mut self,
-        new_authority: Option<solana_program::pubkey::Pubkey>,
+        new_update_authority: Option<solana_program::pubkey::Pubkey>,
     ) -> &mut Self {
-        self.new_authority = new_authority;
+        self.new_update_authority = new_update_authority;
         self
     }
     #[inline(always)]
@@ -177,7 +177,7 @@ impl UpdateWhitelistV2Builder {
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         let accounts = UpdateWhitelistV2 {
             update_authority: self.update_authority.expect("update_authority is not set"),
-            new_authority: self.new_authority,
+            new_update_authority: self.new_update_authority,
             whitelist: self.whitelist.expect("whitelist is not set"),
             system_program: self
                 .system_program
@@ -199,7 +199,7 @@ impl UpdateWhitelistV2Builder {
 pub struct UpdateWhitelistV2CpiAccounts<'a, 'b> {
     pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
 
-    pub new_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pub new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
 
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
 
@@ -213,7 +213,7 @@ pub struct UpdateWhitelistV2Cpi<'a, 'b> {
 
     pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
 
-    pub new_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pub new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
 
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
 
@@ -231,7 +231,7 @@ impl<'a, 'b> UpdateWhitelistV2Cpi<'a, 'b> {
         Self {
             __program: program,
             update_authority: accounts.update_authority,
-            new_authority: accounts.new_authority,
+            new_update_authority: accounts.new_update_authority,
             whitelist: accounts.whitelist,
             system_program: accounts.system_program,
             __args: args,
@@ -275,9 +275,9 @@ impl<'a, 'b> UpdateWhitelistV2Cpi<'a, 'b> {
             *self.update_authority.key,
             true,
         ));
-        if let Some(new_authority) = self.new_authority {
+        if let Some(new_update_authority) = self.new_update_authority {
             accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-                *new_authority.key,
+                *new_update_authority.key,
                 true,
             ));
         } else {
@@ -315,8 +315,8 @@ impl<'a, 'b> UpdateWhitelistV2Cpi<'a, 'b> {
         let mut account_infos = Vec::with_capacity(4 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.update_authority.clone());
-        if let Some(new_authority) = self.new_authority {
-            account_infos.push(new_authority.clone());
+        if let Some(new_update_authority) = self.new_update_authority {
+            account_infos.push(new_update_authority.clone());
         }
         account_infos.push(self.whitelist.clone());
         account_infos.push(self.system_program.clone());
@@ -337,7 +337,7 @@ impl<'a, 'b> UpdateWhitelistV2Cpi<'a, 'b> {
 /// ### Accounts:
 ///
 ///   0. `[writable, signer]` update_authority
-///   1. `[signer, optional]` new_authority
+///   1. `[signer, optional]` new_update_authority
 ///   2. `[writable]` whitelist
 ///   3. `[]` system_program
 pub struct UpdateWhitelistV2CpiBuilder<'a, 'b> {
@@ -349,7 +349,7 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
         let instruction = Box::new(UpdateWhitelistV2CpiBuilderInstruction {
             __program: program,
             update_authority: None,
-            new_authority: None,
+            new_update_authority: None,
             whitelist: None,
             system_program: None,
             freeze_authority: None,
@@ -368,11 +368,11 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
     }
     /// `[optional account]`
     #[inline(always)]
-    pub fn new_authority(
+    pub fn new_update_authority(
         &mut self,
-        new_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+        new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     ) -> &mut Self {
-        self.instruction.new_authority = new_authority;
+        self.instruction.new_update_authority = new_update_authority;
         self
     }
     #[inline(always)]
@@ -459,7 +459,7 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
                 .update_authority
                 .expect("update_authority is not set"),
 
-            new_authority: self.instruction.new_authority,
+            new_update_authority: self.instruction.new_update_authority,
 
             whitelist: self.instruction.whitelist.expect("whitelist is not set"),
 
@@ -479,7 +479,7 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
 struct UpdateWhitelistV2CpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    new_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     whitelist: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     freeze_authority: Option<Toggle>,

@@ -58,7 +58,7 @@ import {
 export type UpdateWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
   TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
-  TAccountNewAuthority extends string | IAccountMeta<string> = string,
+  TAccountNewUpdateAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
@@ -71,9 +71,9 @@ export type UpdateWhitelistV2Instruction<
       TAccountUpdateAuthority extends string
         ? WritableSignerAccount<TAccountUpdateAuthority>
         : TAccountUpdateAuthority,
-      TAccountNewAuthority extends string
-        ? ReadonlySignerAccount<TAccountNewAuthority>
-        : TAccountNewAuthority,
+      TAccountNewUpdateAuthority extends string
+        ? ReadonlySignerAccount<TAccountNewUpdateAuthority>
+        : TAccountNewUpdateAuthority,
       TAccountWhitelist extends string
         ? WritableAccount<TAccountWhitelist>
         : TAccountWhitelist,
@@ -87,7 +87,7 @@ export type UpdateWhitelistV2Instruction<
 export type UpdateWhitelistV2InstructionWithSigners<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
   TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
-  TAccountNewAuthority extends string | IAccountMeta<string> = string,
+  TAccountNewUpdateAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
@@ -101,10 +101,10 @@ export type UpdateWhitelistV2InstructionWithSigners<
         ? WritableSignerAccount<TAccountUpdateAuthority> &
             IAccountSignerMeta<TAccountUpdateAuthority>
         : TAccountUpdateAuthority,
-      TAccountNewAuthority extends string
-        ? ReadonlySignerAccount<TAccountNewAuthority> &
-            IAccountSignerMeta<TAccountNewAuthority>
-        : TAccountNewAuthority,
+      TAccountNewUpdateAuthority extends string
+        ? ReadonlySignerAccount<TAccountNewUpdateAuthority> &
+            IAccountSignerMeta<TAccountNewUpdateAuthority>
+        : TAccountNewUpdateAuthority,
       TAccountWhitelist extends string
         ? WritableAccount<TAccountWhitelist>
         : TAccountWhitelist,
@@ -164,12 +164,12 @@ export function getUpdateWhitelistV2InstructionDataCodec(): Codec<
 
 export type UpdateWhitelistV2Input<
   TAccountUpdateAuthority extends string,
-  TAccountNewAuthority extends string,
+  TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string
 > = {
   updateAuthority: Address<TAccountUpdateAuthority>;
-  newAuthority?: Address<TAccountNewAuthority>;
+  newUpdateAuthority?: Address<TAccountNewUpdateAuthority>;
   whitelist: Address<TAccountWhitelist>;
   systemProgram?: Address<TAccountSystemProgram>;
   freezeAuthority: UpdateWhitelistV2InstructionDataArgs['freezeAuthority'];
@@ -178,12 +178,12 @@ export type UpdateWhitelistV2Input<
 
 export type UpdateWhitelistV2InputWithSigners<
   TAccountUpdateAuthority extends string,
-  TAccountNewAuthority extends string,
+  TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string
 > = {
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
-  newAuthority?: TransactionSigner<TAccountNewAuthority>;
+  newUpdateAuthority?: TransactionSigner<TAccountNewUpdateAuthority>;
   whitelist: Address<TAccountWhitelist>;
   systemProgram?: Address<TAccountSystemProgram>;
   freezeAuthority: UpdateWhitelistV2InstructionDataArgs['freezeAuthority'];
@@ -192,54 +192,54 @@ export type UpdateWhitelistV2InputWithSigners<
 
 export function getUpdateWhitelistV2Instruction<
   TAccountUpdateAuthority extends string,
-  TAccountNewAuthority extends string,
+  TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: UpdateWhitelistV2InputWithSigners<
     TAccountUpdateAuthority,
-    TAccountNewAuthority,
+    TAccountNewUpdateAuthority,
     TAccountWhitelist,
     TAccountSystemProgram
   >
 ): UpdateWhitelistV2InstructionWithSigners<
   TProgram,
   TAccountUpdateAuthority,
-  TAccountNewAuthority,
+  TAccountNewUpdateAuthority,
   TAccountWhitelist,
   TAccountSystemProgram
 >;
 export function getUpdateWhitelistV2Instruction<
   TAccountUpdateAuthority extends string,
-  TAccountNewAuthority extends string,
+  TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: UpdateWhitelistV2Input<
     TAccountUpdateAuthority,
-    TAccountNewAuthority,
+    TAccountNewUpdateAuthority,
     TAccountWhitelist,
     TAccountSystemProgram
   >
 ): UpdateWhitelistV2Instruction<
   TProgram,
   TAccountUpdateAuthority,
-  TAccountNewAuthority,
+  TAccountNewUpdateAuthority,
   TAccountWhitelist,
   TAccountSystemProgram
 >;
 export function getUpdateWhitelistV2Instruction<
   TAccountUpdateAuthority extends string,
-  TAccountNewAuthority extends string,
+  TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: UpdateWhitelistV2Input<
     TAccountUpdateAuthority,
-    TAccountNewAuthority,
+    TAccountNewUpdateAuthority,
     TAccountWhitelist,
     TAccountSystemProgram
   >
@@ -253,14 +253,17 @@ export function getUpdateWhitelistV2Instruction<
     typeof getUpdateWhitelistV2InstructionRaw<
       TProgram,
       TAccountUpdateAuthority,
-      TAccountNewAuthority,
+      TAccountNewUpdateAuthority,
       TAccountWhitelist,
       TAccountSystemProgram
     >
   >[0];
   const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
     updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
-    newAuthority: { value: input.newAuthority ?? null, isWritable: false },
+    newUpdateAuthority: {
+      value: input.newUpdateAuthority ?? null,
+      isWritable: false,
+    },
     whitelist: { value: input.whitelist ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
@@ -293,7 +296,7 @@ export function getUpdateWhitelistV2Instruction<
 export function getUpdateWhitelistV2InstructionRaw<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
   TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
-  TAccountNewAuthority extends string | IAccountMeta<string> = string,
+  TAccountNewUpdateAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
@@ -304,9 +307,9 @@ export function getUpdateWhitelistV2InstructionRaw<
     updateAuthority: TAccountUpdateAuthority extends string
       ? Address<TAccountUpdateAuthority>
       : TAccountUpdateAuthority;
-    newAuthority?: TAccountNewAuthority extends string
-      ? Address<TAccountNewAuthority>
-      : TAccountNewAuthority;
+    newUpdateAuthority?: TAccountNewUpdateAuthority extends string
+      ? Address<TAccountNewUpdateAuthority>
+      : TAccountNewUpdateAuthority;
     whitelist: TAccountWhitelist extends string
       ? Address<TAccountWhitelist>
       : TAccountWhitelist;
@@ -325,7 +328,7 @@ export function getUpdateWhitelistV2InstructionRaw<
         AccountRole.WRITABLE_SIGNER
       ),
       accountMetaWithDefault(
-        accounts.newAuthority ?? {
+        accounts.newUpdateAuthority ?? {
           address:
             'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>,
           role: AccountRole.READONLY,
@@ -345,7 +348,7 @@ export function getUpdateWhitelistV2InstructionRaw<
   } as UpdateWhitelistV2Instruction<
     TProgram,
     TAccountUpdateAuthority,
-    TAccountNewAuthority,
+    TAccountNewUpdateAuthority,
     TAccountWhitelist,
     TAccountSystemProgram,
     TRemainingAccounts
@@ -359,7 +362,7 @@ export type ParsedUpdateWhitelistV2Instruction<
   programAddress: Address<TProgram>;
   accounts: {
     updateAuthority: TAccountMetas[0];
-    newAuthority?: TAccountMetas[1] | undefined;
+    newUpdateAuthority?: TAccountMetas[1] | undefined;
     whitelist: TAccountMetas[2];
     systemProgram: TAccountMetas[3];
   };
@@ -394,7 +397,7 @@ export function parseUpdateWhitelistV2Instruction<
     programAddress: instruction.programAddress,
     accounts: {
       updateAuthority: getNextAccount(),
-      newAuthority: getNextOptionalAccount(),
+      newUpdateAuthority: getNextOptionalAccount(),
       whitelist: getNextAccount(),
       systemProgram: getNextAccount(),
     },
