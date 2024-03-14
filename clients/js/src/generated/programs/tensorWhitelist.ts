@@ -78,9 +78,11 @@ export enum TensorWhitelistInstruction {
   ReallocWhitelist,
   UnfreezeWhitelist,
   CreateWhitelistV2,
-  EditWhitelistV2,
+  UpdateWhitelistV2,
   CreateMintProofV2,
   CloseMintProofV2,
+  FreezeWhitelistV2,
+  UnfreezeWhitelistV2,
 }
 
 export function identifyTensorWhitelistInstruction(
@@ -112,14 +114,20 @@ export function identifyTensorWhitelistInstruction(
   if (memcmp(data, new Uint8Array([31, 207, 213, 77, 105, 13, 127, 98]), 0)) {
     return TensorWhitelistInstruction.CreateWhitelistV2;
   }
-  if (memcmp(data, new Uint8Array([64, 183, 223, 226, 136, 69, 83, 11]), 0)) {
-    return TensorWhitelistInstruction.EditWhitelistV2;
+  if (memcmp(data, new Uint8Array([184, 188, 157, 214, 205, 49, 74, 226]), 0)) {
+    return TensorWhitelistInstruction.UpdateWhitelistV2;
   }
   if (memcmp(data, new Uint8Array([219, 176, 21, 37, 145, 89, 154, 53]), 0)) {
     return TensorWhitelistInstruction.CreateMintProofV2;
   }
   if (memcmp(data, new Uint8Array([237, 78, 8, 208, 47, 148, 145, 170]), 0)) {
     return TensorWhitelistInstruction.CloseMintProofV2;
+  }
+  if (memcmp(data, new Uint8Array([69, 158, 243, 78, 116, 68, 221, 113]), 0)) {
+    return TensorWhitelistInstruction.FreezeWhitelistV2;
+  }
+  if (memcmp(data, new Uint8Array([51, 105, 214, 84, 252, 188, 26, 1]), 0)) {
+    return TensorWhitelistInstruction.UnfreezeWhitelistV2;
   }
   throw new Error(
     'The provided instruction could not be identified as a tensorWhitelist instruction.'

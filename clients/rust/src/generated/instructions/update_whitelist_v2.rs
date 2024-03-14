@@ -11,7 +11,7 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct EditWhitelistV2 {
+pub struct UpdateWhitelistV2 {
     pub update_authority: solana_program::pubkey::Pubkey,
 
     pub new_authority: Option<solana_program::pubkey::Pubkey>,
@@ -21,17 +21,17 @@ pub struct EditWhitelistV2 {
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
-impl EditWhitelistV2 {
+impl UpdateWhitelistV2 {
     pub fn instruction(
         &self,
-        args: EditWhitelistV2InstructionArgs,
+        args: UpdateWhitelistV2InstructionArgs,
     ) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: EditWhitelistV2InstructionArgs,
+        args: UpdateWhitelistV2InstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
         let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
@@ -59,7 +59,9 @@ impl EditWhitelistV2 {
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = EditWhitelistV2InstructionData::new().try_to_vec().unwrap();
+        let mut data = UpdateWhitelistV2InstructionData::new()
+            .try_to_vec()
+            .unwrap();
         let mut args = args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -72,26 +74,26 @@ impl EditWhitelistV2 {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct EditWhitelistV2InstructionData {
+struct UpdateWhitelistV2InstructionData {
     discriminator: [u8; 8],
 }
 
-impl EditWhitelistV2InstructionData {
+impl UpdateWhitelistV2InstructionData {
     fn new() -> Self {
         Self {
-            discriminator: [64, 183, 223, 226, 136, 69, 83, 11],
+            discriminator: [184, 188, 157, 214, 205, 49, 74, 226],
         }
     }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct EditWhitelistV2InstructionArgs {
+pub struct UpdateWhitelistV2InstructionArgs {
     pub freeze_authority: Toggle,
     pub conditions: Option<Vec<Condition>>,
 }
 
-/// Instruction builder for `EditWhitelistV2`.
+/// Instruction builder for `UpdateWhitelistV2`.
 ///
 /// ### Accounts:
 ///
@@ -100,7 +102,7 @@ pub struct EditWhitelistV2InstructionArgs {
 ///   2. `[writable]` whitelist
 ///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Default)]
-pub struct EditWhitelistV2Builder {
+pub struct UpdateWhitelistV2Builder {
     update_authority: Option<solana_program::pubkey::Pubkey>,
     new_authority: Option<solana_program::pubkey::Pubkey>,
     whitelist: Option<solana_program::pubkey::Pubkey>,
@@ -110,7 +112,7 @@ pub struct EditWhitelistV2Builder {
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl EditWhitelistV2Builder {
+impl UpdateWhitelistV2Builder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -173,7 +175,7 @@ impl EditWhitelistV2Builder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = EditWhitelistV2 {
+        let accounts = UpdateWhitelistV2 {
             update_authority: self.update_authority.expect("update_authority is not set"),
             new_authority: self.new_authority,
             whitelist: self.whitelist.expect("whitelist is not set"),
@@ -181,7 +183,7 @@ impl EditWhitelistV2Builder {
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
-        let args = EditWhitelistV2InstructionArgs {
+        let args = UpdateWhitelistV2InstructionArgs {
             freeze_authority: self
                 .freeze_authority
                 .clone()
@@ -193,8 +195,8 @@ impl EditWhitelistV2Builder {
     }
 }
 
-/// `edit_whitelist_v2` CPI accounts.
-pub struct EditWhitelistV2CpiAccounts<'a, 'b> {
+/// `update_whitelist_v2` CPI accounts.
+pub struct UpdateWhitelistV2CpiAccounts<'a, 'b> {
     pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub new_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
@@ -204,8 +206,8 @@ pub struct EditWhitelistV2CpiAccounts<'a, 'b> {
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-/// `edit_whitelist_v2` CPI instruction.
-pub struct EditWhitelistV2Cpi<'a, 'b> {
+/// `update_whitelist_v2` CPI instruction.
+pub struct UpdateWhitelistV2Cpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
 
@@ -217,14 +219,14 @@ pub struct EditWhitelistV2Cpi<'a, 'b> {
 
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
-    pub __args: EditWhitelistV2InstructionArgs,
+    pub __args: UpdateWhitelistV2InstructionArgs,
 }
 
-impl<'a, 'b> EditWhitelistV2Cpi<'a, 'b> {
+impl<'a, 'b> UpdateWhitelistV2Cpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: EditWhitelistV2CpiAccounts<'a, 'b>,
-        args: EditWhitelistV2InstructionArgs,
+        accounts: UpdateWhitelistV2CpiAccounts<'a, 'b>,
+        args: UpdateWhitelistV2InstructionArgs,
     ) -> Self {
         Self {
             __program: program,
@@ -299,7 +301,9 @@ impl<'a, 'b> EditWhitelistV2Cpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = EditWhitelistV2InstructionData::new().try_to_vec().unwrap();
+        let mut data = UpdateWhitelistV2InstructionData::new()
+            .try_to_vec()
+            .unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
         data.append(&mut args);
 
@@ -328,7 +332,7 @@ impl<'a, 'b> EditWhitelistV2Cpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `EditWhitelistV2` via CPI.
+/// Instruction builder for `UpdateWhitelistV2` via CPI.
 ///
 /// ### Accounts:
 ///
@@ -336,13 +340,13 @@ impl<'a, 'b> EditWhitelistV2Cpi<'a, 'b> {
 ///   1. `[signer, optional]` new_authority
 ///   2. `[writable]` whitelist
 ///   3. `[]` system_program
-pub struct EditWhitelistV2CpiBuilder<'a, 'b> {
-    instruction: Box<EditWhitelistV2CpiBuilderInstruction<'a, 'b>>,
+pub struct UpdateWhitelistV2CpiBuilder<'a, 'b> {
+    instruction: Box<UpdateWhitelistV2CpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> EditWhitelistV2CpiBuilder<'a, 'b> {
+impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(EditWhitelistV2CpiBuilderInstruction {
+        let instruction = Box::new(UpdateWhitelistV2CpiBuilderInstruction {
             __program: program,
             update_authority: None,
             new_authority: None,
@@ -439,7 +443,7 @@ impl<'a, 'b> EditWhitelistV2CpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let args = EditWhitelistV2InstructionArgs {
+        let args = UpdateWhitelistV2InstructionArgs {
             freeze_authority: self
                 .instruction
                 .freeze_authority
@@ -447,7 +451,7 @@ impl<'a, 'b> EditWhitelistV2CpiBuilder<'a, 'b> {
                 .expect("freeze_authority is not set"),
             conditions: self.instruction.conditions.clone(),
         };
-        let instruction = EditWhitelistV2Cpi {
+        let instruction = UpdateWhitelistV2Cpi {
             __program: self.instruction.__program,
 
             update_authority: self
@@ -472,7 +476,7 @@ impl<'a, 'b> EditWhitelistV2CpiBuilder<'a, 'b> {
     }
 }
 
-struct EditWhitelistV2CpiBuilderInstruction<'a, 'b> {
+struct UpdateWhitelistV2CpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     new_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,

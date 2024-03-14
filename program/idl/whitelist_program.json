@@ -368,7 +368,7 @@
       ]
     },
     {
-      "name": "editWhitelistV2",
+      "name": "updateWhitelistV2",
       "accounts": [
         {
           "name": "updateAuthority",
@@ -396,7 +396,7 @@
         {
           "name": "args",
           "type": {
-            "defined": "EditWhitelistV2Args"
+            "defined": "UpdateWhitelistV2Args"
           }
         }
       ]
@@ -465,6 +465,38 @@
         {
           "name": "systemProgram",
           "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "freezeWhitelistV2",
+      "accounts": [
+        {
+          "name": "freezeAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unfreezeWhitelistV2",
+      "accounts": [
+        {
+          "name": "freezeAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
           "isSigner": false
         }
       ],
@@ -737,7 +769,7 @@
       }
     },
     {
-      "name": "EditWhitelistV2Args",
+      "name": "UpdateWhitelistV2Args",
       "type": {
         "kind": "struct",
         "fields": [
@@ -846,9 +878,6 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "Empty"
-          },
-          {
             "name": "VOC"
           },
           {
@@ -936,6 +965,11 @@
       "code": 6014,
       "name": "TooManyMerkleProofs",
       "msg": "too many merkle proofs"
+    },
+    {
+      "code": 6015,
+      "name": "WhitelistIsFrozen",
+      "msg": "whitelist is frozen"
     }
   ],
   "metadata": {

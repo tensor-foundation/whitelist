@@ -83,11 +83,11 @@ pub mod whitelist_program {
         process_create_whitelist_v2(ctx, args)
     }
 
-    pub fn edit_whitelist_v2(
-        ctx: Context<EditWhitelistV2>,
-        args: EditWhitelistV2Args,
+    pub fn update_whitelist_v2(
+        ctx: Context<UpdateWhitelistV2>,
+        args: UpdateWhitelistV2Args,
     ) -> Result<()> {
-        process_edit_whitelist_v2(ctx, args)
+        process_update_whitelist_v2(ctx, args)
     }
 
     pub fn create_mint_proof_v2(
@@ -99,5 +99,13 @@ pub mod whitelist_program {
 
     pub fn close_mint_proof_v2(ctx: Context<CloseMintProofV2>) -> Result<()> {
         process_close_mint_proof_v2(ctx)
+    }
+
+    pub fn freeze_whitelist_v2(ctx: Context<FreezeWhitelistV2>) -> Result<()> {
+        process_freeze_whitelist_v2(ctx)
+    }
+
+    pub fn unfreeze_whitelist_v2(ctx: Context<UnfreezeWhitelistV2>) -> Result<()> {
+        process_unfreeze_whitelist_v2(ctx)
     }
 }

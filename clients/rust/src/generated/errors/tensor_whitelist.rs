@@ -55,6 +55,9 @@ pub enum TensorWhitelistError {
     /// 6014 (0x177E) - too many merkle proofs
     #[error("too many merkle proofs")]
     TooManyMerkleProofs,
+    /// 6015 (0x177F) - whitelist is frozen
+    #[error("whitelist is frozen")]
+    WhitelistIsFrozen,
 }
 
 impl solana_program::program_error::PrintProgramError for TensorWhitelistError {

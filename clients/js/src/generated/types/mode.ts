@@ -13,7 +13,6 @@ import {
 } from '@solana/codecs-data-structures';
 
 export enum Mode {
-  Empty,
   VOC,
   FVC,
   MerkleProof,

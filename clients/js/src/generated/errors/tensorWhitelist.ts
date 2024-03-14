@@ -37,6 +37,8 @@ export const enum TensorWhitelistProgramErrorCode {
   TOO_MANY_CONDITIONS = 0x177d, // 6013
   /** TooManyMerkleProofs: too many merkle proofs */
   TOO_MANY_MERKLE_PROOFS = 0x177e, // 6014
+  /** WhitelistIsFrozen: whitelist is frozen */
+  WHITELIST_IS_FROZEN = 0x177f, // 6015
 }
 
 export class TensorWhitelistProgramError extends Error {
@@ -122,6 +124,10 @@ if (__DEV__) {
     [TensorWhitelistProgramErrorCode.TOO_MANY_MERKLE_PROOFS]: [
       'TooManyMerkleProofs',
       `too many merkle proofs`,
+    ],
+    [TensorWhitelistProgramErrorCode.WHITELIST_IS_FROZEN]: [
+      'WhitelistIsFrozen',
+      `whitelist is frozen`,
     ],
   };
 }

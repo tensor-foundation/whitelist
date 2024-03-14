@@ -46,4 +46,7 @@ pub enum ErrorCode {
 
     #[msg("too many merkle proofs")]
     TooManyMerkleProofs = 14,
+
+    #[msg("whitelist is frozen")]
+    WhitelistIsFrozen = 15,
 }

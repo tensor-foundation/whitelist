@@ -40,6 +40,10 @@ impl WhitelistV2 {
     // 33 bytes for Mode + Pubkey
     pub const CONDITION_SIZE: usize = std::mem::size_of::<u8>() + std::mem::size_of::<Pubkey>();
 
+    pub fn is_frozen(&self) -> bool {
+        self.state == State::Frozen
+    }
+
     // Limit the number of conditions to control compute usage.
     pub fn validate_conditions(conditions: &[Condition]) -> Result<()> {
         if conditions.len() > WHITELIST_V2_CONDITIONS_LENGTH {
@@ -109,7 +113,6 @@ impl Condition {
         proof: &Option<FullMerkleProof>,
     ) -> Result<()> {
         match self.mode {
-            Mode::Empty => (),
             Mode::MerkleProof => {
                 if let Some(proof) = proof {
                     if !validate_proof(&self.value.to_bytes(), &proof.leaf, &proof.proof) {
@@ -153,7 +156,6 @@ impl Condition {
 #[repr(u8)]
 #[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, PartialEq)]
 pub enum Mode {
-    Empty,
     VOC,
     FVC,
     MerkleProof,

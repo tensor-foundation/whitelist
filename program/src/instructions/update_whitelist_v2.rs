@@ -2,7 +2,7 @@ use crate::{error::ErrorCode, state::WhitelistV2, Condition, VEC_LENGTH};
 use anchor_lang::prelude::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct EditWhitelistV2Args {
+pub struct UpdateWhitelistV2Args {
     freeze_authority: Toggle,
     conditions: Option<Vec<Condition>>,
 }
@@ -42,8 +42,8 @@ impl Toggle {
 }
 
 #[derive(Accounts)]
-#[instruction(args: EditWhitelistV2Args)]
-pub struct EditWhitelistV2<'info> {
+#[instruction(args: UpdateWhitelistV2Args)]
+pub struct UpdateWhitelistV2<'info> {
     #[account(mut)]
     pub update_authority: Signer<'info>,
 
@@ -62,7 +62,7 @@ pub struct EditWhitelistV2<'info> {
         // args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() just get us either
         // 1) the length of the passed in conditions, or the length of the current conditions
         realloc = WhitelistV2::BASE_SIZE + VEC_LENGTH + args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() * WhitelistV2::CONDITION_SIZE,
-        realloc::zero = false,
+        realloc::zero = false,  // TODO: Check if this needs to be true
         realloc::payer = update_authority,
         has_one = update_authority @ ErrorCode::InvalidAuthority
     )]
@@ -73,16 +73,20 @@ pub struct EditWhitelistV2<'info> {
 
 //  TODO: Add access control
 // #[access_control(WhitelistV2::validate_conditions(&args.conditions.unwrap_or(vec![])))]
-pub fn process_edit_whitelist_v2(
-    ctx: Context<EditWhitelistV2>,
-    args: EditWhitelistV2Args,
+pub fn process_update_whitelist_v2(
+    ctx: Context<UpdateWhitelistV2>,
+    args: UpdateWhitelistV2Args,
 ) -> Result<()> {
     let whitelist = &mut ctx.accounts.whitelist;
 
-    msg!("current conditions: {:?}", whitelist.conditions);
-    msg!("new conditions: {:?}", args.conditions);
+    // Check if the whitelist is frozen; cannot update if it is.
+    if whitelist.is_frozen() {
+        return Err(ErrorCode::WhitelistIsFrozen.into());
+    }
 
     // Update the freeze authority. If the Toggle is None, then there's nothing to do.
+    // Update authority can change the freeze authority if the whitelist is unfrozen,
+    // but cannot unfreeze the whitelist itself.
     if let Toggle::Set(authority) = args.freeze_authority {
         // Set
         whitelist.freeze_authority = authority;
@@ -98,7 +102,6 @@ pub fn process_edit_whitelist_v2(
 
     // Set new conditions if they are present. Realloc happens in the account declaration.
     if let Some(conditions) = args.conditions {
-        msg!("updating conditions");
         whitelist.conditions = conditions;
     }
 

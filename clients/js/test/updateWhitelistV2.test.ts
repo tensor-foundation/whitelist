@@ -12,12 +12,12 @@ import {
   Mode,
   WhitelistV2,
   fetchWhitelistV2,
-  getEditWhitelistV2Instruction,
+  getUpdateWhitelistV2Instruction,
   toggle,
 } from '../src';
 import { createWhitelist, getAccountDataLength } from './_common';
 
-test('it can edit a whitelist v2, reallocing to be larger', async (t) => {
+test('it can update a whitelist v2, reallocing to be larger', async (t) => {
   const client = createDefaultSolanaClient();
   const updateAuthority = await generateKeyPairSignerWithSol(client);
   const voc = (await generateKeyPairSigner()).address;
@@ -49,7 +49,7 @@ test('it can edit a whitelist v2, reallocing to be larger', async (t) => {
     { mode: Mode.FVC, value: updateAuthority.address },
   ];
 
-  const editWhitelistIx = getEditWhitelistV2Instruction({
+  const updateWhitelistIx = getUpdateWhitelistV2Instruction({
     updateAuthority,
     whitelist,
     conditions: newConditions,
@@ -58,7 +58,7 @@ test('it can edit a whitelist v2, reallocing to be larger', async (t) => {
 
   await pipe(
     await createDefaultTransaction(client, updateAuthority.address),
-    (tx) => appendTransactionInstruction(editWhitelistIx, tx),
+    (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
@@ -109,7 +109,7 @@ test('it can edit a whitelist v2 reallocing to be smaller', async (t) => {
 
   const newConditions: Condition[] = [{ mode: Mode.VOC, value: voc }];
 
-  const editWhitelistIx = getEditWhitelistV2Instruction({
+  const updateWhitelistIx = getUpdateWhitelistV2Instruction({
     updateAuthority,
     whitelist,
     conditions: newConditions,
@@ -118,7 +118,7 @@ test('it can edit a whitelist v2 reallocing to be smaller', async (t) => {
 
   await pipe(
     await createDefaultTransaction(client, updateAuthority.address),
-    (tx) => appendTransactionInstruction(editWhitelistIx, tx),
+    (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
@@ -161,7 +161,7 @@ test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
     { mode: Mode.FVC, value: updateAuthority.address },
   ];
 
-  const editWhitelistIx = getEditWhitelistV2Instruction({
+  const updateWhitelistIx = getUpdateWhitelistV2Instruction({
     updateAuthority: wrongAuthority,
     whitelist,
     conditions: newConditions,
@@ -170,7 +170,7 @@ test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
 
   const promise = pipe(
     await createDefaultTransaction(client, wrongAuthority.address),
-    (tx) => appendTransactionInstruction(editWhitelistIx, tx),
+    (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
