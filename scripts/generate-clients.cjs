@@ -88,3 +88,37 @@ kinobi.accept(
     renderParentInstructions: true,
   })
 );
+
+// Render Token Metadata types for tests.
+const fs = require("fs");
+const externalDir = path.join(clientDir, "js", "test", "external");
+const testKinobi = k.createFromJson(
+  fs.readFileSync(path.join(externalDir, "token-metadata.json"))
+);
+
+testKinobi.update(
+  k.updateInstructionsVisitor({
+    "/^delegate*$/": { delete: true },
+    "/^revoke*$/": { delete: true },
+    "/^update*$/": { delete: true },
+  })
+);
+testKinobi.update(
+  k.deleteNodesVisitor([
+    (node, _stack) => {
+      return node.kind === "instructionNode" && /delegate*/.test(node.name);
+    },
+    (node, _stack) => {
+      return node.kind === "instructionNode" && /revoke*/.test(node.name);
+    },
+    (node, _stack) => {
+      return node.kind === "instructionNode" && /update*/.test(node.name);
+    },
+  ])
+);
+
+testKinobi.accept(
+  k.renderJavaScriptExperimentalVisitor(path.join(externalDir, "generated"), {
+    prettier,
+  })
+);
