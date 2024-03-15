@@ -91,23 +91,9 @@ export type WhitelistAccountDataArgs = {
   reserved: Uint8Array;
 };
 
-export function getWhitelistAccountDataEncoder() {
+export function getWhitelistAccountDataEncoder(): Encoder<WhitelistAccountDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: Array<number>;
-      version: number;
-      bump: number;
-      /** DEPRECATED, doesn't do anything */
-      verified: boolean;
-      /** in the case when not present will be [u8; 32] */
-      rootHash: Uint8Array;
-      uuid: Uint8Array;
-      name: Uint8Array;
-      frozen: boolean;
-      voc: OptionOrNullable<Address>;
-      fvc: OptionOrNullable<Address>;
-      reserved: Uint8Array;
-    }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['version', getU8Encoder()],
       ['bump', getU8Encoder()],
@@ -124,11 +110,11 @@ export function getWhitelistAccountDataEncoder() {
       ...value,
       discriminator: [204, 176, 52, 79, 146, 121, 54, 247],
     })
-  ) satisfies Encoder<WhitelistAccountDataArgs>;
+  );
 }
 
-export function getWhitelistAccountDataDecoder() {
-  return getStructDecoder<WhitelistAccountData>([
+export function getWhitelistAccountDataDecoder(): Decoder<WhitelistAccountData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['version', getU8Decoder()],
     ['bump', getU8Decoder()],
@@ -140,7 +126,7 @@ export function getWhitelistAccountDataDecoder() {
     ['voc', getOptionDecoder(getAddressDecoder())],
     ['fvc', getOptionDecoder(getAddressDecoder())],
     ['reserved', getBytesDecoder({ size: 64 })],
-  ]) satisfies Decoder<WhitelistAccountData>;
+  ]);
 }
 
 export function getWhitelistAccountDataCodec(): Codec<

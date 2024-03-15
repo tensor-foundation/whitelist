@@ -28,7 +28,7 @@ test('it can initialize a new update authority', async (t) => {
   });
 
   await pipe(
-    await createDefaultTransaction(client, cosigner.address),
+    await createDefaultTransaction(client, cosigner),
     (tx) => appendTransactionInstruction(initUpdateAuthority, tx),
     (tx) => signAndSendTransaction(client, tx)
   );

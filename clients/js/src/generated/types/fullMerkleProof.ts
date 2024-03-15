@@ -20,18 +20,18 @@ export type FullMerkleProof = { proof: Array<Uint8Array>; leaf: Uint8Array };
 
 export type FullMerkleProofArgs = FullMerkleProof;
 
-export function getFullMerkleProofEncoder() {
-  return getStructEncoder<FullMerkleProofArgs>([
+export function getFullMerkleProofEncoder(): Encoder<FullMerkleProofArgs> {
+  return getStructEncoder([
     ['proof', getArrayEncoder(getBytesEncoder({ size: 32 }))],
     ['leaf', getBytesEncoder({ size: 32 })],
-  ]) satisfies Encoder<FullMerkleProofArgs>;
+  ]);
 }
 
-export function getFullMerkleProofDecoder() {
-  return getStructDecoder<FullMerkleProof>([
+export function getFullMerkleProofDecoder(): Decoder<FullMerkleProof> {
+  return getStructDecoder([
     ['proof', getArrayDecoder(getBytesDecoder({ size: 32 }))],
     ['leaf', getBytesDecoder({ size: 32 })],
-  ]) satisfies Decoder<FullMerkleProof>;
+  ]);
 }
 
 export function getFullMerkleProofCodec(): Codec<

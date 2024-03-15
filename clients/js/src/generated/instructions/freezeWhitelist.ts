@@ -102,22 +102,22 @@ export type FreezeWhitelistInstructionData = { discriminator: Array<number> };
 
 export type FreezeWhitelistInstructionDataArgs = {};
 
-export function getFreezeWhitelistInstructionDataEncoder() {
+export function getFreezeWhitelistInstructionDataEncoder(): Encoder<FreezeWhitelistInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: Array<number> }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
     ]),
     (value) => ({
       ...value,
       discriminator: [248, 112, 12, 150, 175, 238, 38, 184],
     })
-  ) satisfies Encoder<FreezeWhitelistInstructionDataArgs>;
+  );
 }
 
-export function getFreezeWhitelistInstructionDataDecoder() {
-  return getStructDecoder<FreezeWhitelistInstructionData>([
+export function getFreezeWhitelistInstructionDataDecoder(): Decoder<FreezeWhitelistInstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-  ]) satisfies Decoder<FreezeWhitelistInstructionData>;
+  ]);
 }
 
 export function getFreezeWhitelistInstructionDataCodec(): Codec<

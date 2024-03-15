@@ -77,20 +77,9 @@ export type AuthorityAccountDataArgs = {
   reserved: Uint8Array;
 };
 
-export function getAuthorityAccountDataEncoder() {
+export function getAuthorityAccountDataEncoder(): Encoder<AuthorityAccountDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: Array<number>;
-      bump: number;
-      /** cosigner of the whitelist - has rights to update it if unfrozen */
-      cosigner: Address;
-      /**
-       * owner of the whitelist (stricter, should be handled more carefully)
-       * has rights to 1)freeze, 2)unfreeze, 3)update frozen whitelists
-       */
-      owner: Address;
-      reserved: Uint8Array;
-    }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['bump', getU8Encoder()],
       ['cosigner', getAddressEncoder()],
@@ -101,17 +90,17 @@ export function getAuthorityAccountDataEncoder() {
       ...value,
       discriminator: [36, 108, 254, 18, 167, 144, 27, 36],
     })
-  ) satisfies Encoder<AuthorityAccountDataArgs>;
+  );
 }
 
-export function getAuthorityAccountDataDecoder() {
-  return getStructDecoder<AuthorityAccountData>([
+export function getAuthorityAccountDataDecoder(): Decoder<AuthorityAccountData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['bump', getU8Decoder()],
     ['cosigner', getAddressDecoder()],
     ['owner', getAddressDecoder()],
     ['reserved', getBytesDecoder({ size: 64 })],
-  ]) satisfies Decoder<AuthorityAccountData>;
+  ]);
 }
 
 export function getAuthorityAccountDataCodec(): Codec<

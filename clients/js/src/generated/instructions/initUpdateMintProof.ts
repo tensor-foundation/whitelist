@@ -115,24 +115,21 @@ export type InitUpdateMintProofInstructionDataArgs = {
   proof: Array<Uint8Array>;
 };
 
-export function getInitUpdateMintProofInstructionDataEncoder() {
+export function getInitUpdateMintProofInstructionDataEncoder(): Encoder<InitUpdateMintProofInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: Array<number>;
-      proof: Array<Uint8Array>;
-    }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['proof', getArrayEncoder(getBytesEncoder({ size: 32 }))],
     ]),
     (value) => ({ ...value, discriminator: [30, 77, 123, 9, 191, 37, 52, 159] })
-  ) satisfies Encoder<InitUpdateMintProofInstructionDataArgs>;
+  );
 }
 
-export function getInitUpdateMintProofInstructionDataDecoder() {
-  return getStructDecoder<InitUpdateMintProofInstructionData>([
+export function getInitUpdateMintProofInstructionDataDecoder(): Decoder<InitUpdateMintProofInstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['proof', getArrayDecoder(getBytesDecoder({ size: 32 }))],
-  ]) satisfies Decoder<InitUpdateMintProofInstructionData>;
+  ]);
 }
 
 export function getInitUpdateMintProofInstructionDataCodec(): Codec<

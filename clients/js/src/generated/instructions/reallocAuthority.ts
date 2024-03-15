@@ -94,19 +94,19 @@ export type ReallocAuthorityInstructionData = { discriminator: Array<number> };
 
 export type ReallocAuthorityInstructionDataArgs = {};
 
-export function getReallocAuthorityInstructionDataEncoder() {
+export function getReallocAuthorityInstructionDataEncoder(): Encoder<ReallocAuthorityInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: Array<number> }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
     ]),
     (value) => ({ ...value, discriminator: [128, 120, 16, 197, 85, 34, 2, 91] })
-  ) satisfies Encoder<ReallocAuthorityInstructionDataArgs>;
+  );
 }
 
-export function getReallocAuthorityInstructionDataDecoder() {
-  return getStructDecoder<ReallocAuthorityInstructionData>([
+export function getReallocAuthorityInstructionDataDecoder(): Decoder<ReallocAuthorityInstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-  ]) satisfies Decoder<ReallocAuthorityInstructionData>;
+  ]);
 }
 
 export function getReallocAuthorityInstructionDataCodec(): Codec<

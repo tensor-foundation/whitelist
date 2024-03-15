@@ -13,6 +13,15 @@ import {
   TensorWhitelistProgramErrorCode,
   getTensorWhitelistProgramErrorFromCode,
 } from '../errors';
+import {
+  ParsedFreezeWhitelistInstruction,
+  ParsedInitUpdateAuthorityInstruction,
+  ParsedInitUpdateMintProofInstruction,
+  ParsedInitUpdateWhitelistInstruction,
+  ParsedReallocAuthorityInstruction,
+  ParsedReallocWhitelistInstruction,
+  ParsedUnfreezeWhitelistInstruction,
+} from '../instructions';
 import { memcmp } from '../shared';
 
 export const TENSOR_WHITELIST_PROGRAM_ADDRESS =
@@ -101,3 +110,28 @@ export function identifyTensorWhitelistInstruction(
     'The provided instruction could not be identified as a tensorWhitelist instruction.'
   );
 }
+
+export type ParsedTensorWhitelistInstruction<
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+> =
+  | ({
+      instructionType: TensorWhitelistInstruction.FreezeWhitelist;
+    } & ParsedFreezeWhitelistInstruction<TProgram>)
+  | ({
+      instructionType: TensorWhitelistInstruction.InitUpdateAuthority;
+    } & ParsedInitUpdateAuthorityInstruction<TProgram>)
+  | ({
+      instructionType: TensorWhitelistInstruction.InitUpdateMintProof;
+    } & ParsedInitUpdateMintProofInstruction<TProgram>)
+  | ({
+      instructionType: TensorWhitelistInstruction.InitUpdateWhitelist;
+    } & ParsedInitUpdateWhitelistInstruction<TProgram>)
+  | ({
+      instructionType: TensorWhitelistInstruction.ReallocAuthority;
+    } & ParsedReallocAuthorityInstruction<TProgram>)
+  | ({
+      instructionType: TensorWhitelistInstruction.ReallocWhitelist;
+    } & ParsedReallocWhitelistInstruction<TProgram>)
+  | ({
+      instructionType: TensorWhitelistInstruction.UnfreezeWhitelist;
+    } & ParsedUnfreezeWhitelistInstruction<TProgram>);

@@ -121,13 +121,9 @@ export type InitUpdateAuthorityInstructionDataArgs = {
   newOwner: OptionOrNullable<Address>;
 };
 
-export function getInitUpdateAuthorityInstructionDataEncoder() {
+export function getInitUpdateAuthorityInstructionDataEncoder(): Encoder<InitUpdateAuthorityInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: Array<number>;
-      newCosigner: OptionOrNullable<Address>;
-      newOwner: OptionOrNullable<Address>;
-    }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['newCosigner', getOptionEncoder(getAddressEncoder())],
       ['newOwner', getOptionEncoder(getAddressEncoder())],
@@ -136,15 +132,15 @@ export function getInitUpdateAuthorityInstructionDataEncoder() {
       ...value,
       discriminator: [53, 144, 79, 150, 196, 110, 22, 55],
     })
-  ) satisfies Encoder<InitUpdateAuthorityInstructionDataArgs>;
+  );
 }
 
-export function getInitUpdateAuthorityInstructionDataDecoder() {
-  return getStructDecoder<InitUpdateAuthorityInstructionData>([
+export function getInitUpdateAuthorityInstructionDataDecoder(): Decoder<InitUpdateAuthorityInstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['newCosigner', getOptionDecoder(getAddressDecoder())],
     ['newOwner', getOptionDecoder(getAddressDecoder())],
-  ]) satisfies Decoder<InitUpdateAuthorityInstructionData>;
+  ]);
 }
 
 export function getInitUpdateAuthorityInstructionDataCodec(): Codec<

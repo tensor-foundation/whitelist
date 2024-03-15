@@ -128,16 +128,9 @@ export type InitUpdateWhitelistInstructionDataArgs = {
   fvc: OptionOrNullable<Address>;
 };
 
-export function getInitUpdateWhitelistInstructionDataEncoder() {
+export function getInitUpdateWhitelistInstructionDataEncoder(): Encoder<InitUpdateWhitelistInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: Array<number>;
-      uuid: Uint8Array;
-      rootHash: OptionOrNullable<Uint8Array>;
-      name: OptionOrNullable<Uint8Array>;
-      voc: OptionOrNullable<Address>;
-      fvc: OptionOrNullable<Address>;
-    }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['uuid', getBytesEncoder({ size: 32 })],
       ['rootHash', getOptionEncoder(getBytesEncoder({ size: 32 }))],
@@ -149,18 +142,18 @@ export function getInitUpdateWhitelistInstructionDataEncoder() {
       ...value,
       discriminator: [255, 1, 192, 134, 111, 49, 212, 131],
     })
-  ) satisfies Encoder<InitUpdateWhitelistInstructionDataArgs>;
+  );
 }
 
-export function getInitUpdateWhitelistInstructionDataDecoder() {
-  return getStructDecoder<InitUpdateWhitelistInstructionData>([
+export function getInitUpdateWhitelistInstructionDataDecoder(): Decoder<InitUpdateWhitelistInstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['uuid', getBytesDecoder({ size: 32 })],
     ['rootHash', getOptionDecoder(getBytesDecoder({ size: 32 }))],
     ['name', getOptionDecoder(getBytesDecoder({ size: 32 }))],
     ['voc', getOptionDecoder(getAddressDecoder())],
     ['fvc', getOptionDecoder(getAddressDecoder())],
-  ]) satisfies Decoder<InitUpdateWhitelistInstructionData>;
+  ]);
 }
 
 export function getInitUpdateWhitelistInstructionDataCodec(): Codec<

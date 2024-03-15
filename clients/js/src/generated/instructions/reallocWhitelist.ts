@@ -102,22 +102,22 @@ export type ReallocWhitelistInstructionData = { discriminator: Array<number> };
 
 export type ReallocWhitelistInstructionDataArgs = {};
 
-export function getReallocWhitelistInstructionDataEncoder() {
+export function getReallocWhitelistInstructionDataEncoder(): Encoder<ReallocWhitelistInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: Array<number> }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
     ]),
     (value) => ({
       ...value,
       discriminator: [173, 147, 168, 152, 181, 46, 55, 60],
     })
-  ) satisfies Encoder<ReallocWhitelistInstructionDataArgs>;
+  );
 }
 
-export function getReallocWhitelistInstructionDataDecoder() {
-  return getStructDecoder<ReallocWhitelistInstructionData>([
+export function getReallocWhitelistInstructionDataDecoder(): Decoder<ReallocWhitelistInstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-  ]) satisfies Decoder<ReallocWhitelistInstructionData>;
+  ]);
 }
 
 export function getReallocWhitelistInstructionDataCodec(): Codec<

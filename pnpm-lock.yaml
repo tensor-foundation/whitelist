@@ -7,16 +7,16 @@ settings:
 devDependencies:
   '@metaplex-foundation/amman':
     specifier: ^0.12.1
-    version: 0.12.1(typescript@4.9.5)
+    version: 0.12.1(typescript@5.4.2)
   '@metaplex-foundation/kinobi':
-    specifier: ^0.17.0
-    version: 0.17.3(fastestsmallesttextencoderdecoder@1.0.22)
+    specifier: ^0.17.7
+    version: 0.17.7(fastestsmallesttextencoderdecoder@1.0.22)
   '@metaplex-foundation/shank-js':
     specifier: ^0.1.0
     version: 0.1.0
   typescript:
-    specifier: ^4.9.4
-    version: 4.9.5
+    specifier: ^5.3.3
+    version: 5.4.2
 
 packages:
 
@@ -55,7 +55,7 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@metaplex-foundation/amman@0.12.1(typescript@4.9.5):
+  /@metaplex-foundation/amman@0.12.1(typescript@5.4.2):
     resolution: {integrity: sha512-F3cdHr11ByLGMCrSBRvRCf5uIlhLE+5sWaHT2ZzcE6zVyDta3gs/A12ZBzYZS8ugNETNpJySfB42kMp1VZwbUA==}
     hasBin: true
     dependencies:
@@ -74,7 +74,7 @@ packages:
       socket.io: 4.6.1
       text-table: 0.2.0
       timeago.js: 4.0.2
-      ts-essentials: 9.3.1(typescript@4.9.5)
+      ts-essentials: 9.3.1(typescript@5.4.2)
       wait-on: 6.0.1(debug@4.3.4)
       yargs: 17.7.1
     transitivePeerDependencies:
@@ -89,8 +89,8 @@ packages:
     resolution: {integrity: sha512-S9RulC2fFCFOQraz61bij+5YCHhSO9llJegK8c8Y6731fSi6snUSQJdCUqYS8AIgR0TKbQvdvgSyIIdbDFZbBA==}
     dev: true
 
-  /@metaplex-foundation/kinobi@0.17.3(fastestsmallesttextencoderdecoder@1.0.22):
-    resolution: {integrity: sha512-coO9jx0xR1gW+8DzxAo4yADgNw9UUXZSPbMsJELjK/hq292AMH363Y/4N0oH2OmL0sAS0Ljk8mK5eKcO97eL1w==}
+  /@metaplex-foundation/kinobi@0.17.7(fastestsmallesttextencoderdecoder@1.0.22):
+    resolution: {integrity: sha512-cfx33zB/a0WH4q9ECoIIEGY3xmQZnmCQThz0oEqUZQ3755DIAv+WwHz3smTvKCLgNj2zchZ45O0xggo/egf1sA==}
     dependencies:
       '@noble/hashes': 1.3.0
       '@solana/codecs-strings': 2.0.0-experimental.a157265(fastestsmallesttextencoderdecoder@1.0.22)
@@ -1243,12 +1243,12 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /ts-essentials@9.3.1(typescript@4.9.5):
+  /ts-essentials@9.3.1(typescript@5.4.2):
     resolution: {integrity: sha512-9CChSvQMyVRo29Vb1A2jbs+LKo3d/bAf+ndSaX0T8cEiy/HChVaRN/HY5DqUryZ8hZ6uol9bEgCnGmnDbwBR9Q==}
     peerDependencies:
       typescript: '>=4.1.0'
     dependencies:
-      typescript: 4.9.5
+      typescript: 5.4.2
     dev: true
 
   /tslib@2.5.0:
@@ -1259,9 +1259,9 @@ packages:
     resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
     dev: true
 
-  /typescript@4.9.5:
-    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
-    engines: {node: '>=4.2.0'}
+  /typescript@5.4.2:
+    resolution: {integrity: sha512-+2/g0Fds1ERlP6JsakQQDXjZdZMM+rqpamFZJEKh4kwTIn3iDkgKtby0CeNd5ATNZ4Ry1ax15TMx0W2V+miizQ==}
+    engines: {node: '>=14.17'}
     hasBin: true
     dev: true
 
