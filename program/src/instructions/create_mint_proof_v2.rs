@@ -6,7 +6,7 @@ use vipers::{throw_err, unwrap_int};
 use crate::{
     error::ErrorCode,
     state::{MintProofV2, MAX_PROOF_LEN},
-    Mode, WhitelistV2,
+    Mode, WhitelistV2, MINT_PROOF_V2_SIZE,
 };
 
 #[derive(Accounts)]
@@ -38,7 +38,7 @@ pub struct CreateMintProofV2<'info> {
             whitelist.key().as_ref(),
         ],
         bump,
-        space = 8 + MintProofV2::INIT_SPACE,
+        space = MINT_PROOF_V2_SIZE,
     )]
     pub mint_proof: Box<Account<'info, MintProofV2>>,
 
@@ -61,14 +61,11 @@ pub fn process_create_mint_proof_v2(
 
     if let Some(condition) = whitelist.conditions.first() {
         // Ensure the condition at the whitelist index is a merkle root type
-        require!(
-            condition.mode == Mode::MerkleProof,
-            ErrorCode::NotMerkleRoot
-        );
+        require!(condition.mode == Mode::MerkleTree, ErrorCode::NotMerkleRoot);
 
         // Validate the proof.
         require!(
-            validate_proof(&condition.value.to_bytes(), &leaf.0, &proof),
+            validate_proof(&condition.value.to_bytes(), &leaf.0, &proof.clone()),
             ErrorCode::FailedMerkleProofVerification,
         );
     } else {
@@ -77,8 +74,8 @@ pub fn process_create_mint_proof_v2(
 
     // Upsert proof into the MintProof account.
     mint_proof.proof_len = unwrap_int!(u8::try_from(proof.len()).ok());
-    // let padded_proof = &mut proof.to_vec();
-    // padded_proof.resize(MAX_PROOF_LEN, [0; 32]);
+    let padded_proof = &mut proof.to_vec();
+    padded_proof.resize(MAX_PROOF_LEN, [0; 32]);
 
     // Zero out array.
     for elem in mint_proof.proof.iter_mut() {

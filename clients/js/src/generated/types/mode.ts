@@ -15,7 +15,7 @@ import {
 export enum Mode {
   VOC,
   FVC,
-  MerkleProof,
+  MerkleTree,
 }
 
 export type ModeArgs = Mode;

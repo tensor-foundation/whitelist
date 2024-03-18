@@ -13,5 +13,5 @@ use borsh::BorshSerialize;
 pub enum Mode {
     VOC,
     FVC,
-    MerkleProof,
+    MerkleTree,
 }

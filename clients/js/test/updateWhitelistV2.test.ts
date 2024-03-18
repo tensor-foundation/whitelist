@@ -234,7 +234,7 @@ test('it cannot update a whitelist v2 with more than one merkle proof', async (t
   const merkleProof2 = (await generateKeyPairSigner()).address;
 
   const conditions = [
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.FVC, value: updateAuthority.address },
   ];
 
@@ -255,8 +255,8 @@ test('it cannot update a whitelist v2 with more than one merkle proof', async (t
 
   const newConditions = [
     { mode: Mode.FVC, value: updateAuthority.address },
-    { mode: Mode.MerkleProof, value: merkleProof1 },
-    { mode: Mode.MerkleProof, value: merkleProof2 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof2 },
   ];
 
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
@@ -283,7 +283,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
 
   // Create initial whitelist.
   const conditions = [
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.FVC, value: updateAuthority.address },
   ];
 
@@ -296,11 +296,11 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
   // Merkle is last item in the list.
   let newConditions = [
     { mode: Mode.FVC, value: updateAuthority.address },
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
   ];
 
   let expectedConditions = [
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.FVC, value: updateAuthority.address },
   ];
 
@@ -323,14 +323,14 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
   newConditions = [
     { mode: Mode.VOC, value: updateAuthority.address },
     { mode: Mode.VOC, value: updateAuthority.address },
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.FVC, value: updateAuthority.address },
     { mode: Mode.FVC, value: updateAuthority.address },
   ];
 
   // Rotated to the front.
   expectedConditions = [
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.FVC, value: updateAuthority.address },
     { mode: Mode.FVC, value: updateAuthority.address },
     { mode: Mode.VOC, value: updateAuthority.address },
@@ -354,7 +354,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
 
   // Merkle is first item in the list.
   newConditions = [
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.VOC, value: updateAuthority.address },
     { mode: Mode.VOC, value: updateAuthority.address },
     { mode: Mode.FVC, value: updateAuthority.address },

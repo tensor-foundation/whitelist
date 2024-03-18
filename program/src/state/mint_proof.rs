@@ -2,7 +2,9 @@ use anchor_lang::prelude::*;
 
 // 28-length padded merkle proof -> 2^28 mints supported.
 // 28 is max length b/c of tx size limits.
+#[constant]
 pub const MAX_PROOF_LEN: usize = 28;
+
 // (!) INCLUSIVE of discriminator (8 bytes)
 // (!) Sync with MAX_PROOF_LEN (can't ref teh constant or wont show up in IDL)
 #[constant]

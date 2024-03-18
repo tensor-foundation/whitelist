@@ -28,6 +28,38 @@ pub struct MintProofV2 {
 impl MintProofV2 {
     pub const LEN: usize = 945;
 
+    /// Prefix values used to generate a PDA for this account.
+    ///
+    /// Values are positional and appear in the following order:
+    ///
+    ///   0. `MintProofV2::PREFIX`
+    ///   1. mint (`Pubkey`)
+    ///   2. whitelist (`Pubkey`)
+    pub const PREFIX: &'static [u8] = "mint_proof".as_bytes();
+
+    pub fn create_pda(
+        mint: Pubkey,
+        whitelist: Pubkey,
+        bump: u8,
+    ) -> Result<solana_program::pubkey::Pubkey, solana_program::pubkey::PubkeyError> {
+        solana_program::pubkey::Pubkey::create_program_address(
+            &[
+                "mint_proof".as_bytes(),
+                mint.as_ref(),
+                whitelist.as_ref(),
+                &[bump],
+            ],
+            &crate::TENSOR_WHITELIST_ID,
+        )
+    }
+
+    pub fn find_pda(mint: &Pubkey, whitelist: &Pubkey) -> (solana_program::pubkey::Pubkey, u8) {
+        solana_program::pubkey::Pubkey::find_program_address(
+            &["mint_proof".as_bytes(), mint.as_ref(), whitelist.as_ref()],
+            &crate::TENSOR_WHITELIST_ID,
+        )
+    }
+
     #[inline(always)]
     pub fn from_bytes(data: &[u8]) -> Result<Self, std::io::Error> {
         let mut data = data;

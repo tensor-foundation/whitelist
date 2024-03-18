@@ -144,8 +144,8 @@ test('it cannot create a whitelist v2 with more than one merkle proof', async (t
 
   const conditions = [
     { mode: Mode.FVC, value: updateAuthority.address },
-    { mode: Mode.MerkleProof, value: merkleProof1 },
-    { mode: Mode.MerkleProof, value: merkleProof2 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof2 },
   ];
 
   await createWhitelistThrows({
@@ -170,7 +170,7 @@ test.only('it moves the merkle proof to the first index for a whitelist v2', asy
   // Merkle is last item in the list.
   let conditions = [
     { mode: Mode.FVC, value: updateAuthority.address },
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
   ];
 
   let { whitelist, uuid } = await createWhitelist({
@@ -182,7 +182,7 @@ test.only('it moves the merkle proof to the first index for a whitelist v2', asy
   });
 
   let expectedConditions = [
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.FVC, value: updateAuthority.address },
   ];
 
@@ -202,7 +202,7 @@ test.only('it moves the merkle proof to the first index for a whitelist v2', asy
   conditions = [
     { mode: Mode.VOC, value: updateAuthority.address },
     { mode: Mode.VOC, value: updateAuthority.address },
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.FVC, value: updateAuthority.address },
     { mode: Mode.FVC, value: updateAuthority.address },
   ];
@@ -216,7 +216,7 @@ test.only('it moves the merkle proof to the first index for a whitelist v2', asy
   }));
 
   expectedConditions = [
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.FVC, value: updateAuthority.address },
     { mode: Mode.FVC, value: updateAuthority.address },
     { mode: Mode.VOC, value: updateAuthority.address },
@@ -237,7 +237,7 @@ test.only('it moves the merkle proof to the first index for a whitelist v2', asy
 
   // Merkle is first item in the list.
   conditions = [
-    { mode: Mode.MerkleProof, value: merkleProof1 },
+    { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.VOC, value: updateAuthority.address },
     { mode: Mode.VOC, value: updateAuthority.address },
     { mode: Mode.FVC, value: updateAuthority.address },

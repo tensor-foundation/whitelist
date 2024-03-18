@@ -62,7 +62,7 @@ pub struct UpdateWhitelistV2<'info> {
         // args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() just get us either
         // 1) the length of the passed in conditions, or the length of the current conditions
         realloc = WhitelistV2::BASE_SIZE + VEC_LENGTH + args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() * WhitelistV2::CONDITION_SIZE,
-        realloc::zero = false,  // TODO: Check if this needs to be true
+        realloc::zero = false,
         realloc::payer = update_authority,
         has_one = update_authority @ ErrorCode::InvalidAuthority
     )]

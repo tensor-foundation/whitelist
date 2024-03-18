@@ -36,6 +36,22 @@ kinobi.update(
         )
       ]
     },
+    mintProofV2: {
+      size: 945,
+      seeds: [
+        k.constantPdaSeedNodeFromString("mint_proof"),
+        k.variablePdaSeedNode(
+          "mint",
+          k.publicKeyTypeNode(),
+          "The address of the mint account"
+        ),
+        k.variablePdaSeedNode(
+          "whitelist",
+          k.publicKeyTypeNode(),
+          "The address of the whitelist pda"
+        )
+      ]
+    },
     whitelist: {
       size: 238,
       seeds: [

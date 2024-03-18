@@ -45,6 +45,7 @@ import {
   getU8Decoder,
   getU8Encoder,
 } from '@solana/codecs-numbers';
+import { MintProofV2Seeds, findMintProofV2Pda } from '../pdas';
 
 export type MintProofV2<TAddress extends string = string> = Account<
   MintProofV2AccountData,
@@ -168,4 +169,24 @@ export async function fetchAllMaybeMintProofV2(
 
 export function getMintProofV2Size(): number {
   return 945;
+}
+
+export async function fetchMintProofV2FromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MintProofV2Seeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {}
+): Promise<MintProofV2> {
+  const maybeAccount = await fetchMaybeMintProofV2FromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeMintProofV2FromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: MintProofV2Seeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {}
+): Promise<MaybeMintProofV2> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findMintProofV2Pda(seeds, { programAddress });
+  return fetchMaybeMintProofV2(rpc, address, fetchConfig);
 }

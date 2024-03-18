@@ -57,14 +57,14 @@ impl WhitelistV2 {
         // Only one merkle proof per whitelist allowed.
         let merkle_proofs = conditions
             .iter()
-            .filter(|c| c.mode == Mode::MerkleProof)
+            .filter(|c| c.mode == Mode::MerkleTree)
             .count();
 
         // Ensure the merkle proof is the first item in the vector, if it exists.
         if let Some(index) = conditions
             .iter()
             .enumerate()
-            .find(|(_, c)| c.mode == Mode::MerkleProof)
+            .find(|(_, c)| c.mode == Mode::MerkleTree)
             .map(|(index, _)| index)
         {
             conditions.rotate_left(index);
@@ -127,7 +127,7 @@ impl Condition {
         proof: &Option<FullMerkleProof>,
     ) -> Result<()> {
         match self.mode {
-            Mode::MerkleProof => {
+            Mode::MerkleTree => {
                 if let Some(proof) = proof {
                     if !validate_proof(&self.value.to_bytes(), &proof.leaf, &proof.proof) {
                         throw_err!(ErrorCode::FailedMerkleProofVerification);
@@ -172,5 +172,5 @@ impl Condition {
 pub enum Mode {
     VOC,
     FVC,
-    MerkleProof,
+    MerkleTree,
 }

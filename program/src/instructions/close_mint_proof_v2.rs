@@ -2,6 +2,9 @@ use anchor_lang::prelude::*;
 
 use crate::state::MintProofV2;
 
+#[constant]
+pub const SLOT_DELAY: u64 = 100;
+
 #[derive(Accounts)]
 pub struct CloseMintProofV2<'info> {
     /// CHECK: This account just receives refunded rent, so there are no checks to be done.
@@ -24,7 +27,7 @@ pub fn process_close_mint_proof_v2(ctx: Context<CloseMintProofV2>) -> Result<()>
     let clock = Clock::get()?;
 
     // Close the mint proof account.
-    if clock.slot < mint_proof.creation_slot + 100 {
+    if clock.slot < mint_proof.creation_slot + SLOT_DELAY {
         mint_proof.close(ctx.accounts.payer.to_account_info())?;
     } else {
         mint_proof.close(ctx.accounts.signer.to_account_info())?;

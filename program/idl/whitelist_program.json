@@ -3,6 +3,11 @@
   "name": "whitelist_program",
   "constants": [
     {
+      "name": "SLOT_DELAY",
+      "type": "u64",
+      "value": "100"
+    },
+    {
       "name": "AUTHORITY_SIZE",
       "type": {
         "defined": "usize"
@@ -15,6 +20,13 @@
         "defined": "usize"
       },
       "value": "8 + 1 + (32 * 28) + 8 + 32"
+    },
+    {
+      "name": "MAX_PROOF_LEN",
+      "type": {
+        "defined": "usize"
+      },
+      "value": "28"
     },
     {
       "name": "MINT_PROOF_SIZE",
@@ -884,7 +896,7 @@
             "name": "FVC"
           },
           {
-            "name": "MerkleProof"
+            "name": "MerkleTree"
           }
         ]
       }
