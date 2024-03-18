@@ -69,15 +69,17 @@ pub struct TestWhitelistV2 {
     pub uuid: [u8; 32],
 }
 
-pub async fn fetch<T: BorshDeserialize>(address: &Pubkey, context: &mut ProgramTestContext) -> T {
-    let account = context
-        .banks_client
-        .get_account(*address)
-        .await
-        .expect("get_account")
-        .expect("account not found");
+pub async fn fetch<T: BorshDeserialize>(
+    address: &Pubkey,
+    context: &mut ProgramTestContext,
+) -> Result<T, BanksClientError> {
+    let account = context.banks_client.get_account(*address).await?;
 
-    T::try_from_slice(&account.data).unwrap()
+    if let Some(account) = account {
+        Ok(T::try_from_slice(&account.data).unwrap())
+    } else {
+        Err(BanksClientError::ClientError("Account not found"))
+    }
 }
 
 pub struct TestWhitelistV2Inputs<'a> {
@@ -187,9 +189,15 @@ pub async fn mint_metaplex_nft(
     let metadata = Metadata::find_pda(&mint.pubkey()).0;
     let master_edition = MasterEdition::find_pda(&mint.pubkey()).0;
 
+    let mut signers = vec![&context.payer, &mint, &inputs.update_authority];
+
     let payer = inputs
         .payer
         .unwrap_or(inputs.update_authority.dirty_clone());
+
+    if payer.pubkey() != inputs.update_authority.pubkey() {
+        signers.push(&payer);
+    }
 
     let owner = inputs.owner.unwrap_or(inputs.update_authority.pubkey());
     let token = Pubkey::find_program_address(
@@ -206,9 +214,9 @@ pub async fn mint_metaplex_nft(
         .metadata(metadata)
         .master_edition(Some(master_edition))
         .mint(mint.pubkey(), true)
-        .authority(payer.pubkey())
+        .authority(inputs.update_authority.pubkey())
         .payer(payer.pubkey())
-        .update_authority(payer.pubkey(), false)
+        .update_authority(inputs.update_authority.pubkey(), false)
         .spl_token_program(Some(TOKEN_PROGRAM_ID))
         .name(String::from("My NFT"))
         .uri(String::from("https://example.com"))
@@ -232,7 +240,7 @@ pub async fn mint_metaplex_nft(
     let tx = Transaction::new_signed_with_payer(
         &[create_ix, mint_ix],
         Some(&context.payer.pubkey()),
-        &[&context.payer, &mint, &inputs.update_authority],
+        &signers,
         context.last_blockhash,
     );
     context.banks_client.process_transaction(tx).await.unwrap();

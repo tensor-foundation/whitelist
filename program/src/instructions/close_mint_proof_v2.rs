@@ -7,8 +7,11 @@ pub const SLOT_DELAY: u64 = 100;
 
 #[derive(Accounts)]
 pub struct CloseMintProofV2<'info> {
-    /// CHECK: This account just receives refunded rent, so there are no checks to be done.
-    #[account(mut)]
+    /// CHECK: This account receives refunded rent in a specific time period,
+    /// so must be the same as the stored payer account.
+    #[account(mut,
+    constraint = payer.key() == mint_proof.payer
+    )]
     pub payer: AccountInfo<'info>,
 
     // Signing account, will receive rent if 100 slots after mint_proof creation.
