@@ -13,7 +13,7 @@ pub struct CloseMintProofV2<'info> {
     )]
     pub payer: AccountInfo<'info>,
 
-    // Signing account, will receive rent if 100 slots after mint_proof creation.
+    // Signing account, will receive rent if > 100 slots after mint_proof creation.
     #[account(mut)]
     pub signer: Signer<'info>,
 

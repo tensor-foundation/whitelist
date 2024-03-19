@@ -60,6 +60,10 @@ impl WhitelistV2 {
             .filter(|c| c.mode == Mode::MerkleTree)
             .count();
 
+        if merkle_proofs > 1 {
+            throw_err!(ErrorCode::TooManyMerkleProofs);
+        }
+
         // Ensure the merkle proof is the first item in the vector, if it exists.
         if let Some(index) = conditions
             .iter()
@@ -68,10 +72,6 @@ impl WhitelistV2 {
             .map(|(index, _)| index)
         {
             conditions.rotate_left(index);
-        }
-
-        if merkle_proofs > 1 {
-            throw_err!(ErrorCode::TooManyMerkleProofs);
         }
 
         Ok(())

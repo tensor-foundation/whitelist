@@ -1,4 +1,4 @@
-use crate::{state::WhitelistV2, Condition, State, CURRENT_WHITELIST_VERSION, VEC_LENGTH};
+use crate::{state::WhitelistV2, Condition, State, CURRENT_WHITELIST_V2_VERSION, VEC_LENGTH};
 use anchor_lang::prelude::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -46,7 +46,7 @@ pub fn process_create_whitelist_v2(
 
     let whitelist = &mut ctx.accounts.whitelist;
 
-    whitelist.version = CURRENT_WHITELIST_VERSION;
+    whitelist.version = CURRENT_WHITELIST_V2_VERSION;
     whitelist.bump = ctx.bumps.whitelist;
     whitelist.uuid = args.uuid;
     whitelist.state = State::Unfrozen;

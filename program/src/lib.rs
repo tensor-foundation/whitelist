@@ -26,6 +26,7 @@ declare_id!("TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW");
 
 /// Current version of the whitelist.
 pub const CURRENT_WHITELIST_VERSION: u8 = 2;
+pub const CURRENT_WHITELIST_V2_VERSION: u8 = 1;
 
 #[program]
 pub mod whitelist_program {
