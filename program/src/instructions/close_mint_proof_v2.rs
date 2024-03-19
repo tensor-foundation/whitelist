@@ -7,8 +7,7 @@ pub const SLOT_DELAY: u64 = 100;
 
 #[derive(Accounts)]
 pub struct CloseMintProofV2<'info> {
-    /// CHECK: This account receives refunded rent in a specific time period,
-    /// so must be the same as the stored payer account.
+    /// CHECK: This account must be the same as the stored payer on mint_proof_v2.
     #[account(mut,
     constraint = payer.key() == mint_proof.payer
     )]
