@@ -47,7 +47,6 @@
     "@solana/rpc-core": "2.0.0-experimental.dbe6a73",
     "@solana/rpc-transport": "2.0.0-experimental.dbe6a73",
     "@solana/web3.js": "2.0.0-experimental.dbe6a73",
-    "@solana/old-web3.js": "1.91.1",
     "@solana/webcrypto-ed25519-polyfill": "2.0.0-experimental.dbe6a73",
     "@types/node": "^20.11.26",
     "@types/uuid": "9.0.8",
