@@ -3,7 +3,7 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "rootDir": ".",
-    "target": "ES2020",
+    "target": "ES2021",
     "module": "commonjs",
     "sourceMap": true,
     "declaration": true,

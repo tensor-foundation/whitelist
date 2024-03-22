@@ -26,28 +26,28 @@ impl MintProof {
     ///
     ///   0. `MintProof::PREFIX`
     ///   1. mint (`Pubkey`)
-    ///   2. whiltelist (`Pubkey`)
+    ///   2. whitelist (`Pubkey`)
     pub const PREFIX: &'static [u8] = "mint_proof".as_bytes();
 
     pub fn create_pda(
         mint: Pubkey,
-        whiltelist: Pubkey,
+        whitelist: Pubkey,
         bump: u8,
     ) -> Result<solana_program::pubkey::Pubkey, solana_program::pubkey::PubkeyError> {
         solana_program::pubkey::Pubkey::create_program_address(
             &[
                 "mint_proof".as_bytes(),
                 mint.as_ref(),
-                whiltelist.as_ref(),
+                whitelist.as_ref(),
                 &[bump],
             ],
             &crate::TENSOR_WHITELIST_ID,
         )
     }
 
-    pub fn find_pda(mint: &Pubkey, whiltelist: &Pubkey) -> (solana_program::pubkey::Pubkey, u8) {
+    pub fn find_pda(mint: &Pubkey, whitelist: &Pubkey) -> (solana_program::pubkey::Pubkey, u8) {
         solana_program::pubkey::Pubkey::find_program_address(
-            &["mint_proof".as_bytes(), mint.as_ref(), whiltelist.as_ref()],
+            &["mint_proof".as_bytes(), mint.as_ref(), whitelist.as_ref()],
             &crate::TENSOR_WHITELIST_ID,
         )
     }

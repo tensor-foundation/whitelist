@@ -34,9 +34,11 @@ import {
   WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
+import { findMintProofPda } from '../pdas';
 import {
   ResolvedAccount,
   accountMetaWithDefault,
+  expectAddress,
   getAccountMetasWithSigners,
 } from '../shared';
 
@@ -143,6 +145,156 @@ export function getInitUpdateMintProofInstructionDataCodec(): Codec<
     getInitUpdateMintProofInstructionDataEncoder(),
     getInitUpdateMintProofInstructionDataDecoder()
   );
+}
+
+export type InitUpdateMintProofAsyncInput<
+  TAccountWhitelist extends string,
+  TAccountMint extends string,
+  TAccountMintProof extends string,
+  TAccountUser extends string,
+  TAccountSystemProgram extends string
+> = {
+  whitelist: Address<TAccountWhitelist>;
+  mint: Address<TAccountMint>;
+  mintProof?: Address<TAccountMintProof>;
+  user: Address<TAccountUser>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  proof: InitUpdateMintProofInstructionDataArgs['proof'];
+};
+
+export type InitUpdateMintProofAsyncInputWithSigners<
+  TAccountWhitelist extends string,
+  TAccountMint extends string,
+  TAccountMintProof extends string,
+  TAccountUser extends string,
+  TAccountSystemProgram extends string
+> = {
+  whitelist: Address<TAccountWhitelist>;
+  mint: Address<TAccountMint>;
+  mintProof?: Address<TAccountMintProof>;
+  user: TransactionSigner<TAccountUser>;
+  systemProgram?: Address<TAccountSystemProgram>;
+  proof: InitUpdateMintProofInstructionDataArgs['proof'];
+};
+
+export async function getInitUpdateMintProofInstructionAsync<
+  TAccountWhitelist extends string,
+  TAccountMint extends string,
+  TAccountMintProof extends string,
+  TAccountUser extends string,
+  TAccountSystemProgram extends string,
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+>(
+  input: InitUpdateMintProofAsyncInputWithSigners<
+    TAccountWhitelist,
+    TAccountMint,
+    TAccountMintProof,
+    TAccountUser,
+    TAccountSystemProgram
+  >
+): Promise<
+  InitUpdateMintProofInstructionWithSigners<
+    TProgram,
+    TAccountWhitelist,
+    TAccountMint,
+    TAccountMintProof,
+    TAccountUser,
+    TAccountSystemProgram
+  >
+>;
+export async function getInitUpdateMintProofInstructionAsync<
+  TAccountWhitelist extends string,
+  TAccountMint extends string,
+  TAccountMintProof extends string,
+  TAccountUser extends string,
+  TAccountSystemProgram extends string,
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+>(
+  input: InitUpdateMintProofAsyncInput<
+    TAccountWhitelist,
+    TAccountMint,
+    TAccountMintProof,
+    TAccountUser,
+    TAccountSystemProgram
+  >
+): Promise<
+  InitUpdateMintProofInstruction<
+    TProgram,
+    TAccountWhitelist,
+    TAccountMint,
+    TAccountMintProof,
+    TAccountUser,
+    TAccountSystemProgram
+  >
+>;
+export async function getInitUpdateMintProofInstructionAsync<
+  TAccountWhitelist extends string,
+  TAccountMint extends string,
+  TAccountMintProof extends string,
+  TAccountUser extends string,
+  TAccountSystemProgram extends string,
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+>(
+  input: InitUpdateMintProofAsyncInput<
+    TAccountWhitelist,
+    TAccountMint,
+    TAccountMintProof,
+    TAccountUser,
+    TAccountSystemProgram
+  >
+): Promise<IInstruction> {
+  // Program address.
+  const programAddress =
+    'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>;
+
+  // Original accounts.
+  type AccountMetas = Parameters<
+    typeof getInitUpdateMintProofInstructionRaw<
+      TProgram,
+      TAccountWhitelist,
+      TAccountMint,
+      TAccountMintProof,
+      TAccountUser,
+      TAccountSystemProgram
+    >
+  >[0];
+  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+    whitelist: { value: input.whitelist ?? null, isWritable: false },
+    mint: { value: input.mint ?? null, isWritable: false },
+    mintProof: { value: input.mintProof ?? null, isWritable: true },
+    user: { value: input.user ?? null, isWritable: true },
+    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+  };
+
+  // Original args.
+  const args = { ...input };
+
+  // Resolve default values.
+  if (!accounts.mintProof.value) {
+    accounts.mintProof.value = await findMintProofPda({
+      mint: expectAddress(accounts.mint.value),
+      whitelist: expectAddress(accounts.whitelist.value),
+    });
+  }
+  if (!accounts.systemProgram.value) {
+    accounts.systemProgram.value =
+      '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
+  }
+
+  // Get account metas and signers.
+  const accountMetas = getAccountMetasWithSigners(
+    accounts,
+    'programId',
+    programAddress
+  );
+
+  const instruction = getInitUpdateMintProofInstructionRaw(
+    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
+    args as InitUpdateMintProofInstructionDataArgs,
+    programAddress
+  );
+
+  return instruction;
 }
 
 export type InitUpdateMintProofInput<

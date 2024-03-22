@@ -1,6 +1,6 @@
 #![cfg(feature = "test-sbf")]
 
-mod setup;
+pub mod setup;
 use borsh::BorshDeserialize;
 use setup::*;
 

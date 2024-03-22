@@ -21,8 +21,8 @@ test('it can initialize a new update authority', async (t) => {
 
   // When we initialize a new update authority.
   const initUpdateAuthority = await getInitUpdateAuthorityInstructionAsync({
-    cosigner: cosigner,
-    owner: owner,
+    cosigner,
+    owner,
     newCosigner: cosigner.address,
     newOwner: owner.address,
   });

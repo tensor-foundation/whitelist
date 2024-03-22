@@ -37,7 +37,9 @@ export function getTensorWhitelistProgram(): TensorWhitelistProgram {
 
 export enum TensorWhitelistAccount {
   Authority,
+  MintProofV2,
   MintProof,
+  WhitelistV2,
   Whitelist,
 }
 
@@ -48,10 +50,16 @@ export function identifyTensorWhitelistAccount(
   if (memcmp(data, new Uint8Array([36, 108, 254, 18, 167, 144, 27, 36]), 0)) {
     return TensorWhitelistAccount.Authority;
   }
+  if (memcmp(data, new Uint8Array([22, 197, 150, 178, 249, 225, 183, 75]), 0)) {
+    return TensorWhitelistAccount.MintProofV2;
+  }
   if (
     memcmp(data, new Uint8Array([227, 131, 106, 240, 190, 48, 219, 228]), 0)
   ) {
     return TensorWhitelistAccount.MintProof;
+  }
+  if (memcmp(data, new Uint8Array([136, 184, 45, 191, 85, 203, 191, 119]), 0)) {
+    return TensorWhitelistAccount.WhitelistV2;
   }
   if (memcmp(data, new Uint8Array([204, 176, 52, 79, 146, 121, 54, 247]), 0)) {
     return TensorWhitelistAccount.Whitelist;
@@ -69,6 +77,12 @@ export enum TensorWhitelistInstruction {
   ReallocAuthority,
   ReallocWhitelist,
   UnfreezeWhitelist,
+  CreateWhitelistV2,
+  UpdateWhitelistV2,
+  CreateMintProofV2,
+  CloseMintProofV2,
+  FreezeWhitelistV2,
+  UnfreezeWhitelistV2,
 }
 
 export function identifyTensorWhitelistInstruction(
@@ -96,6 +110,24 @@ export function identifyTensorWhitelistInstruction(
   }
   if (memcmp(data, new Uint8Array([215, 119, 9, 92, 160, 139, 226, 253]), 0)) {
     return TensorWhitelistInstruction.UnfreezeWhitelist;
+  }
+  if (memcmp(data, new Uint8Array([31, 207, 213, 77, 105, 13, 127, 98]), 0)) {
+    return TensorWhitelistInstruction.CreateWhitelistV2;
+  }
+  if (memcmp(data, new Uint8Array([184, 188, 157, 214, 205, 49, 74, 226]), 0)) {
+    return TensorWhitelistInstruction.UpdateWhitelistV2;
+  }
+  if (memcmp(data, new Uint8Array([219, 176, 21, 37, 145, 89, 154, 53]), 0)) {
+    return TensorWhitelistInstruction.CreateMintProofV2;
+  }
+  if (memcmp(data, new Uint8Array([237, 78, 8, 208, 47, 148, 145, 170]), 0)) {
+    return TensorWhitelistInstruction.CloseMintProofV2;
+  }
+  if (memcmp(data, new Uint8Array([69, 158, 243, 78, 116, 68, 221, 113]), 0)) {
+    return TensorWhitelistInstruction.FreezeWhitelistV2;
+  }
+  if (memcmp(data, new Uint8Array([51, 105, 214, 84, 252, 188, 26, 1]), 0)) {
+    return TensorWhitelistInstruction.UnfreezeWhitelistV2;
   }
   throw new Error(
     'The provided instruction could not be identified as a tensorWhitelist instruction.'

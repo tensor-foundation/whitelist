@@ -37,6 +37,30 @@ pub enum TensorWhitelistError {
     /// 6008 (0x1778) - failed merkle proof verification
     #[error("failed merkle proof verification")]
     FailedMerkleProofVerification,
+    /// 6009 (0x1779) - no whitelist conditions provided
+    #[error("no whitelist conditions provided")]
+    NoConditions,
+    /// 6010 (0x177A) - invalid authority
+    #[error("invalid authority")]
+    InvalidAuthority,
+    /// 6011 (0x177B) - condition at index not a merkle root
+    #[error("condition at index not a merkle root")]
+    NotMerkleRoot,
+    /// 6012 (0x177C) - invalid whitelist index
+    #[error("invalid whitelist index")]
+    InvalidWhitelistIndex,
+    /// 6013 (0x177D) - too many conditions
+    #[error("too many conditions")]
+    TooManyConditions,
+    /// 6014 (0x177E) - cannot have empty conditions
+    #[error("cannot have empty conditions")]
+    EmptyConditions,
+    /// 6015 (0x177F) - too many merkle proofs
+    #[error("too many merkle proofs")]
+    TooManyMerkleProofs,
+    /// 6016 (0x1780) - whitelist is frozen
+    #[error("whitelist is frozen")]
+    WhitelistIsFrozen,
 }
 
 impl solana_program::program_error::PrintProgramError for TensorWhitelistError {

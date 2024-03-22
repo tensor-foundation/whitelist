@@ -25,6 +25,22 @@ export const enum TensorWhitelistProgramErrorCode {
   FAILED_FVC_VERIFICATION = 0x1777, // 6007
   /** FailedMerkleProofVerification: failed merkle proof verification */
   FAILED_MERKLE_PROOF_VERIFICATION = 0x1778, // 6008
+  /** NoConditions: no whitelist conditions provided */
+  NO_CONDITIONS = 0x1779, // 6009
+  /** InvalidAuthority: invalid authority */
+  INVALID_AUTHORITY = 0x177a, // 6010
+  /** NotMerkleRoot: condition at index not a merkle root */
+  NOT_MERKLE_ROOT = 0x177b, // 6011
+  /** InvalidWhitelistIndex: invalid whitelist index */
+  INVALID_WHITELIST_INDEX = 0x177c, // 6012
+  /** TooManyConditions: too many conditions */
+  TOO_MANY_CONDITIONS = 0x177d, // 6013
+  /** EmptyConditions: cannot have empty conditions */
+  EMPTY_CONDITIONS = 0x177e, // 6014
+  /** TooManyMerkleProofs: too many merkle proofs */
+  TOO_MANY_MERKLE_PROOFS = 0x177f, // 6015
+  /** WhitelistIsFrozen: whitelist is frozen */
+  WHITELIST_IS_FROZEN = 0x1780, // 6016
 }
 
 export class TensorWhitelistProgramError extends Error {
@@ -86,6 +102,38 @@ if (__DEV__) {
     [TensorWhitelistProgramErrorCode.FAILED_MERKLE_PROOF_VERIFICATION]: [
       'FailedMerkleProofVerification',
       `failed merkle proof verification`,
+    ],
+    [TensorWhitelistProgramErrorCode.NO_CONDITIONS]: [
+      'NoConditions',
+      `no whitelist conditions provided`,
+    ],
+    [TensorWhitelistProgramErrorCode.INVALID_AUTHORITY]: [
+      'InvalidAuthority',
+      `invalid authority`,
+    ],
+    [TensorWhitelistProgramErrorCode.NOT_MERKLE_ROOT]: [
+      'NotMerkleRoot',
+      `condition at index not a merkle root`,
+    ],
+    [TensorWhitelistProgramErrorCode.INVALID_WHITELIST_INDEX]: [
+      'InvalidWhitelistIndex',
+      `invalid whitelist index`,
+    ],
+    [TensorWhitelistProgramErrorCode.TOO_MANY_CONDITIONS]: [
+      'TooManyConditions',
+      `too many conditions`,
+    ],
+    [TensorWhitelistProgramErrorCode.EMPTY_CONDITIONS]: [
+      'EmptyConditions',
+      `cannot have empty conditions`,
+    ],
+    [TensorWhitelistProgramErrorCode.TOO_MANY_MERKLE_PROOFS]: [
+      'TooManyMerkleProofs',
+      `too many merkle proofs`,
+    ],
+    [TensorWhitelistProgramErrorCode.WHITELIST_IS_FROZEN]: [
+      'WhitelistIsFrozen',
+      `whitelist is frozen`,
     ],
   };
 }

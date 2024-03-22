@@ -26,6 +26,7 @@ declare_id!("TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW");
 
 /// Current version of the whitelist.
 pub const CURRENT_WHITELIST_VERSION: u8 = 2;
+pub const CURRENT_WHITELIST_V2_VERSION: u8 = 1;
 
 #[program]
 pub mod whitelist_program {
@@ -72,5 +73,40 @@ pub mod whitelist_program {
 
     pub fn unfreeze_whitelist(ctx: Context<UnfreezeWhitelist>) -> Result<()> {
         instructions::process_unfreeze_whitelist(ctx)
+    }
+
+    /* ------WhitelistV2------ */
+
+    pub fn create_whitelist_v2(
+        ctx: Context<CreateWhitelistV2>,
+        args: CreateWhitelistV2Args,
+    ) -> Result<()> {
+        process_create_whitelist_v2(ctx, args)
+    }
+
+    pub fn update_whitelist_v2(
+        ctx: Context<UpdateWhitelistV2>,
+        args: UpdateWhitelistV2Args,
+    ) -> Result<()> {
+        process_update_whitelist_v2(ctx, args)
+    }
+
+    pub fn create_mint_proof_v2(
+        ctx: Context<CreateMintProofV2>,
+        proof: Vec<[u8; 32]>,
+    ) -> Result<()> {
+        process_create_mint_proof_v2(ctx, proof)
+    }
+
+    pub fn close_mint_proof_v2(ctx: Context<CloseMintProofV2>) -> Result<()> {
+        process_close_mint_proof_v2(ctx)
+    }
+
+    pub fn freeze_whitelist_v2(ctx: Context<FreezeWhitelistV2>) -> Result<()> {
+        process_freeze_whitelist_v2(ctx)
+    }
+
+    pub fn unfreeze_whitelist_v2(ctx: Context<UnfreezeWhitelistV2>) -> Result<()> {
+        process_unfreeze_whitelist_v2(ctx)
     }
 }

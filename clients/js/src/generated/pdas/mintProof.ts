@@ -18,7 +18,7 @@ export type MintProofSeeds = {
   /** The address of the mint account */
   mint: Address;
   /** The address of the whitelist pda */
-  whiltelist: Address;
+  whitelist: Address;
 };
 
 export async function findMintProofPda(
@@ -33,7 +33,7 @@ export async function findMintProofPda(
     seeds: [
       getStringEncoder({ size: 'variable' }).encode('mint_proof'),
       getAddressEncoder().encode(seeds.mint),
-      getAddressEncoder().encode(seeds.whiltelist),
+      getAddressEncoder().encode(seeds.whitelist),
     ],
   });
 }

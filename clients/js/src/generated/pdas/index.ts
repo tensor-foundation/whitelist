@@ -8,4 +8,6 @@
 
 export * from './authority';
 export * from './mintProof';
+export * from './mintProofV2';
 export * from './whitelist';
+export * from './whitelistV2';

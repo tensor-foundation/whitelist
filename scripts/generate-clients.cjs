@@ -12,8 +12,8 @@ const kinobi = k.createFromIdls([path.join(idlDir, "whitelist_program.json")]);
 kinobi.update(
   k.updateProgramsVisitor({
     whitelistProgram: {
-      name: "tensorWhitelist",
-    },
+      name: "tensorWhitelist"
+    }
   })
 );
 
@@ -30,11 +30,27 @@ kinobi.update(
           "The address of the mint account"
         ),
         k.variablePdaSeedNode(
-          "whiltelist",
+          "whitelist",
           k.publicKeyTypeNode(),
           "The address of the whitelist pda"
+        )
+      ]
+    },
+    mintProofV2: {
+      size: 945,
+      seeds: [
+        k.constantPdaSeedNodeFromString("mint_proof"),
+        k.variablePdaSeedNode(
+          "mint",
+          k.publicKeyTypeNode(),
+          "The address of the mint account"
         ),
-      ],
+        k.variablePdaSeedNode(
+          "whitelist",
+          k.publicKeyTypeNode(),
+          "The address of the whitelist pda"
+        )
+      ]
     },
     whitelist: {
       size: 238,
@@ -43,13 +59,29 @@ kinobi.update(
           "uuid",
           k.bytesTypeNode(k.fixedSizeNode(32)),
           "UUID of the whitelist"
+        )
+      ]
+    },
+    whitelistV2: {
+      size: 239,
+      seeds: [
+        k.constantPdaSeedNodeFromString("whitelist"),
+        k.variablePdaSeedNode(
+          "namespace",
+          k.publicKeyTypeNode(),
+          "The namespace address"
         ),
-      ],
+        k.variablePdaSeedNode(
+          "uuid",
+          k.bytesTypeNode(k.fixedSizeNode(32)),
+          "UUID of the whitelist"
+        )
+      ]
     },
     authority: {
       size: 137,
-      seeds: [],
-    },
+      seeds: []
+    }
   })
 );
 
@@ -59,17 +91,17 @@ kinobi.update(
     {
       account: "mintProof",
       ignoreIfOptional: true,
-      defaultValue: k.pdaValueNode("mintProof"),
+      defaultValue: k.pdaValueNode("mintProof")
     },
     {
       account: "whitelist",
       ignoreIfOptional: true,
-      defaultValue: k.pdaValueNode("whitelist"),
+      defaultValue: k.pdaValueNode("whitelist")
     },
     {
       account: "whitelistAuthority",
-      defaultValue: k.pdaValueNode("authority"),
-    },
+      defaultValue: k.pdaValueNode("authority")
+    }
   ])
 );
 
@@ -85,6 +117,6 @@ kinobi.accept(
   k.renderRustVisitor(rustDir, {
     formatCode: true,
     crateFolder: crateDir,
-    renderParentInstructions: true,
+    renderParentInstructions: true
   })
 );

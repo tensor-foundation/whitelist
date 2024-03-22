@@ -3,6 +3,11 @@
   "name": "whitelist_program",
   "constants": [
     {
+      "name": "SLOT_DELAY",
+      "type": "u64",
+      "value": "100"
+    },
+    {
       "name": "AUTHORITY_SIZE",
       "type": {
         "defined": "usize"
@@ -10,11 +15,39 @@
       "value": "8 + 1 + (32 * 2) + 64"
     },
     {
+      "name": "MINT_PROOF_V2_SIZE",
+      "type": {
+        "defined": "usize"
+      },
+      "value": "8 + 1 + (32 * 28) + 8 + 32"
+    },
+    {
+      "name": "MAX_PROOF_LEN",
+      "type": {
+        "defined": "usize"
+      },
+      "value": "28"
+    },
+    {
       "name": "MINT_PROOF_SIZE",
       "type": {
         "defined": "usize"
       },
       "value": "8 + (32 * 28) + 1"
+    },
+    {
+      "name": "WHITELIST_V2_BASE_SIZE",
+      "type": {
+        "defined": "usize"
+      },
+      "value": "8 + 1 + 1 + 32 + 1 + 32 + 32 + 32"
+    },
+    {
+      "name": "WHITELIST_V2_CONDITIONS_LENGTH",
+      "type": {
+        "defined": "usize"
+      },
+      "value": "24"
     },
     {
       "name": "WHITELIST_SIZE",
@@ -307,6 +340,184 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "createWhitelistV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "updateAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "namespace",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "CreateWhitelistV2Args"
+          }
+        }
+      ]
+    },
+    {
+      "name": "updateWhitelistV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "updateAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "newUpdateAuthority",
+          "isMut": false,
+          "isSigner": true,
+          "isOptional": true
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": "UpdateWhitelistV2Args"
+          }
+        }
+      ]
+    },
+    {
+      "name": "createMintProofV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelist",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintProof",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "proof",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "closeMintProofV2",
+      "accounts": [
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mintProof",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "freezeWhitelistV2",
+      "accounts": [
+        {
+          "name": "freezeAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unfreezeWhitelistV2",
+      "accounts": [
+        {
+          "name": "freezeAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -347,6 +558,43 @@
       }
     },
     {
+      "name": "MintProofV2",
+      "docs": [
+        "Seeds: [\"mint_proof\", mint, whitelist]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "proofLen",
+            "type": "u8"
+          },
+          {
+            "name": "proof",
+            "type": {
+              "array": [
+                {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                },
+                28
+              ]
+            }
+          },
+          {
+            "name": "creationSlot",
+            "type": "u64"
+          },
+          {
+            "name": "payer",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
       "name": "MintProof",
       "type": {
         "kind": "struct",
@@ -367,6 +615,60 @@
                 },
                 28
               ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistV2",
+      "docs": [
+        "Seeds: [\"whitelist\", <authority>, <uuid>]"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "uuid",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "state",
+            "type": {
+              "defined": "State"
+            }
+          },
+          {
+            "name": "updateAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "namespace",
+            "type": "publicKey"
+          },
+          {
+            "name": "freezeAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "vec": {
+                "defined": "Condition"
+              }
             }
           }
         ]
@@ -453,6 +755,61 @@
   ],
   "types": [
     {
+      "name": "CreateWhitelistV2Args",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "uuid",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "freezeAuthority",
+            "type": {
+              "option": "publicKey"
+            }
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "vec": {
+                "defined": "Condition"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateWhitelistV2Args",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "freezeAuthority",
+            "type": {
+              "defined": "Operation"
+            }
+          },
+          {
+            "name": "conditions",
+            "type": {
+              "option": {
+                "vec": {
+                  "defined": "Condition"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "FullMerkleProof",
       "type": {
         "kind": "struct",
@@ -476,6 +833,75 @@
                 32
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Condition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mode",
+            "type": {
+              "defined": "Mode"
+            }
+          },
+          {
+            "name": "value",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Operation",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Noop"
+          },
+          {
+            "name": "Clear"
+          },
+          {
+            "name": "Set",
+            "fields": [
+              "publicKey"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "State",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unfrozen"
+          },
+          {
+            "name": "Frozen"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Mode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "VOC"
+          },
+          {
+            "name": "FVC"
+          },
+          {
+            "name": "MerkleTree"
           }
         ]
       }
@@ -526,6 +952,46 @@
       "code": 6008,
       "name": "FailedMerkleProofVerification",
       "msg": "failed merkle proof verification"
+    },
+    {
+      "code": 6009,
+      "name": "NoConditions",
+      "msg": "no whitelist conditions provided"
+    },
+    {
+      "code": 6010,
+      "name": "InvalidAuthority",
+      "msg": "invalid authority"
+    },
+    {
+      "code": 6011,
+      "name": "NotMerkleRoot",
+      "msg": "condition at index not a merkle root"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidWhitelistIndex",
+      "msg": "invalid whitelist index"
+    },
+    {
+      "code": 6013,
+      "name": "TooManyConditions",
+      "msg": "too many conditions"
+    },
+    {
+      "code": 6014,
+      "name": "EmptyConditions",
+      "msg": "cannot have empty conditions"
+    },
+    {
+      "code": 6015,
+      "name": "TooManyMerkleProofs",
+      "msg": "too many merkle proofs"
+    },
+    {
+      "code": 6016,
+      "name": "WhitelistIsFrozen",
+      "msg": "whitelist is frozen"
     }
   ],
   "metadata": {
