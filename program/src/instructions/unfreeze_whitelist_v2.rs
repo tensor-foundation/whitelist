@@ -8,12 +8,6 @@ pub struct UnfreezeWhitelistV2<'info> {
 
     #[account(
         mut,
-        seeds = [
-            b"whitelist",
-            &whitelist.namespace.key().as_ref(),
-            &whitelist.uuid
-        ],
-        bump,
         has_one = freeze_authority,
     )]
     pub whitelist: Account<'info, WhitelistV2>,

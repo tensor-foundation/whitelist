@@ -53,11 +53,7 @@ pub fn process_create_whitelist_v2(
     whitelist.update_authority = ctx.accounts.update_authority.key();
     whitelist.namespace = ctx.accounts.namespace.key();
 
-    if let Some(freeze_authority) = args.freeze_authority {
-        whitelist.freeze_authority = freeze_authority;
-    } else {
-        whitelist.freeze_authority = Pubkey::default();
-    }
+    whitelist.freeze_authority = args.freeze_authority.unwrap_or_default();
 
     whitelist.conditions = args.conditions;
 

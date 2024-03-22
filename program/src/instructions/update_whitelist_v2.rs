@@ -52,12 +52,6 @@ pub struct UpdateWhitelistV2<'info> {
 
     #[account(
         mut,
-        seeds = [
-            b"whitelist",
-            &whitelist.namespace.as_ref(),
-            &whitelist.uuid
-        ],
-        bump,
         // Realloc to new length; if no conditions are passed in, use the existing length--which should be no-op.
         // args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() just get us either
         // 1) the length of the passed in conditions, or the length of the current conditions

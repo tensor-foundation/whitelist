@@ -11,7 +11,7 @@ pub struct CloseMintProofV2<'info> {
     #[account(mut,
     constraint = payer.key() == mint_proof.payer
     )]
-    pub payer: AccountInfo<'info>,
+    pub payer: UncheckedAccount<'info>,
 
     // Signing account, will receive rent if > 100 slots after mint_proof creation.
     #[account(mut)]
