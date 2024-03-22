@@ -5144,8 +5144,8 @@ dependencies = [
 
 [[package]]
 name = "tensor-toolbox"
-version = "0.0.1"
-source = "git+ssh://git@github.com/tensor-foundation/toolbox.git#47620ea66f187378f04bfa0ad20617815d191881"
+version = "0.0.2"
+source = "git+ssh://git@github.com/tensor-foundation/toolbox.git?rev=1e84508#1e8450835f681463130ebbfcdb7625b15a89e2ae"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -5155,7 +5155,7 @@ dependencies = [
  "spl-account-compression",
  "spl-noop",
  "spl-token-metadata-interface",
- "vipers",
+ "vipers 2.0.6 (git+ssh://git@github.com/tensor-foundation/toolbox.git?rev=1e84508)",
 ]
 
 [[package]]
@@ -5677,6 +5677,16 @@ checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 [[package]]
 name = "vipers"
 version = "2.0.6"
+source = "git+ssh://git@github.com/tensor-foundation/toolbox.git?rev=1e84508#1e8450835f681463130ebbfcdb7625b15a89e2ae"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "num-traits",
+]
+
+[[package]]
+name = "vipers"
+version = "2.0.6"
 source = "git+ssh://git@github.com/tensor-foundation/toolbox.git#47620ea66f187378f04bfa0ad20617815d191881"
 dependencies = [
  "anchor-lang",
@@ -5821,7 +5831,7 @@ dependencies = [
  "mpl-token-metadata",
  "solana-program",
  "tensor-toolbox",
- "vipers",
+ "vipers 2.0.6 (git+ssh://git@github.com/tensor-foundation/toolbox.git)",
 ]
 
 [[package]]
