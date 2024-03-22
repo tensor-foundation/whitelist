@@ -20,7 +20,7 @@ pub const WHITELIST_V2_BASE_SIZE: usize =
 ;
 
 #[constant]
-pub const WHITELIST_V2_CONDITIONS_LENGTH: usize = 7;
+pub const WHITELIST_V2_CONDITIONS_LENGTH: usize = 24;
 
 /// Seeds: ["whitelist", <authority>, <uuid>]
 #[account]

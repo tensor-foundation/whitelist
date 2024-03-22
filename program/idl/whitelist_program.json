@@ -47,7 +47,7 @@
       "type": {
         "defined": "usize"
       },
-      "value": "7"
+      "value": "24"
     },
     {
       "name": "WHITELIST_SIZE",

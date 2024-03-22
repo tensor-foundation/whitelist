@@ -11,6 +11,8 @@ import {
   createWhitelistThrows,
 } from './_common';
 
+const MAX_CONDITIONS = 24;
+
 test('it can create a whitelist v2', async (t) => {
   const client = createDefaultSolanaClient();
   const updateAuthority = await generateKeyPairSignerWithSol(client);
@@ -256,5 +258,60 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
       // Should be no change.
       conditions,
     },
+  });
+});
+
+test('it can create a whitelist v2 of max length', async (t) => {
+  const client = createDefaultSolanaClient();
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const freezeAuthority = (await generateKeyPairSigner()).address;
+  const namespace = await generateKeyPairSigner();
+
+  const conditions = new Array(MAX_CONDITIONS).fill({
+    mode: Mode.FVC,
+    value: updateAuthority.address,
+  });
+
+  const { whitelist, uuid } = await createWhitelist({
+    client,
+    updateAuthority,
+    freezeAuthority,
+    conditions,
+    namespace,
+  });
+
+  // Then a whitelist authority was created with the correct data.
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      namespace: namespace.address,
+      freezeAuthority,
+      uuid,
+      conditions,
+    },
+  });
+});
+
+test('it throws when trying to create a whitelist v2 more than max length', async (t) => {
+  const client = createDefaultSolanaClient();
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const freezeAuthority = (await generateKeyPairSigner()).address;
+  const namespace = await generateKeyPairSigner();
+
+  const conditions = new Array(MAX_CONDITIONS + 1).fill({
+    mode: Mode.FVC,
+    value: updateAuthority.address,
+  });
+
+  await createWhitelistThrows({
+    client,
+    updateAuthority,
+    freezeAuthority,
+    conditions,
+    namespace,
+    t,
+    // Exceeds max transaction size.
+    message: /too large: 1652 bytes/,
   });
 });
