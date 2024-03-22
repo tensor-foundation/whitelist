@@ -44,9 +44,12 @@ pub enum ErrorCode {
     #[msg("too many conditions")]
     TooManyConditions = 13,
 
+    #[msg("cannot have empty conditions")]
+    EmptyConditions = 14,
+
     #[msg("too many merkle proofs")]
-    TooManyMerkleProofs = 14,
+    TooManyMerkleProofs = 15,
 
     #[msg("whitelist is frozen")]
-    WhitelistIsFrozen = 15,
+    WhitelistIsFrozen = 16,
 }

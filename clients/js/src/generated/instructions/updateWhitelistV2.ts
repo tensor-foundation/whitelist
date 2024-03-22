@@ -57,6 +57,7 @@ import {
 
 export type UpdateWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
   TAccountNewUpdateAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
@@ -68,6 +69,9 @@ export type UpdateWhitelistV2Instruction<
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
     [
+      TAccountPayer extends string
+        ? WritableSignerAccount<TAccountPayer>
+        : TAccountPayer,
       TAccountUpdateAuthority extends string
         ? WritableSignerAccount<TAccountUpdateAuthority>
         : TAccountUpdateAuthority,
@@ -86,6 +90,7 @@ export type UpdateWhitelistV2Instruction<
 
 export type UpdateWhitelistV2InstructionWithSigners<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
   TAccountNewUpdateAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
@@ -97,6 +102,10 @@ export type UpdateWhitelistV2InstructionWithSigners<
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
     [
+      TAccountPayer extends string
+        ? WritableSignerAccount<TAccountPayer> &
+            IAccountSignerMeta<TAccountPayer>
+        : TAccountPayer,
       TAccountUpdateAuthority extends string
         ? WritableSignerAccount<TAccountUpdateAuthority> &
             IAccountSignerMeta<TAccountUpdateAuthority>
@@ -163,11 +172,13 @@ export function getUpdateWhitelistV2InstructionDataCodec(): Codec<
 }
 
 export type UpdateWhitelistV2Input<
+  TAccountPayer extends string,
   TAccountUpdateAuthority extends string,
   TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string
 > = {
+  payer: Address<TAccountPayer>;
   updateAuthority: Address<TAccountUpdateAuthority>;
   newUpdateAuthority?: Address<TAccountNewUpdateAuthority>;
   whitelist: Address<TAccountWhitelist>;
@@ -177,11 +188,13 @@ export type UpdateWhitelistV2Input<
 };
 
 export type UpdateWhitelistV2InputWithSigners<
+  TAccountPayer extends string,
   TAccountUpdateAuthority extends string,
   TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string
 > = {
+  payer: TransactionSigner<TAccountPayer>;
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
   newUpdateAuthority?: TransactionSigner<TAccountNewUpdateAuthority>;
   whitelist: Address<TAccountWhitelist>;
@@ -191,6 +204,7 @@ export type UpdateWhitelistV2InputWithSigners<
 };
 
 export function getUpdateWhitelistV2Instruction<
+  TAccountPayer extends string,
   TAccountUpdateAuthority extends string,
   TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
@@ -198,6 +212,7 @@ export function getUpdateWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: UpdateWhitelistV2InputWithSigners<
+    TAccountPayer,
     TAccountUpdateAuthority,
     TAccountNewUpdateAuthority,
     TAccountWhitelist,
@@ -205,12 +220,14 @@ export function getUpdateWhitelistV2Instruction<
   >
 ): UpdateWhitelistV2InstructionWithSigners<
   TProgram,
+  TAccountPayer,
   TAccountUpdateAuthority,
   TAccountNewUpdateAuthority,
   TAccountWhitelist,
   TAccountSystemProgram
 >;
 export function getUpdateWhitelistV2Instruction<
+  TAccountPayer extends string,
   TAccountUpdateAuthority extends string,
   TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
@@ -218,6 +235,7 @@ export function getUpdateWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: UpdateWhitelistV2Input<
+    TAccountPayer,
     TAccountUpdateAuthority,
     TAccountNewUpdateAuthority,
     TAccountWhitelist,
@@ -225,12 +243,14 @@ export function getUpdateWhitelistV2Instruction<
   >
 ): UpdateWhitelistV2Instruction<
   TProgram,
+  TAccountPayer,
   TAccountUpdateAuthority,
   TAccountNewUpdateAuthority,
   TAccountWhitelist,
   TAccountSystemProgram
 >;
 export function getUpdateWhitelistV2Instruction<
+  TAccountPayer extends string,
   TAccountUpdateAuthority extends string,
   TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
@@ -238,6 +258,7 @@ export function getUpdateWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: UpdateWhitelistV2Input<
+    TAccountPayer,
     TAccountUpdateAuthority,
     TAccountNewUpdateAuthority,
     TAccountWhitelist,
@@ -252,6 +273,7 @@ export function getUpdateWhitelistV2Instruction<
   type AccountMetas = Parameters<
     typeof getUpdateWhitelistV2InstructionRaw<
       TProgram,
+      TAccountPayer,
       TAccountUpdateAuthority,
       TAccountNewUpdateAuthority,
       TAccountWhitelist,
@@ -259,6 +281,7 @@ export function getUpdateWhitelistV2Instruction<
     >
   >[0];
   const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+    payer: { value: input.payer ?? null, isWritable: true },
     updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
     newUpdateAuthority: {
       value: input.newUpdateAuthority ?? null,
@@ -295,6 +318,7 @@ export function getUpdateWhitelistV2Instruction<
 
 export function getUpdateWhitelistV2InstructionRaw<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
   TAccountNewUpdateAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
@@ -304,6 +328,9 @@ export function getUpdateWhitelistV2InstructionRaw<
   TRemainingAccounts extends Array<IAccountMeta<string>> = []
 >(
   accounts: {
+    payer: TAccountPayer extends string
+      ? Address<TAccountPayer>
+      : TAccountPayer;
     updateAuthority: TAccountUpdateAuthority extends string
       ? Address<TAccountUpdateAuthority>
       : TAccountUpdateAuthority;
@@ -323,6 +350,7 @@ export function getUpdateWhitelistV2InstructionRaw<
 ) {
   return {
     accounts: [
+      accountMetaWithDefault(accounts.payer, AccountRole.WRITABLE_SIGNER),
       accountMetaWithDefault(
         accounts.updateAuthority,
         AccountRole.WRITABLE_SIGNER
@@ -347,6 +375,7 @@ export function getUpdateWhitelistV2InstructionRaw<
     programAddress,
   } as UpdateWhitelistV2Instruction<
     TProgram,
+    TAccountPayer,
     TAccountUpdateAuthority,
     TAccountNewUpdateAuthority,
     TAccountWhitelist,
@@ -361,10 +390,11 @@ export type ParsedUpdateWhitelistV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
-    updateAuthority: TAccountMetas[0];
-    newUpdateAuthority?: TAccountMetas[1] | undefined;
-    whitelist: TAccountMetas[2];
-    systemProgram: TAccountMetas[3];
+    payer: TAccountMetas[0];
+    updateAuthority: TAccountMetas[1];
+    newUpdateAuthority?: TAccountMetas[2] | undefined;
+    whitelist: TAccountMetas[3];
+    systemProgram: TAccountMetas[4];
   };
   data: UpdateWhitelistV2InstructionData;
 };
@@ -377,7 +407,7 @@ export function parseUpdateWhitelistV2Instruction<
     IInstructionWithAccounts<TAccountMetas> &
     IInstructionWithData<Uint8Array>
 ): ParsedUpdateWhitelistV2Instruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 4) {
+  if (instruction.accounts.length < 5) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -396,6 +426,7 @@ export function parseUpdateWhitelistV2Instruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
+      payer: getNextAccount(),
       updateAuthority: getNextAccount(),
       newUpdateAuthority: getNextOptionalAccount(),
       whitelist: getNextAccount(),

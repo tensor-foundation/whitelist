@@ -383,6 +383,11 @@
       "name": "updateWhitelistV2",
       "accounts": [
         {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
           "name": "updateAuthority",
           "isMut": true,
           "isSigner": true
@@ -975,11 +980,16 @@
     },
     {
       "code": 6014,
+      "name": "EmptyConditions",
+      "msg": "cannot have empty conditions"
+    },
+    {
+      "code": 6015,
       "name": "TooManyMerkleProofs",
       "msg": "too many merkle proofs"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "WhitelistIsFrozen",
       "msg": "whitelist is frozen"
     }

@@ -52,10 +52,13 @@ pub enum TensorWhitelistError {
     /// 6013 (0x177D) - too many conditions
     #[error("too many conditions")]
     TooManyConditions,
-    /// 6014 (0x177E) - too many merkle proofs
+    /// 6014 (0x177E) - cannot have empty conditions
+    #[error("cannot have empty conditions")]
+    EmptyConditions,
+    /// 6015 (0x177F) - too many merkle proofs
     #[error("too many merkle proofs")]
     TooManyMerkleProofs,
-    /// 6015 (0x177F) - whitelist is frozen
+    /// 6016 (0x1780) - whitelist is frozen
     #[error("whitelist is frozen")]
     WhitelistIsFrozen,
 }

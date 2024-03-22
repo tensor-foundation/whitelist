@@ -75,26 +75,19 @@ test('creating a whitelist v2 with no freeze authority defaults to system pubkey
   });
 });
 
-test('it can create a whitelist v2 with an empty conditions list', async (t) => {
+test('it throws when creating a whitelist v2 with an empty conditions list', async (t) => {
   const client = createDefaultSolanaClient();
   const updateAuthority = await generateKeyPairSignerWithSol(client);
 
   const conditions: Condition[] = [];
 
-  const { whitelist, uuid } = await createWhitelist({
+  await createWhitelistThrows({
     client,
     updateAuthority,
     conditions,
-  });
-
-  // Then a whitelist updateAuthority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
-    address: whitelist,
-    data: {
-      updateAuthority: updateAuthority.address,
-      uuid,
-      conditions,
-    },
+    t,
+    // 6014 -- Emptyconditions
+    message: /custom program error: 0x177e/,
   });
 });
 
@@ -155,8 +148,8 @@ test('it cannot create a whitelist v2 with more than one merkle proof', async (t
     conditions,
     namespace,
     t,
-    // 6014 -- TooManyMerkleProofs
-    message: /custom program error: 0x177e/,
+    // 6015 -- TooManyMerkleProofs
+    message: /custom program error: 0x177f/,
   });
 });
 

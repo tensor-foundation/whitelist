@@ -35,10 +35,12 @@ export const enum TensorWhitelistProgramErrorCode {
   INVALID_WHITELIST_INDEX = 0x177c, // 6012
   /** TooManyConditions: too many conditions */
   TOO_MANY_CONDITIONS = 0x177d, // 6013
+  /** EmptyConditions: cannot have empty conditions */
+  EMPTY_CONDITIONS = 0x177e, // 6014
   /** TooManyMerkleProofs: too many merkle proofs */
-  TOO_MANY_MERKLE_PROOFS = 0x177e, // 6014
+  TOO_MANY_MERKLE_PROOFS = 0x177f, // 6015
   /** WhitelistIsFrozen: whitelist is frozen */
-  WHITELIST_IS_FROZEN = 0x177f, // 6015
+  WHITELIST_IS_FROZEN = 0x1780, // 6016
 }
 
 export class TensorWhitelistProgramError extends Error {
@@ -120,6 +122,10 @@ if (__DEV__) {
     [TensorWhitelistProgramErrorCode.TOO_MANY_CONDITIONS]: [
       'TooManyConditions',
       `too many conditions`,
+    ],
+    [TensorWhitelistProgramErrorCode.EMPTY_CONDITIONS]: [
+      'EmptyConditions',
+      `cannot have empty conditions`,
     ],
     [TensorWhitelistProgramErrorCode.TOO_MANY_MERKLE_PROOFS]: [
       'TooManyMerkleProofs',

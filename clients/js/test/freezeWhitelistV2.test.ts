@@ -142,6 +142,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
 
   // Try to update
   const editWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer: updateAuthority,
     updateAuthority,
     whitelist,
     conditions: newConditions,
@@ -154,8 +155,8 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  // Cannot update: 0x177f / 6015 WhitelistIsFrozen
+  // Cannot update: 0x1780 / 6016 WhitelistIsFrozen
   await t.throwsAsync(promise, {
-    message: /custom program error: 0x177f/,
+    message: /custom program error: 0x1780/,
   });
 });

@@ -12,6 +12,8 @@ use borsh::BorshSerialize;
 
 /// Accounts.
 pub struct UpdateWhitelistV2 {
+    pub payer: solana_program::pubkey::Pubkey,
+
     pub update_authority: solana_program::pubkey::Pubkey,
 
     pub new_update_authority: Option<solana_program::pubkey::Pubkey>,
@@ -34,7 +36,10 @@ impl UpdateWhitelistV2 {
         args: UpdateWhitelistV2InstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            self.payer, true,
+        ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.update_authority,
             true,
@@ -97,12 +102,14 @@ pub struct UpdateWhitelistV2InstructionArgs {
 ///
 /// ### Accounts:
 ///
-///   0. `[writable, signer]` update_authority
-///   1. `[signer, optional]` new_update_authority
-///   2. `[writable]` whitelist
-///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
+///   0. `[writable, signer]` payer
+///   1. `[writable, signer]` update_authority
+///   2. `[signer, optional]` new_update_authority
+///   3. `[writable]` whitelist
+///   4. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Default)]
 pub struct UpdateWhitelistV2Builder {
+    payer: Option<solana_program::pubkey::Pubkey>,
     update_authority: Option<solana_program::pubkey::Pubkey>,
     new_update_authority: Option<solana_program::pubkey::Pubkey>,
     whitelist: Option<solana_program::pubkey::Pubkey>,
@@ -115,6 +122,11 @@ pub struct UpdateWhitelistV2Builder {
 impl UpdateWhitelistV2Builder {
     pub fn new() -> Self {
         Self::default()
+    }
+    #[inline(always)]
+    pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.payer = Some(payer);
+        self
     }
     #[inline(always)]
     pub fn update_authority(
@@ -176,6 +188,7 @@ impl UpdateWhitelistV2Builder {
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
         let accounts = UpdateWhitelistV2 {
+            payer: self.payer.expect("payer is not set"),
             update_authority: self.update_authority.expect("update_authority is not set"),
             new_update_authority: self.new_update_authority,
             whitelist: self.whitelist.expect("whitelist is not set"),
@@ -197,6 +210,8 @@ impl UpdateWhitelistV2Builder {
 
 /// `update_whitelist_v2` CPI accounts.
 pub struct UpdateWhitelistV2CpiAccounts<'a, 'b> {
+    pub payer: &'b solana_program::account_info::AccountInfo<'a>,
+
     pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
@@ -210,6 +225,8 @@ pub struct UpdateWhitelistV2CpiAccounts<'a, 'b> {
 pub struct UpdateWhitelistV2Cpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+
+    pub payer: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
 
@@ -230,6 +247,7 @@ impl<'a, 'b> UpdateWhitelistV2Cpi<'a, 'b> {
     ) -> Self {
         Self {
             __program: program,
+            payer: accounts.payer,
             update_authority: accounts.update_authority,
             new_update_authority: accounts.new_update_authority,
             whitelist: accounts.whitelist,
@@ -270,7 +288,11 @@ impl<'a, 'b> UpdateWhitelistV2Cpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            *self.payer.key,
+            true,
+        ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.update_authority.key,
             true,
@@ -312,8 +334,9 @@ impl<'a, 'b> UpdateWhitelistV2Cpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(4 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(5 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
+        account_infos.push(self.payer.clone());
         account_infos.push(self.update_authority.clone());
         if let Some(new_update_authority) = self.new_update_authority {
             account_infos.push(new_update_authority.clone());
@@ -336,10 +359,11 @@ impl<'a, 'b> UpdateWhitelistV2Cpi<'a, 'b> {
 ///
 /// ### Accounts:
 ///
-///   0. `[writable, signer]` update_authority
-///   1. `[signer, optional]` new_update_authority
-///   2. `[writable]` whitelist
-///   3. `[]` system_program
+///   0. `[writable, signer]` payer
+///   1. `[writable, signer]` update_authority
+///   2. `[signer, optional]` new_update_authority
+///   3. `[writable]` whitelist
+///   4. `[]` system_program
 pub struct UpdateWhitelistV2CpiBuilder<'a, 'b> {
     instruction: Box<UpdateWhitelistV2CpiBuilderInstruction<'a, 'b>>,
 }
@@ -348,6 +372,7 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
         let instruction = Box::new(UpdateWhitelistV2CpiBuilderInstruction {
             __program: program,
+            payer: None,
             update_authority: None,
             new_update_authority: None,
             whitelist: None,
@@ -357,6 +382,11 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
+    }
+    #[inline(always)]
+    pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+        self.instruction.payer = Some(payer);
+        self
     }
     #[inline(always)]
     pub fn update_authority(
@@ -454,6 +484,8 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
         let instruction = UpdateWhitelistV2Cpi {
             __program: self.instruction.__program,
 
+            payer: self.instruction.payer.expect("payer is not set"),
+
             update_authority: self
                 .instruction
                 .update_authority
@@ -478,6 +510,7 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
 
 struct UpdateWhitelistV2CpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
+    payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     whitelist: Option<&'b solana_program::account_info::AccountInfo<'a>>,

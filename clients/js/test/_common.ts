@@ -153,6 +153,7 @@ export async function updateWhitelist({
   newConditions,
 }: UpdateWhitelistParams) {
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer,
     updateAuthority,
     whitelist,
     newUpdateAuthority,
@@ -179,6 +180,7 @@ export async function updateWhitelistThrows({
   message,
 }: UpdateWhitelistThrowsParams) {
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer,
     updateAuthority,
     whitelist,
     newUpdateAuthority,

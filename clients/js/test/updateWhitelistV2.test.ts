@@ -55,6 +55,7 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
   ];
 
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer: updateAuthority,
     updateAuthority,
     whitelist,
     conditions: newConditions,
@@ -116,6 +117,7 @@ test('it can edit a whitelist v2 reallocing to be smaller', async (t) => {
   const newConditions: Condition[] = [{ mode: Mode.VOC, value: voc }];
 
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer: updateAuthority,
     updateAuthority,
     whitelist,
     conditions: newConditions,
@@ -168,6 +170,7 @@ test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
   ];
 
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer: updateAuthority,
     updateAuthority: wrongAuthority,
     whitelist,
     conditions: newConditions,
@@ -204,6 +207,7 @@ test('it can change the update authority of a whitelist v2', async (t) => {
   });
 
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer: updateAuthority,
     updateAuthority,
     whitelist,
     newUpdateAuthority,
@@ -260,6 +264,7 @@ test('it cannot update a whitelist v2 with more than one merkle proof', async (t
   ];
 
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer: updateAuthority,
     updateAuthority,
     whitelist,
     conditions: newConditions,
@@ -272,8 +277,8 @@ test('it cannot update a whitelist v2 with more than one merkle proof', async (t
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  // 6014 - TooManyMerkleProofs
-  await t.throwsAsync(promise, { message: /0x177e/ });
+  // 6015 - TooManyMerkleProofs
+  await t.throwsAsync(promise, { message: /0x177f/ });
 });
 
 test('it moves the merkle proof to the first index for a whitelist v2', async (t) => {

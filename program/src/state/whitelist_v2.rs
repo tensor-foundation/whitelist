@@ -46,6 +46,10 @@ impl WhitelistV2 {
 
     // Limit the number of conditions to control compute usage.
     pub fn validate_conditions(conditions: &mut [Condition]) -> Result<()> {
+        if conditions.is_empty() {
+            throw_err!(ErrorCode::EmptyConditions);
+        }
+
         if conditions.len() > WHITELIST_V2_CONDITIONS_LENGTH {
             throw_err!(ErrorCode::TooManyConditions);
         }

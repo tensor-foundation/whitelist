@@ -45,6 +45,9 @@ impl Toggle {
 #[instruction(args: UpdateWhitelistV2Args)]
 pub struct UpdateWhitelistV2<'info> {
     #[account(mut)]
+    pub payer: Signer<'info>,
+
+    #[account(mut)]
     pub update_authority: Signer<'info>,
 
     // New update authority must be a signer, if present, to prevent mistakes.
@@ -57,7 +60,7 @@ pub struct UpdateWhitelistV2<'info> {
         // 1) the length of the passed in conditions, or the length of the current conditions
         realloc = WhitelistV2::BASE_SIZE + VEC_LENGTH + args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() * WhitelistV2::CONDITION_SIZE,
         realloc::zero = false,
-        realloc::payer = update_authority,
+        realloc::payer = payer,
         has_one = update_authority @ ErrorCode::InvalidAuthority
     )]
     pub whitelist: Account<'info, WhitelistV2>,
@@ -67,11 +70,15 @@ pub struct UpdateWhitelistV2<'info> {
 
 pub fn process_update_whitelist_v2(
     ctx: Context<UpdateWhitelistV2>,
-    mut args: UpdateWhitelistV2Args,
+    args: UpdateWhitelistV2Args,
 ) -> Result<()> {
-    WhitelistV2::validate_conditions(args.conditions.as_mut().unwrap_or(&mut vec![]))?;
-
     let whitelist = &mut ctx.accounts.whitelist;
+
+    // None means no update to conditions so nothing to validate.
+    if let Some(mut conditions) = args.conditions {
+        WhitelistV2::validate_conditions(&mut conditions)?;
+        whitelist.conditions = conditions;
+    }
 
     // Check if the whitelist is frozen; cannot update if it is.
     if whitelist.is_frozen() {
@@ -92,11 +99,6 @@ pub fn process_update_whitelist_v2(
     // Change the update authority.
     if let Some(new_update_authority) = &ctx.accounts.new_update_authority {
         whitelist.update_authority = new_update_authority.key();
-    }
-
-    // Set new conditions if they are present. Realloc happens in the account declaration.
-    if let Some(conditions) = args.conditions {
-        whitelist.conditions = conditions;
     }
 
     Ok(())
