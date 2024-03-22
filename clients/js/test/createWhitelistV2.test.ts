@@ -160,7 +160,7 @@ test('it cannot create a whitelist v2 with more than one merkle proof', async (t
   });
 });
 
-test.only('it moves the merkle proof to the first index for a whitelist v2', async (t) => {
+test('it moves the merkle proof to the first index for a whitelist v2', async (t) => {
   const client = createDefaultSolanaClient();
   const updateAuthority = await generateKeyPairSignerWithSol(client);
   const freezeAuthority = (await generateKeyPairSigner()).address;
