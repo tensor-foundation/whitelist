@@ -6,7 +6,7 @@
 //!
 
 use crate::generated::types::Condition;
-use crate::generated::types::Toggle;
+use crate::generated::types::Operation;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
@@ -94,7 +94,7 @@ impl UpdateWhitelistV2InstructionData {
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct UpdateWhitelistV2InstructionArgs {
-    pub freeze_authority: Toggle,
+    pub freeze_authority: Operation,
     pub conditions: Option<Vec<Condition>>,
 }
 
@@ -114,7 +114,7 @@ pub struct UpdateWhitelistV2Builder {
     new_update_authority: Option<solana_program::pubkey::Pubkey>,
     whitelist: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
-    freeze_authority: Option<Toggle>,
+    freeze_authority: Option<Operation>,
     conditions: Option<Vec<Condition>>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
@@ -157,7 +157,7 @@ impl UpdateWhitelistV2Builder {
         self
     }
     #[inline(always)]
-    pub fn freeze_authority(&mut self, freeze_authority: Toggle) -> &mut Self {
+    pub fn freeze_authority(&mut self, freeze_authority: Operation) -> &mut Self {
         self.freeze_authority = Some(freeze_authority);
         self
     }
@@ -422,7 +422,7 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn freeze_authority(&mut self, freeze_authority: Toggle) -> &mut Self {
+    pub fn freeze_authority(&mut self, freeze_authority: Operation) -> &mut Self {
         self.instruction.freeze_authority = Some(freeze_authority);
         self
     }
@@ -515,7 +515,7 @@ struct UpdateWhitelistV2CpiBuilderInstruction<'a, 'b> {
     new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     whitelist: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    freeze_authority: Option<Toggle>,
+    freeze_authority: Option<Operation>,
     conditions: Option<Vec<Condition>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(

@@ -14,7 +14,7 @@ import {
   WhitelistV2,
   fetchWhitelistV2,
   getUpdateWhitelistV2Instruction,
-  toggle,
+  operation,
 } from '../src';
 import {
   createWhitelist,
@@ -59,7 +59,7 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
     updateAuthority,
     whitelist,
     conditions: newConditions,
-    freezeAuthority: toggle('None'),
+    freezeAuthority: operation('Noop'),
   });
 
   await pipe(
@@ -121,7 +121,7 @@ test('it can edit a whitelist v2 reallocing to be smaller', async (t) => {
     updateAuthority,
     whitelist,
     conditions: newConditions,
-    freezeAuthority: toggle('None'),
+    freezeAuthority: operation('Noop'),
   });
 
   await pipe(
@@ -174,7 +174,7 @@ test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
     updateAuthority: wrongAuthority,
     whitelist,
     conditions: newConditions,
-    freezeAuthority: toggle('None'),
+    freezeAuthority: operation('Noop'),
   });
 
   const promise = pipe(
@@ -212,7 +212,7 @@ test('it can change the update authority of a whitelist v2', async (t) => {
     whitelist,
     newUpdateAuthority,
     conditions: none(),
-    freezeAuthority: toggle('None'),
+    freezeAuthority: operation('Noop'),
   });
 
   await pipe(
@@ -268,7 +268,7 @@ test('it cannot update a whitelist v2 with more than one merkle proof', async (t
     updateAuthority,
     whitelist,
     conditions: newConditions,
-    freezeAuthority: toggle('None'),
+    freezeAuthority: operation('Noop'),
   });
 
   const promise = pipe(

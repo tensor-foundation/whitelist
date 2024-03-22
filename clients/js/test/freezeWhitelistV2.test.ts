@@ -14,7 +14,7 @@ import {
   getUpdateWhitelistV2Instruction,
   getFreezeWhitelistV2Instruction,
   getUnfreezeWhitelistV2Instruction,
-  toggle,
+  operation,
 } from '../src';
 import { createWhitelist } from './_common';
 
@@ -146,7 +146,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
     updateAuthority,
     whitelist,
     conditions: newConditions,
-    freezeAuthority: toggle('None'),
+    freezeAuthority: operation('Noop'),
   });
 
   const promise = pipe(

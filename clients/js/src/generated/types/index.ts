@@ -9,5 +9,5 @@
 export * from './condition';
 export * from './fullMerkleProof';
 export * from './mode';
+export * from './operation';
 export * from './state';
-export * from './toggle';

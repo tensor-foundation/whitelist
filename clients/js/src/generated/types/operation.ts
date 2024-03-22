@@ -25,62 +25,64 @@ import {
   getUnitEncoder,
 } from '@solana/codecs-data-structures';
 
-export type Toggle =
-  | { __kind: 'None' }
+export type Operation =
+  | { __kind: 'Noop' }
   | { __kind: 'Clear' }
   | { __kind: 'Set'; fields: [Address] };
 
-export type ToggleArgs = Toggle;
+export type OperationArgs = Operation;
 
-export function getToggleEncoder() {
-  return getDataEnumEncoder<ToggleArgs>([
-    ['None', getUnitEncoder()],
+export function getOperationEncoder() {
+  return getDataEnumEncoder<OperationArgs>([
+    ['Noop', getUnitEncoder()],
     ['Clear', getUnitEncoder()],
     [
       'Set',
-      getStructEncoder<GetDataEnumKindContent<ToggleArgs, 'Set'>>([
+      getStructEncoder<GetDataEnumKindContent<OperationArgs, 'Set'>>([
         ['fields', getTupleEncoder([getAddressEncoder()])],
       ]),
     ],
-  ]) satisfies Encoder<ToggleArgs>;
+  ]) satisfies Encoder<OperationArgs>;
 }
 
-export function getToggleDecoder() {
-  return getDataEnumDecoder<Toggle>([
-    ['None', getUnitDecoder()],
+export function getOperationDecoder() {
+  return getDataEnumDecoder<Operation>([
+    ['Noop', getUnitDecoder()],
     ['Clear', getUnitDecoder()],
     [
       'Set',
-      getStructDecoder<GetDataEnumKindContent<Toggle, 'Set'>>([
+      getStructDecoder<GetDataEnumKindContent<Operation, 'Set'>>([
         ['fields', getTupleDecoder([getAddressDecoder()])],
       ]),
     ],
-  ]) satisfies Decoder<Toggle>;
+  ]) satisfies Decoder<Operation>;
 }
 
-export function getToggleCodec(): Codec<ToggleArgs, Toggle> {
-  return combineCodec(getToggleEncoder(), getToggleDecoder());
+export function getOperationCodec(): Codec<OperationArgs, Operation> {
+  return combineCodec(getOperationEncoder(), getOperationDecoder());
 }
 
 // Data Enum Helpers.
-export function toggle(kind: 'None'): GetDataEnumKind<ToggleArgs, 'None'>;
-export function toggle(kind: 'Clear'): GetDataEnumKind<ToggleArgs, 'Clear'>;
-export function toggle(
+export function operation(kind: 'Noop'): GetDataEnumKind<OperationArgs, 'Noop'>;
+export function operation(
+  kind: 'Clear'
+): GetDataEnumKind<OperationArgs, 'Clear'>;
+export function operation(
   kind: 'Set',
-  data: GetDataEnumKindContent<ToggleArgs, 'Set'>['fields']
-): GetDataEnumKind<ToggleArgs, 'Set'>;
-export function toggle<K extends ToggleArgs['__kind']>(
+  data: GetDataEnumKindContent<OperationArgs, 'Set'>['fields']
+): GetDataEnumKind<OperationArgs, 'Set'>;
+export function operation<K extends OperationArgs['__kind']>(
   kind: K,
   data?: any
-): Extract<ToggleArgs, { __kind: K }> {
+): Extract<OperationArgs, { __kind: K }> {
   return Array.isArray(data)
     ? { __kind: kind, fields: data }
     : { __kind: kind, ...(data ?? {}) };
 }
 
-export function isToggle<K extends Toggle['__kind']>(
+export function isOperation<K extends Operation['__kind']>(
   kind: K,
-  value: Toggle
-): value is Toggle & { __kind: K } {
+  value: Operation
+): value is Operation & { __kind: K } {
   return value.__kind === kind;
 }

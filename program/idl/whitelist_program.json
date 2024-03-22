@@ -793,7 +793,7 @@
           {
             "name": "freezeAuthority",
             "type": {
-              "defined": "Toggle"
+              "defined": "Operation"
             }
           },
           {
@@ -856,12 +856,12 @@
       }
     },
     {
-      "name": "Toggle",
+      "name": "Operation",
       "type": {
         "kind": "enum",
         "variants": [
           {
-            "name": "None"
+            "name": "Noop"
           },
           {
             "name": "Clear"

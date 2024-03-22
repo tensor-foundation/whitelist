@@ -3,40 +3,36 @@ use anchor_lang::prelude::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct UpdateWhitelistV2Args {
-    freeze_authority: Toggle,
+    freeze_authority: Operation,
     conditions: Option<Vec<Condition>>,
 }
 
 // Allows for the update authority to be set to a new pubkey, or cleared.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub enum Toggle {
-    None,
+pub enum Operation {
+    Noop,
     Clear,
     Set(Pubkey),
 }
 
-impl Toggle {
-    pub fn is_some(&self) -> bool {
-        matches!(self, Toggle::Clear | Toggle::Set(_))
-    }
-
-    pub fn is_none(&self) -> bool {
-        matches!(self, Toggle::None)
+impl Operation {
+    pub fn is_noop(&self) -> bool {
+        matches!(self, Operation::Noop)
     }
 
     pub fn is_clear(&self) -> bool {
-        matches!(self, Toggle::Clear)
+        matches!(self, Operation::Clear)
     }
 
     pub fn is_set(&self) -> bool {
-        matches!(self, Toggle::Set(_))
+        matches!(self, Operation::Set(_))
     }
 
     pub fn to_option(self) -> Option<Pubkey> {
         match self {
-            Toggle::Set(value) => Some(value),
-            Toggle::Clear => None,
-            Toggle::None => panic!("Tried to convert 'None' value"),
+            Operation::Set(value) => Some(value),
+            Operation::Clear => None,
+            Operation::Noop => panic!("Tried to convert 'Noop' value"),
         }
     }
 }
@@ -88,7 +84,7 @@ pub fn process_update_whitelist_v2(
     // Update the freeze authority. If the Toggle is None, then there's nothing to do.
     // Update authority can change the freeze authority if the whitelist is unfrozen,
     // but cannot unfreeze the whitelist itself.
-    if let Toggle::Set(authority) = args.freeze_authority {
+    if let Operation::Set(authority) = args.freeze_authority {
         // Set
         whitelist.freeze_authority = authority;
     } else if args.freeze_authority.is_clear() {

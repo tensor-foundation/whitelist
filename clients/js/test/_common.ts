@@ -8,11 +8,11 @@ import { Buffer } from 'buffer';
 import {
   Condition,
   Mode,
-  Toggle,
+  Operation,
   findWhitelistV2Pda,
   getCreateWhitelistV2Instruction,
   getUpdateWhitelistV2Instruction,
-  toggle,
+  operation,
 } from '../src';
 import {
   Client,
@@ -134,7 +134,7 @@ export interface UpdateWhitelistParams {
   updateAuthority: KeyPairSigner;
   payer?: KeyPairSigner;
   newUpdateAuthority?: KeyPairSigner;
-  newFreezeAuthority?: Toggle;
+  newFreezeAuthority?: Operation;
   newConditions?: Condition[];
 }
 
@@ -157,7 +157,7 @@ export async function updateWhitelist({
     updateAuthority,
     whitelist,
     newUpdateAuthority,
-    freezeAuthority: newFreezeAuthority ?? toggle('None'),
+    freezeAuthority: newFreezeAuthority ?? operation('Noop'),
     conditions: newConditions ?? none(),
   });
 
@@ -184,7 +184,7 @@ export async function updateWhitelistThrows({
     updateAuthority,
     whitelist,
     newUpdateAuthority,
-    freezeAuthority: newFreezeAuthority ?? toggle('None'),
+    freezeAuthority: newFreezeAuthority ?? operation('Noop'),
     conditions: newConditions ?? none(),
   });
 

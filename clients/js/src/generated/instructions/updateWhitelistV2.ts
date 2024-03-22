@@ -47,12 +47,12 @@ import {
 import {
   Condition,
   ConditionArgs,
-  Toggle,
-  ToggleArgs,
+  Operation,
+  OperationArgs,
   getConditionDecoder,
   getConditionEncoder,
-  getToggleDecoder,
-  getToggleEncoder,
+  getOperationDecoder,
+  getOperationEncoder,
 } from '../types';
 
 export type UpdateWhitelistV2Instruction<
@@ -126,12 +126,12 @@ export type UpdateWhitelistV2InstructionWithSigners<
 
 export type UpdateWhitelistV2InstructionData = {
   discriminator: Array<number>;
-  freezeAuthority: Toggle;
+  freezeAuthority: Operation;
   conditions: Option<Array<Condition>>;
 };
 
 export type UpdateWhitelistV2InstructionDataArgs = {
-  freezeAuthority: ToggleArgs;
+  freezeAuthority: OperationArgs;
   conditions: OptionOrNullable<Array<ConditionArgs>>;
 };
 
@@ -139,11 +139,11 @@ export function getUpdateWhitelistV2InstructionDataEncoder() {
   return mapEncoder(
     getStructEncoder<{
       discriminator: Array<number>;
-      freezeAuthority: ToggleArgs;
+      freezeAuthority: OperationArgs;
       conditions: OptionOrNullable<Array<ConditionArgs>>;
     }>([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
-      ['freezeAuthority', getToggleEncoder()],
+      ['freezeAuthority', getOperationEncoder()],
       ['conditions', getOptionEncoder(getArrayEncoder(getConditionEncoder()))],
     ]),
     (value) => ({
@@ -156,7 +156,7 @@ export function getUpdateWhitelistV2InstructionDataEncoder() {
 export function getUpdateWhitelistV2InstructionDataDecoder() {
   return getStructDecoder<UpdateWhitelistV2InstructionData>([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-    ['freezeAuthority', getToggleDecoder()],
+    ['freezeAuthority', getOperationDecoder()],
     ['conditions', getOptionDecoder(getArrayDecoder(getConditionDecoder()))],
   ]) satisfies Decoder<UpdateWhitelistV2InstructionData>;
 }
