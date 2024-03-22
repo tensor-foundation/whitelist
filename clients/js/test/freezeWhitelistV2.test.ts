@@ -31,7 +31,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
   });
 
   // It was created correctly, and is unfrozen.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -39,7 +39,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
       conditions,
       state: State.Unfrozen,
     },
-  }));
+  });
 
   // Freeze
   const freezeWhitelistIx = getFreezeWhitelistV2Instruction({
@@ -53,7 +53,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -62,7 +62,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
       state: State.Frozen,
       conditions,
     },
-  }));
+  });
 
   // Unfreeze
   const unfreezeWhitelistIx = getUnfreezeWhitelistV2Instruction({
@@ -76,7 +76,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -85,7 +85,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
       state: State.Unfrozen,
       conditions,
     },
-  }));
+  });
 });
 
 test('a frozen whitelist v2 cannot be updated', async (t) => {
@@ -102,7 +102,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
   });
 
   // It was created correctly, and is unfrozen.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -110,7 +110,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
       conditions,
       state: State.Unfrozen,
     },
-  }));
+  });
 
   // Freeze
   const freezeWhitelistIx = getFreezeWhitelistV2Instruction({
@@ -124,7 +124,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -133,7 +133,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
       state: State.Frozen,
       conditions,
     },
-  }));
+  });
 
   const newConditions = [
     { mode: Mode.VOC, value: voc },

@@ -32,7 +32,7 @@ test('it can create a whitelist v2', async (t) => {
   });
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -41,7 +41,7 @@ test('it can create a whitelist v2', async (t) => {
       uuid,
       conditions,
     },
-  }));
+  });
 });
 
 test('creating a whitelist v2 with no freeze authority defaults to system pubkey', async (t) => {
@@ -63,7 +63,7 @@ test('creating a whitelist v2 with no freeze authority defaults to system pubkey
   });
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -72,7 +72,7 @@ test('creating a whitelist v2 with no freeze authority defaults to system pubkey
       uuid,
       conditions,
     },
-  }));
+  });
 });
 
 test('it can create a whitelist v2 with an empty conditions list', async (t) => {
@@ -88,14 +88,14 @@ test('it can create a whitelist v2 with an empty conditions list', async (t) => 
   });
 
   // Then a whitelist updateAuthority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       uuid,
       conditions,
     },
-  }));
+  });
 });
 
 test('it can create a whitelist v2 funded by a separate payer', async (t) => {
@@ -122,7 +122,7 @@ test('it can create a whitelist v2 funded by a separate payer', async (t) => {
   });
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -131,7 +131,7 @@ test('it can create a whitelist v2 funded by a separate payer', async (t) => {
       uuid,
       conditions,
     },
-  }));
+  });
 });
 
 test('it cannot create a whitelist v2 with more than one merkle proof', async (t) => {
@@ -187,7 +187,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
   ];
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -196,7 +196,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
       uuid,
       conditions: expectedConditions,
     },
-  }));
+  });
 
   // Merkle is in the middle of the list.
   conditions = [
@@ -224,7 +224,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
   ];
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -233,7 +233,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
       uuid,
       conditions: expectedConditions,
     },
-  }));
+  });
 
   // Merkle is first item in the list.
   conditions = [
@@ -253,7 +253,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
   }));
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -263,5 +263,5 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
       // Should be no change.
       conditions,
     },
-  }));
+  });
 });

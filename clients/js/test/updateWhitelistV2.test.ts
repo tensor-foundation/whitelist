@@ -33,14 +33,14 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
     updateAuthority,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       uuid,
       conditions,
     },
-  }));
+  });
 
   const originalAccountSize = await getAccountDataLength(client, whitelist);
 
@@ -67,14 +67,14 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       uuid,
       conditions: newConditions,
     },
-  }));
+  });
 
   const newAccountSize = await getAccountDataLength(client, whitelist);
 
@@ -103,14 +103,14 @@ test('it can edit a whitelist v2 reallocing to be smaller', async (t) => {
 
   const originalAccountSize = await getAccountDataLength(client, whitelist);
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       uuid,
       conditions,
     },
-  }));
+  });
 
   // Smaller conditions list
   const newConditions: Condition[] = [{ mode: Mode.VOC, value: voc }];
@@ -130,14 +130,14 @@ test('it can edit a whitelist v2 reallocing to be smaller', async (t) => {
 
   const newAccountSize = await getAccountDataLength(client, whitelist);
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       uuid,
       conditions: newConditions,
     },
-  }));
+  });
 
   t.true(newAccountSize < originalAccountSize);
 });
@@ -153,14 +153,14 @@ test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
     updateAuthority,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       uuid,
       conditions,
     },
-  }));
+  });
 
   const newConditions = [
     { mode: Mode.VOC, value: voc },
@@ -194,14 +194,14 @@ test('it can change the update authority of a whitelist v2', async (t) => {
     updateAuthority,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       uuid,
       conditions,
     },
-  }));
+  });
 
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
     updateAuthority,
@@ -217,14 +217,14 @@ test('it can change the update authority of a whitelist v2', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: newUpdateAuthority.address,
       uuid,
       conditions,
     },
-  }));
+  });
 });
 
 test('it cannot update a whitelist v2 with more than one merkle proof', async (t) => {
@@ -244,14 +244,14 @@ test('it cannot update a whitelist v2 with more than one merkle proof', async (t
     conditions,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       uuid,
       conditions,
     },
-  }));
+  });
 
   const newConditions = [
     { mode: Mode.FVC, value: updateAuthority.address },
@@ -311,13 +311,13 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
     newConditions,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       conditions: expectedConditions,
     },
-  }));
+  });
 
   // Merkle is in the middle of the list.
   newConditions = [
@@ -344,13 +344,13 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
     newConditions,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       conditions: expectedConditions,
     },
-  }));
+  });
 
   // Merkle is first item in the list.
   newConditions = [
@@ -368,12 +368,12 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
     newConditions,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>(<unknown>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
       // No rotation needed, should be the same.
       conditions: newConditions,
     },
-  }));
+  });
 });
