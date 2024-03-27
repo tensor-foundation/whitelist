@@ -28,7 +28,7 @@ export async function findMintProofV2Pda(
   const {
     programAddress = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>,
   } = config;
-  return getProgramDerivedAddress({
+  return await getProgramDerivedAddress({
     programAddress,
     seeds: [
       getStringEncoder({ size: 'variable' }).encode('mint_proof'),

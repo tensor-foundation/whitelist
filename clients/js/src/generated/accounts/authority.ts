@@ -184,5 +184,5 @@ export async function fetchMaybeAuthorityFromSeeds(
 ): Promise<MaybeAuthority> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findAuthorityPda({ programAddress });
-  return fetchMaybeAuthority(rpc, address, fetchConfig);
+  return await fetchMaybeAuthority(rpc, address, fetchConfig);
 }

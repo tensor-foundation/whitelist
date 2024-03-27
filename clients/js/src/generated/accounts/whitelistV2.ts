@@ -202,5 +202,5 @@ export async function fetchMaybeWhitelistV2FromSeeds(
 ): Promise<MaybeWhitelistV2> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findWhitelistV2Pda(seeds, { programAddress });
-  return fetchMaybeWhitelistV2(rpc, address, fetchConfig);
+  return await fetchMaybeWhitelistV2(rpc, address, fetchConfig);
 }

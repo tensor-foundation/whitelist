@@ -70,10 +70,10 @@ export function operation(
   kind: 'Set',
   data: GetDataEnumKindContent<OperationArgs, 'Set'>['fields']
 ): GetDataEnumKind<OperationArgs, 'Set'>;
-export function operation<K extends OperationArgs['__kind']>(
+export function operation<K extends OperationArgs['__kind'], Data>(
   kind: K,
-  data?: any
-): Extract<OperationArgs, { __kind: K }> {
+  data?: Data
+) {
   return Array.isArray(data)
     ? { __kind: kind, fields: data }
     : { __kind: kind, ...(data ?? {}) };

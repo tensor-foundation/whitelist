@@ -25,7 +25,6 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -36,11 +35,8 @@ import {
   WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 import {
   Condition,
   ConditionArgs,
@@ -53,7 +49,7 @@ import {
 } from '../types';
 
 export type UpdateWhitelistV2Instruction<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
   TAccountNewUpdateAuthority extends string | IAccountMeta<string> = string,
@@ -61,40 +57,7 @@ export type UpdateWhitelistV2Instruction<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountPayer extends string
-        ? WritableSignerAccount<TAccountPayer>
-        : TAccountPayer,
-      TAccountUpdateAuthority extends string
-        ? WritableSignerAccount<TAccountUpdateAuthority>
-        : TAccountUpdateAuthority,
-      TAccountNewUpdateAuthority extends string
-        ? ReadonlySignerAccount<TAccountNewUpdateAuthority>
-        : TAccountNewUpdateAuthority,
-      TAccountWhitelist extends string
-        ? WritableAccount<TAccountWhitelist>
-        : TAccountWhitelist,
-      TAccountSystemProgram extends string
-        ? ReadonlyAccount<TAccountSystemProgram>
-        : TAccountSystemProgram,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type UpdateWhitelistV2InstructionWithSigners<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountPayer extends string | IAccountMeta<string> = string,
-  TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
-  TAccountNewUpdateAuthority extends string | IAccountMeta<string> = string,
-  TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -165,27 +128,11 @@ export function getUpdateWhitelistV2InstructionDataCodec(): Codec<
 }
 
 export type UpdateWhitelistV2Input<
-  TAccountPayer extends string,
-  TAccountUpdateAuthority extends string,
-  TAccountNewUpdateAuthority extends string,
-  TAccountWhitelist extends string,
-  TAccountSystemProgram extends string,
-> = {
-  payer: Address<TAccountPayer>;
-  updateAuthority: Address<TAccountUpdateAuthority>;
-  newUpdateAuthority?: Address<TAccountNewUpdateAuthority>;
-  whitelist: Address<TAccountWhitelist>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  freezeAuthority: UpdateWhitelistV2InstructionDataArgs['freezeAuthority'];
-  conditions: UpdateWhitelistV2InstructionDataArgs['conditions'];
-};
-
-export type UpdateWhitelistV2InputWithSigners<
-  TAccountPayer extends string,
-  TAccountUpdateAuthority extends string,
-  TAccountNewUpdateAuthority extends string,
-  TAccountWhitelist extends string,
-  TAccountSystemProgram extends string,
+  TAccountPayer extends string = string,
+  TAccountUpdateAuthority extends string = string,
+  TAccountNewUpdateAuthority extends string = string,
+  TAccountWhitelist extends string = string,
+  TAccountSystemProgram extends string = string,
 > = {
   payer: TransactionSigner<TAccountPayer>;
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
@@ -202,30 +149,6 @@ export function getUpdateWhitelistV2Instruction<
   TAccountNewUpdateAuthority extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: UpdateWhitelistV2InputWithSigners<
-    TAccountPayer,
-    TAccountUpdateAuthority,
-    TAccountNewUpdateAuthority,
-    TAccountWhitelist,
-    TAccountSystemProgram
-  >
-): UpdateWhitelistV2InstructionWithSigners<
-  TProgram,
-  TAccountPayer,
-  TAccountUpdateAuthority,
-  TAccountNewUpdateAuthority,
-  TAccountWhitelist,
-  TAccountSystemProgram
->;
-export function getUpdateWhitelistV2Instruction<
-  TAccountPayer extends string,
-  TAccountUpdateAuthority extends string,
-  TAccountNewUpdateAuthority extends string,
-  TAccountWhitelist extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UpdateWhitelistV2Input<
     TAccountPayer,
@@ -235,45 +158,18 @@ export function getUpdateWhitelistV2Instruction<
     TAccountSystemProgram
   >
 ): UpdateWhitelistV2Instruction<
-  TProgram,
+  typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountPayer,
   TAccountUpdateAuthority,
   TAccountNewUpdateAuthority,
   TAccountWhitelist,
   TAccountSystemProgram
->;
-export function getUpdateWhitelistV2Instruction<
-  TAccountPayer extends string,
-  TAccountUpdateAuthority extends string,
-  TAccountNewUpdateAuthority extends string,
-  TAccountWhitelist extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: UpdateWhitelistV2Input<
-    TAccountPayer,
-    TAccountUpdateAuthority,
-    TAccountNewUpdateAuthority,
-    TAccountWhitelist,
-    TAccountSystemProgram
-  >
-): IInstruction {
+> {
   // Program address.
-  const programAddress =
-    'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>;
+  const programAddress = TENSOR_WHITELIST_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getUpdateWhitelistV2InstructionRaw<
-      TProgram,
-      TAccountPayer,
-      TAccountUpdateAuthority,
-      TAccountNewUpdateAuthority,
-      TAccountWhitelist,
-      TAccountSystemProgram
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     payer: { value: input.payer ?? null, isWritable: true },
     updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
     newUpdateAuthority: {
@@ -283,6 +179,10 @@ export function getUpdateWhitelistV2Instruction<
     whitelist: { value: input.whitelist ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
@@ -293,92 +193,33 @@ export function getUpdateWhitelistV2Instruction<
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
   }
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getUpdateWhitelistV2InstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    args as UpdateWhitelistV2InstructionDataArgs,
-    programAddress
-  );
-
-  return instruction;
-}
-
-export function getUpdateWhitelistV2InstructionRaw<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountPayer extends string | IAccountMeta<string> = string,
-  TAccountUpdateAuthority extends string | IAccountMeta<string> = string,
-  TAccountNewUpdateAuthority extends string | IAccountMeta<string> = string,
-  TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    payer: TAccountPayer extends string
-      ? Address<TAccountPayer>
-      : TAccountPayer;
-    updateAuthority: TAccountUpdateAuthority extends string
-      ? Address<TAccountUpdateAuthority>
-      : TAccountUpdateAuthority;
-    newUpdateAuthority?: TAccountNewUpdateAuthority extends string
-      ? Address<TAccountNewUpdateAuthority>
-      : TAccountNewUpdateAuthority;
-    whitelist: TAccountWhitelist extends string
-      ? Address<TAccountWhitelist>
-      : TAccountWhitelist;
-    systemProgram?: TAccountSystemProgram extends string
-      ? Address<TAccountSystemProgram>
-      : TAccountSystemProgram;
-  },
-  args: UpdateWhitelistV2InstructionDataArgs,
-  programAddress: Address<TProgram> = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
     accounts: [
-      accountMetaWithDefault(accounts.payer, AccountRole.WRITABLE_SIGNER),
-      accountMetaWithDefault(
-        accounts.updateAuthority,
-        AccountRole.WRITABLE_SIGNER
-      ),
-      accountMetaWithDefault(
-        accounts.newUpdateAuthority ?? {
-          address:
-            'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>,
-          role: AccountRole.READONLY,
-        },
-        AccountRole.READONLY_SIGNER
-      ),
-      accountMetaWithDefault(accounts.whitelist, AccountRole.WRITABLE),
-      accountMetaWithDefault(
-        accounts.systemProgram ??
-          ('11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>),
-        AccountRole.READONLY
-      ),
-      ...(remainingAccounts ?? []),
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.updateAuthority),
+      getAccountMeta(accounts.newUpdateAuthority),
+      getAccountMeta(accounts.whitelist),
+      getAccountMeta(accounts.systemProgram),
     ],
-    data: getUpdateWhitelistV2InstructionDataEncoder().encode(args),
     programAddress,
+    data: getUpdateWhitelistV2InstructionDataEncoder().encode(
+      args as UpdateWhitelistV2InstructionDataArgs
+    ),
   } as UpdateWhitelistV2Instruction<
-    TProgram,
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
     TAccountPayer,
     TAccountUpdateAuthority,
     TAccountNewUpdateAuthority,
     TAccountWhitelist,
-    TAccountSystemProgram,
-    TRemainingAccounts
+    TAccountSystemProgram
   >;
+
+  return instruction;
 }
 
 export type ParsedUpdateWhitelistV2Instruction<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
@@ -412,7 +253,7 @@ export function parseUpdateWhitelistV2Instruction<
   };
   const getNextOptionalAccount = () => {
     const accountMeta = getNextAccount();
-    return accountMeta.address === 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+    return accountMeta.address === TENSOR_WHITELIST_PROGRAM_ADDRESS
       ? undefined
       : accountMeta;
   };

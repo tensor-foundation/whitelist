@@ -21,7 +21,6 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -31,50 +30,18 @@ import {
   WritableSignerAccount,
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type CloseMintProofV2Instruction<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountSigner extends string | IAccountMeta<string> = string,
   TAccountMintProof extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountPayer extends string
-        ? WritableAccount<TAccountPayer>
-        : TAccountPayer,
-      TAccountSigner extends string
-        ? WritableSignerAccount<TAccountSigner>
-        : TAccountSigner,
-      TAccountMintProof extends string
-        ? WritableAccount<TAccountMintProof>
-        : TAccountMintProof,
-      TAccountSystemProgram extends string
-        ? ReadonlyAccount<TAccountSystemProgram>
-        : TAccountSystemProgram,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type CloseMintProofV2InstructionWithSigners<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountPayer extends string | IAccountMeta<string> = string,
-  TAccountSigner extends string | IAccountMeta<string> = string,
-  TAccountMintProof extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -129,22 +96,10 @@ export function getCloseMintProofV2InstructionDataCodec(): Codec<
 }
 
 export type CloseMintProofV2Input<
-  TAccountPayer extends string,
-  TAccountSigner extends string,
-  TAccountMintProof extends string,
-  TAccountSystemProgram extends string,
-> = {
-  payer: Address<TAccountPayer>;
-  signer: Address<TAccountSigner>;
-  mintProof: Address<TAccountMintProof>;
-  systemProgram?: Address<TAccountSystemProgram>;
-};
-
-export type CloseMintProofV2InputWithSigners<
-  TAccountPayer extends string,
-  TAccountSigner extends string,
-  TAccountMintProof extends string,
-  TAccountSystemProgram extends string,
+  TAccountPayer extends string = string,
+  TAccountSigner extends string = string,
+  TAccountMintProof extends string = string,
+  TAccountSystemProgram extends string = string,
 > = {
   payer: Address<TAccountPayer>;
   signer: TransactionSigner<TAccountSigner>;
@@ -157,27 +112,6 @@ export function getCloseMintProofV2Instruction<
   TAccountSigner extends string,
   TAccountMintProof extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: CloseMintProofV2InputWithSigners<
-    TAccountPayer,
-    TAccountSigner,
-    TAccountMintProof,
-    TAccountSystemProgram
-  >
-): CloseMintProofV2InstructionWithSigners<
-  TProgram,
-  TAccountPayer,
-  TAccountSigner,
-  TAccountMintProof,
-  TAccountSystemProgram
->;
-export function getCloseMintProofV2Instruction<
-  TAccountPayer extends string,
-  TAccountSigner extends string,
-  TAccountMintProof extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: CloseMintProofV2Input<
     TAccountPayer,
@@ -186,46 +120,26 @@ export function getCloseMintProofV2Instruction<
     TAccountSystemProgram
   >
 ): CloseMintProofV2Instruction<
-  TProgram,
+  typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountPayer,
   TAccountSigner,
   TAccountMintProof,
   TAccountSystemProgram
->;
-export function getCloseMintProofV2Instruction<
-  TAccountPayer extends string,
-  TAccountSigner extends string,
-  TAccountMintProof extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: CloseMintProofV2Input<
-    TAccountPayer,
-    TAccountSigner,
-    TAccountMintProof,
-    TAccountSystemProgram
-  >
-): IInstruction {
+> {
   // Program address.
-  const programAddress =
-    'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>;
+  const programAddress = TENSOR_WHITELIST_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getCloseMintProofV2InstructionRaw<
-      TProgram,
-      TAccountPayer,
-      TAccountSigner,
-      TAccountMintProof,
-      TAccountSystemProgram
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     payer: { value: input.payer ?? null, isWritable: true },
     signer: { value: input.signer ?? null, isWritable: true },
     mintProof: { value: input.mintProof ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.systemProgram.value) {
@@ -233,74 +147,29 @@ export function getCloseMintProofV2Instruction<
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
   }
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getCloseMintProofV2InstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.payer),
+      getAccountMeta(accounts.signer),
+      getAccountMeta(accounts.mintProof),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    programAddress,
+    data: getCloseMintProofV2InstructionDataEncoder().encode({}),
+  } as CloseMintProofV2Instruction<
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
+    TAccountPayer,
+    TAccountSigner,
+    TAccountMintProof,
+    TAccountSystemProgram
+  >;
 
   return instruction;
 }
 
-export function getCloseMintProofV2InstructionRaw<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountPayer extends string | IAccountMeta<string> = string,
-  TAccountSigner extends string | IAccountMeta<string> = string,
-  TAccountMintProof extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    payer: TAccountPayer extends string
-      ? Address<TAccountPayer>
-      : TAccountPayer;
-    signer: TAccountSigner extends string
-      ? Address<TAccountSigner>
-      : TAccountSigner;
-    mintProof: TAccountMintProof extends string
-      ? Address<TAccountMintProof>
-      : TAccountMintProof;
-    systemProgram?: TAccountSystemProgram extends string
-      ? Address<TAccountSystemProgram>
-      : TAccountSystemProgram;
-  },
-  programAddress: Address<TProgram> = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.payer, AccountRole.WRITABLE),
-      accountMetaWithDefault(accounts.signer, AccountRole.WRITABLE_SIGNER),
-      accountMetaWithDefault(accounts.mintProof, AccountRole.WRITABLE),
-      accountMetaWithDefault(
-        accounts.systemProgram ??
-          ('11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>),
-        AccountRole.READONLY
-      ),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getCloseMintProofV2InstructionDataEncoder().encode({}),
-    programAddress,
-  } as CloseMintProofV2Instruction<
-    TProgram,
-    TAccountPayer,
-    TAccountSigner,
-    TAccountMintProof,
-    TAccountSystemProgram,
-    TRemainingAccounts
-  >;
-}
-
 export type ParsedCloseMintProofV2Instruction<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;

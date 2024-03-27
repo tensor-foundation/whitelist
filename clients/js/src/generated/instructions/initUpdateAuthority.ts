@@ -29,7 +29,6 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -41,50 +40,18 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { findAuthorityPda } from '../pdas';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type InitUpdateAuthorityInstruction<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountWhitelistAuthority extends string | IAccountMeta<string> = string,
   TAccountCosigner extends string | IAccountMeta<string> = string,
   TAccountOwner extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountWhitelistAuthority extends string
-        ? WritableAccount<TAccountWhitelistAuthority>
-        : TAccountWhitelistAuthority,
-      TAccountCosigner extends string
-        ? WritableSignerAccount<TAccountCosigner>
-        : TAccountCosigner,
-      TAccountOwner extends string
-        ? ReadonlySignerAccount<TAccountOwner>
-        : TAccountOwner,
-      TAccountSystemProgram extends string
-        ? ReadonlyAccount<TAccountSystemProgram>
-        : TAccountSystemProgram,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type InitUpdateAuthorityInstructionWithSigners<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountWhitelistAuthority extends string | IAccountMeta<string> = string,
-  TAccountCosigner extends string | IAccountMeta<string> = string,
-  TAccountOwner extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -151,25 +118,10 @@ export function getInitUpdateAuthorityInstructionDataCodec(): Codec<
 }
 
 export type InitUpdateAuthorityAsyncInput<
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-> = {
-  whitelistAuthority?: Address<TAccountWhitelistAuthority>;
-  /** both have to sign on any updates */
-  cosigner: Address<TAccountCosigner>;
-  owner: Address<TAccountOwner>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  newCosigner: InitUpdateAuthorityInstructionDataArgs['newCosigner'];
-  newOwner: InitUpdateAuthorityInstructionDataArgs['newOwner'];
-};
-
-export type InitUpdateAuthorityAsyncInputWithSigners<
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
+  TAccountWhitelistAuthority extends string = string,
+  TAccountCosigner extends string = string,
+  TAccountOwner extends string = string,
+  TAccountSystemProgram extends string = string,
 > = {
   whitelistAuthority?: Address<TAccountWhitelistAuthority>;
   /** both have to sign on any updates */
@@ -185,29 +137,6 @@ export async function getInitUpdateAuthorityInstructionAsync<
   TAccountCosigner extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: InitUpdateAuthorityAsyncInputWithSigners<
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountOwner,
-    TAccountSystemProgram
-  >
-): Promise<
-  InitUpdateAuthorityInstructionWithSigners<
-    TProgram,
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountOwner,
-    TAccountSystemProgram
-  >
->;
-export async function getInitUpdateAuthorityInstructionAsync<
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: InitUpdateAuthorityAsyncInput<
     TAccountWhitelistAuthority,
@@ -217,42 +146,18 @@ export async function getInitUpdateAuthorityInstructionAsync<
   >
 ): Promise<
   InitUpdateAuthorityInstruction<
-    TProgram,
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
     TAccountWhitelistAuthority,
     TAccountCosigner,
     TAccountOwner,
     TAccountSystemProgram
   >
->;
-export async function getInitUpdateAuthorityInstructionAsync<
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: InitUpdateAuthorityAsyncInput<
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountOwner,
-    TAccountSystemProgram
-  >
-): Promise<IInstruction> {
+> {
   // Program address.
-  const programAddress =
-    'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>;
+  const programAddress = TENSOR_WHITELIST_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getInitUpdateAuthorityInstructionRaw<
-      TProgram,
-      TAccountWhitelistAuthority,
-      TAccountCosigner,
-      TAccountOwner,
-      TAccountSystemProgram
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     whitelistAuthority: {
       value: input.whitelistAuthority ?? null,
       isWritable: true,
@@ -261,6 +166,10 @@ export async function getInitUpdateAuthorityInstructionAsync<
     owner: { value: input.owner ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
@@ -274,42 +183,34 @@ export async function getInitUpdateAuthorityInstructionAsync<
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
   }
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getInitUpdateAuthorityInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    args as InitUpdateAuthorityInstructionDataArgs,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.whitelistAuthority),
+      getAccountMeta(accounts.cosigner),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    programAddress,
+    data: getInitUpdateAuthorityInstructionDataEncoder().encode(
+      args as InitUpdateAuthorityInstructionDataArgs
+    ),
+  } as InitUpdateAuthorityInstruction<
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
+    TAccountWhitelistAuthority,
+    TAccountCosigner,
+    TAccountOwner,
+    TAccountSystemProgram
+  >;
 
   return instruction;
 }
 
 export type InitUpdateAuthorityInput<
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-> = {
-  whitelistAuthority: Address<TAccountWhitelistAuthority>;
-  /** both have to sign on any updates */
-  cosigner: Address<TAccountCosigner>;
-  owner: Address<TAccountOwner>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  newCosigner: InitUpdateAuthorityInstructionDataArgs['newCosigner'];
-  newOwner: InitUpdateAuthorityInstructionDataArgs['newOwner'];
-};
-
-export type InitUpdateAuthorityInputWithSigners<
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
+  TAccountWhitelistAuthority extends string = string,
+  TAccountCosigner extends string = string,
+  TAccountOwner extends string = string,
+  TAccountSystemProgram extends string = string,
 > = {
   whitelistAuthority: Address<TAccountWhitelistAuthority>;
   /** both have to sign on any updates */
@@ -325,27 +226,6 @@ export function getInitUpdateAuthorityInstruction<
   TAccountCosigner extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: InitUpdateAuthorityInputWithSigners<
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountOwner,
-    TAccountSystemProgram
-  >
-): InitUpdateAuthorityInstructionWithSigners<
-  TProgram,
-  TAccountWhitelistAuthority,
-  TAccountCosigner,
-  TAccountOwner,
-  TAccountSystemProgram
->;
-export function getInitUpdateAuthorityInstruction<
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: InitUpdateAuthorityInput<
     TAccountWhitelistAuthority,
@@ -354,41 +234,17 @@ export function getInitUpdateAuthorityInstruction<
     TAccountSystemProgram
   >
 ): InitUpdateAuthorityInstruction<
-  TProgram,
+  typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountWhitelistAuthority,
   TAccountCosigner,
   TAccountOwner,
   TAccountSystemProgram
->;
-export function getInitUpdateAuthorityInstruction<
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: InitUpdateAuthorityInput<
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountOwner,
-    TAccountSystemProgram
-  >
-): IInstruction {
+> {
   // Program address.
-  const programAddress =
-    'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>;
+  const programAddress = TENSOR_WHITELIST_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getInitUpdateAuthorityInstructionRaw<
-      TProgram,
-      TAccountWhitelistAuthority,
-      TAccountCosigner,
-      TAccountOwner,
-      TAccountSystemProgram
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     whitelistAuthority: {
       value: input.whitelistAuthority ?? null,
       isWritable: true,
@@ -397,6 +253,10 @@ export function getInitUpdateAuthorityInstruction<
     owner: { value: input.owner ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Original args.
   const args = { ...input };
@@ -407,76 +267,31 @@ export function getInitUpdateAuthorityInstruction<
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
   }
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getInitUpdateAuthorityInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    args as InitUpdateAuthorityInstructionDataArgs,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.whitelistAuthority),
+      getAccountMeta(accounts.cosigner),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    programAddress,
+    data: getInitUpdateAuthorityInstructionDataEncoder().encode(
+      args as InitUpdateAuthorityInstructionDataArgs
+    ),
+  } as InitUpdateAuthorityInstruction<
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
+    TAccountWhitelistAuthority,
+    TAccountCosigner,
+    TAccountOwner,
+    TAccountSystemProgram
+  >;
 
   return instruction;
 }
 
-export function getInitUpdateAuthorityInstructionRaw<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountWhitelistAuthority extends string | IAccountMeta<string> = string,
-  TAccountCosigner extends string | IAccountMeta<string> = string,
-  TAccountOwner extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    whitelistAuthority: TAccountWhitelistAuthority extends string
-      ? Address<TAccountWhitelistAuthority>
-      : TAccountWhitelistAuthority;
-    cosigner: TAccountCosigner extends string
-      ? Address<TAccountCosigner>
-      : TAccountCosigner;
-    owner: TAccountOwner extends string
-      ? Address<TAccountOwner>
-      : TAccountOwner;
-    systemProgram?: TAccountSystemProgram extends string
-      ? Address<TAccountSystemProgram>
-      : TAccountSystemProgram;
-  },
-  args: InitUpdateAuthorityInstructionDataArgs,
-  programAddress: Address<TProgram> = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.whitelistAuthority, AccountRole.WRITABLE),
-      accountMetaWithDefault(accounts.cosigner, AccountRole.WRITABLE_SIGNER),
-      accountMetaWithDefault(accounts.owner, AccountRole.READONLY_SIGNER),
-      accountMetaWithDefault(
-        accounts.systemProgram ??
-          ('11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>),
-        AccountRole.READONLY
-      ),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getInitUpdateAuthorityInstructionDataEncoder().encode(args),
-    programAddress,
-  } as InitUpdateAuthorityInstruction<
-    TProgram,
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountOwner,
-    TAccountSystemProgram,
-    TRemainingAccounts
-  >;
-}
-
 export type ParsedInitUpdateAuthorityInstruction<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;

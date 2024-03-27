@@ -178,5 +178,5 @@ export async function fetchMaybeMintProofV2FromSeeds(
 ): Promise<MaybeMintProofV2> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findMintProofV2Pda(seeds, { programAddress });
-  return fetchMaybeMintProofV2(rpc, address, fetchConfig);
+  return await fetchMaybeMintProofV2(rpc, address, fetchConfig);
 }

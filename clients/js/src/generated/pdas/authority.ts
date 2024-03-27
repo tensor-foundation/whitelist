@@ -18,5 +18,5 @@ export async function findAuthorityPda(
   const {
     programAddress = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>,
   } = config;
-  return getProgramDerivedAddress({ programAddress, seeds: [] });
+  return await getProgramDerivedAddress({ programAddress, seeds: [] });
 }

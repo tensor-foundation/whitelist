@@ -21,7 +21,6 @@ import {
   mapEncoder,
 } from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -32,50 +31,18 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { findAuthorityPda } from '../pdas';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type UnfreezeWhitelistInstruction<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
   TAccountWhitelistAuthority extends string | IAccountMeta<string> = string,
   TAccountOwner extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountWhitelist extends string
-        ? WritableAccount<TAccountWhitelist>
-        : TAccountWhitelist,
-      TAccountWhitelistAuthority extends string
-        ? ReadonlyAccount<TAccountWhitelistAuthority>
-        : TAccountWhitelistAuthority,
-      TAccountOwner extends string
-        ? WritableSignerAccount<TAccountOwner>
-        : TAccountOwner,
-      TAccountSystemProgram extends string
-        ? ReadonlyAccount<TAccountSystemProgram>
-        : TAccountSystemProgram,
-      ...TRemainingAccounts,
-    ]
-  >;
-
-export type UnfreezeWhitelistInstructionWithSigners<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TAccountWhitelistAuthority extends string | IAccountMeta<string> = string,
-  TAccountOwner extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -130,35 +97,16 @@ export function getUnfreezeWhitelistInstructionDataCodec(): Codec<
 }
 
 export type UnfreezeWhitelistAsyncInput<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
+  TAccountWhitelist extends string = string,
+  TAccountWhitelistAuthority extends string = string,
+  TAccountOwner extends string = string,
+  TAccountSystemProgram extends string = string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
    * there can only be 1 whitelist authority (due to seeds),
    * and we're checking that 1)the correct cosigner is present on it, and 2)is a signer
    */
-
-  whitelistAuthority?: Address<TAccountWhitelistAuthority>;
-  /** unfreezing requires owner */
-  owner: Address<TAccountOwner>;
-  systemProgram?: Address<TAccountSystemProgram>;
-};
-
-export type UnfreezeWhitelistAsyncInputWithSigners<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-> = {
-  whitelist: Address<TAccountWhitelist>;
-  /**
-   * there can only be 1 whitelist authority (due to seeds),
-   * and we're checking that 1)the correct cosigner is present on it, and 2)is a signer
-   */
-
   whitelistAuthority?: Address<TAccountWhitelistAuthority>;
   /** unfreezing requires owner */
   owner: TransactionSigner<TAccountOwner>;
@@ -170,29 +118,6 @@ export async function getUnfreezeWhitelistInstructionAsync<
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: UnfreezeWhitelistAsyncInputWithSigners<
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountOwner,
-    TAccountSystemProgram
-  >
-): Promise<
-  UnfreezeWhitelistInstructionWithSigners<
-    TProgram,
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountOwner,
-    TAccountSystemProgram
-  >
->;
-export async function getUnfreezeWhitelistInstructionAsync<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistAsyncInput<
     TAccountWhitelist,
@@ -202,42 +127,18 @@ export async function getUnfreezeWhitelistInstructionAsync<
   >
 ): Promise<
   UnfreezeWhitelistInstruction<
-    TProgram,
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
     TAccountWhitelist,
     TAccountWhitelistAuthority,
     TAccountOwner,
     TAccountSystemProgram
   >
->;
-export async function getUnfreezeWhitelistInstructionAsync<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: UnfreezeWhitelistAsyncInput<
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountOwner,
-    TAccountSystemProgram
-  >
-): Promise<IInstruction> {
+> {
   // Program address.
-  const programAddress =
-    'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>;
+  const programAddress = TENSOR_WHITELIST_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getUnfreezeWhitelistInstructionRaw<
-      TProgram,
-      TAccountWhitelist,
-      TAccountWhitelistAuthority,
-      TAccountOwner,
-      TAccountSystemProgram
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     whitelist: { value: input.whitelist ?? null, isWritable: true },
     whitelistAuthority: {
       value: input.whitelistAuthority ?? null,
@@ -246,6 +147,10 @@ export async function getUnfreezeWhitelistInstructionAsync<
     owner: { value: input.owner ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.whitelistAuthority.value) {
@@ -256,51 +161,38 @@ export async function getUnfreezeWhitelistInstructionAsync<
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
   }
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getUnfreezeWhitelistInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.whitelist),
+      getAccountMeta(accounts.whitelistAuthority),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    programAddress,
+    data: getUnfreezeWhitelistInstructionDataEncoder().encode({}),
+  } as UnfreezeWhitelistInstruction<
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
+    TAccountWhitelist,
+    TAccountWhitelistAuthority,
+    TAccountOwner,
+    TAccountSystemProgram
+  >;
 
   return instruction;
 }
 
 export type UnfreezeWhitelistInput<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
+  TAccountWhitelist extends string = string,
+  TAccountWhitelistAuthority extends string = string,
+  TAccountOwner extends string = string,
+  TAccountSystemProgram extends string = string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
    * there can only be 1 whitelist authority (due to seeds),
    * and we're checking that 1)the correct cosigner is present on it, and 2)is a signer
    */
-
-  whitelistAuthority: Address<TAccountWhitelistAuthority>;
-  /** unfreezing requires owner */
-  owner: Address<TAccountOwner>;
-  systemProgram?: Address<TAccountSystemProgram>;
-};
-
-export type UnfreezeWhitelistInputWithSigners<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-> = {
-  whitelist: Address<TAccountWhitelist>;
-  /**
-   * there can only be 1 whitelist authority (due to seeds),
-   * and we're checking that 1)the correct cosigner is present on it, and 2)is a signer
-   */
-
   whitelistAuthority: Address<TAccountWhitelistAuthority>;
   /** unfreezing requires owner */
   owner: TransactionSigner<TAccountOwner>;
@@ -312,27 +204,6 @@ export function getUnfreezeWhitelistInstruction<
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: UnfreezeWhitelistInputWithSigners<
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountOwner,
-    TAccountSystemProgram
-  >
-): UnfreezeWhitelistInstructionWithSigners<
-  TProgram,
-  TAccountWhitelist,
-  TAccountWhitelistAuthority,
-  TAccountOwner,
-  TAccountSystemProgram
->;
-export function getUnfreezeWhitelistInstruction<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistInput<
     TAccountWhitelist,
@@ -341,41 +212,17 @@ export function getUnfreezeWhitelistInstruction<
     TAccountSystemProgram
   >
 ): UnfreezeWhitelistInstruction<
-  TProgram,
+  typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountWhitelist,
   TAccountWhitelistAuthority,
   TAccountOwner,
   TAccountSystemProgram
->;
-export function getUnfreezeWhitelistInstruction<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountOwner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
->(
-  input: UnfreezeWhitelistInput<
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountOwner,
-    TAccountSystemProgram
-  >
-): IInstruction {
+> {
   // Program address.
-  const programAddress =
-    'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>;
+  const programAddress = TENSOR_WHITELIST_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getUnfreezeWhitelistInstructionRaw<
-      TProgram,
-      TAccountWhitelist,
-      TAccountWhitelistAuthority,
-      TAccountOwner,
-      TAccountSystemProgram
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     whitelist: { value: input.whitelist ?? null, isWritable: true },
     whitelistAuthority: {
       value: input.whitelistAuthority ?? null,
@@ -384,6 +231,10 @@ export function getUnfreezeWhitelistInstruction<
     owner: { value: input.owner ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.systemProgram.value) {
@@ -391,74 +242,29 @@ export function getUnfreezeWhitelistInstruction<
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
   }
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getUnfreezeWhitelistInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.whitelist),
+      getAccountMeta(accounts.whitelistAuthority),
+      getAccountMeta(accounts.owner),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    programAddress,
+    data: getUnfreezeWhitelistInstructionDataEncoder().encode({}),
+  } as UnfreezeWhitelistInstruction<
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
+    TAccountWhitelist,
+    TAccountWhitelistAuthority,
+    TAccountOwner,
+    TAccountSystemProgram
+  >;
 
   return instruction;
 }
 
-export function getUnfreezeWhitelistInstructionRaw<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TAccountWhitelistAuthority extends string | IAccountMeta<string> = string,
-  TAccountOwner extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
->(
-  accounts: {
-    whitelist: TAccountWhitelist extends string
-      ? Address<TAccountWhitelist>
-      : TAccountWhitelist;
-    whitelistAuthority: TAccountWhitelistAuthority extends string
-      ? Address<TAccountWhitelistAuthority>
-      : TAccountWhitelistAuthority;
-    owner: TAccountOwner extends string
-      ? Address<TAccountOwner>
-      : TAccountOwner;
-    systemProgram?: TAccountSystemProgram extends string
-      ? Address<TAccountSystemProgram>
-      : TAccountSystemProgram;
-  },
-  programAddress: Address<TProgram> = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.whitelist, AccountRole.WRITABLE),
-      accountMetaWithDefault(accounts.whitelistAuthority, AccountRole.READONLY),
-      accountMetaWithDefault(accounts.owner, AccountRole.WRITABLE_SIGNER),
-      accountMetaWithDefault(
-        accounts.systemProgram ??
-          ('11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>),
-        AccountRole.READONLY
-      ),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getUnfreezeWhitelistInstructionDataEncoder().encode({}),
-    programAddress,
-  } as UnfreezeWhitelistInstruction<
-    TProgram,
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountOwner,
-    TAccountSystemProgram,
-    TRemainingAccounts
-  >;
-}
-
 export type ParsedUnfreezeWhitelistInstruction<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
