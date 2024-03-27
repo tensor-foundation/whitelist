@@ -12,15 +12,14 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import { getU8Decoder, getU8Encoder } from '@solana/codecs-numbers';
+  getU8Decoder,
+  getU8Encoder,
+  mapEncoder,
+} from '@solana/codecs';
 import {
   AccountRole,
   IAccountMeta,
@@ -47,7 +46,7 @@ export type UnfreezeWhitelistInstruction<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -64,7 +63,7 @@ export type UnfreezeWhitelistInstruction<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -76,7 +75,7 @@ export type UnfreezeWhitelistInstructionWithSigners<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -94,7 +93,7 @@ export type UnfreezeWhitelistInstructionWithSigners<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -102,22 +101,22 @@ export type UnfreezeWhitelistInstructionData = { discriminator: Array<number> };
 
 export type UnfreezeWhitelistInstructionDataArgs = {};
 
-export function getUnfreezeWhitelistInstructionDataEncoder() {
+export function getUnfreezeWhitelistInstructionDataEncoder(): Encoder<UnfreezeWhitelistInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: Array<number> }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
     ]),
     (value) => ({
       ...value,
       discriminator: [215, 119, 9, 92, 160, 139, 226, 253],
     })
-  ) satisfies Encoder<UnfreezeWhitelistInstructionDataArgs>;
+  );
 }
 
-export function getUnfreezeWhitelistInstructionDataDecoder() {
-  return getStructDecoder<UnfreezeWhitelistInstructionData>([
+export function getUnfreezeWhitelistInstructionDataDecoder(): Decoder<UnfreezeWhitelistInstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-  ]) satisfies Decoder<UnfreezeWhitelistInstructionData>;
+  ]);
 }
 
 export function getUnfreezeWhitelistInstructionDataCodec(): Codec<
@@ -134,7 +133,7 @@ export type UnfreezeWhitelistAsyncInput<
   TAccountWhitelist extends string,
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
@@ -152,7 +151,7 @@ export type UnfreezeWhitelistAsyncInputWithSigners<
   TAccountWhitelist extends string,
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
@@ -171,7 +170,7 @@ export async function getUnfreezeWhitelistInstructionAsync<
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistAsyncInputWithSigners<
     TAccountWhitelist,
@@ -193,7 +192,7 @@ export async function getUnfreezeWhitelistInstructionAsync<
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistAsyncInput<
     TAccountWhitelist,
@@ -215,7 +214,7 @@ export async function getUnfreezeWhitelistInstructionAsync<
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistAsyncInput<
     TAccountWhitelist,
@@ -276,7 +275,7 @@ export type UnfreezeWhitelistInput<
   TAccountWhitelist extends string,
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
@@ -294,7 +293,7 @@ export type UnfreezeWhitelistInputWithSigners<
   TAccountWhitelist extends string,
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
@@ -313,7 +312,7 @@ export function getUnfreezeWhitelistInstruction<
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistInputWithSigners<
     TAccountWhitelist,
@@ -333,7 +332,7 @@ export function getUnfreezeWhitelistInstruction<
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistInput<
     TAccountWhitelist,
@@ -353,7 +352,7 @@ export function getUnfreezeWhitelistInstruction<
   TAccountWhitelistAuthority extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistInput<
     TAccountWhitelist,
@@ -415,7 +414,7 @@ export function getUnfreezeWhitelistInstructionRaw<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     whitelist: TAccountWhitelist extends string
@@ -460,7 +459,7 @@ export function getUnfreezeWhitelistInstructionRaw<
 
 export type ParsedUnfreezeWhitelistInstruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -480,7 +479,7 @@ export type ParsedUnfreezeWhitelistInstruction<
 
 export function parseUnfreezeWhitelistInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

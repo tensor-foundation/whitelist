@@ -25,17 +25,16 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getArrayDecoder,
   getArrayEncoder,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import { getU8Decoder, getU8Encoder } from '@solana/codecs-numbers';
+  getU8Decoder,
+  getU8Encoder,
+  mapEncoder,
+} from '@solana/codecs';
 import { MintProofSeeds, findMintProofPda } from '../pdas';
 
 export type MintProof<TAddress extends string = string> = Account<
@@ -59,13 +58,9 @@ export type MintProofAccountDataArgs = {
   proof: Array<Uint8Array>;
 };
 
-export function getMintProofAccountDataEncoder() {
+export function getMintProofAccountDataEncoder(): Encoder<MintProofAccountDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: Array<number>;
-      proofLen: number;
-      proof: Array<Uint8Array>;
-    }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['proofLen', getU8Encoder()],
       ['proof', getArrayEncoder(getBytesEncoder({ size: 32 }), { size: 28 })],
@@ -74,15 +69,15 @@ export function getMintProofAccountDataEncoder() {
       ...value,
       discriminator: [227, 131, 106, 240, 190, 48, 219, 228],
     })
-  ) satisfies Encoder<MintProofAccountDataArgs>;
+  );
 }
 
-export function getMintProofAccountDataDecoder() {
-  return getStructDecoder<MintProofAccountData>([
+export function getMintProofAccountDataDecoder(): Decoder<MintProofAccountData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['proofLen', getU8Decoder()],
     ['proof', getArrayDecoder(getBytesDecoder({ size: 32 }), { size: 28 })],
-  ]) satisfies Decoder<MintProofAccountData>;
+  ]);
 }
 
 export function getMintProofAccountDataCodec(): Codec<

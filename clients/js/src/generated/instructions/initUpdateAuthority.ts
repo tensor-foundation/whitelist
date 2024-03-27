@@ -15,16 +15,19 @@ import {
   Codec,
   Decoder,
   Encoder,
+  Option,
+  OptionOrNullable,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getArrayDecoder,
   getArrayEncoder,
+  getOptionDecoder,
+  getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import { getU8Decoder, getU8Encoder } from '@solana/codecs-numbers';
+  getU8Decoder,
+  getU8Encoder,
+  mapEncoder,
+} from '@solana/codecs';
 import {
   AccountRole,
   IAccountMeta,
@@ -36,12 +39,6 @@ import {
   WritableAccount,
   WritableSignerAccount,
 } from '@solana/instructions';
-import {
-  Option,
-  OptionOrNullable,
-  getOptionDecoder,
-  getOptionEncoder,
-} from '@solana/options';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { findAuthorityPda } from '../pdas';
 import {
@@ -58,7 +55,7 @@ export type InitUpdateAuthorityInstruction<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -75,7 +72,7 @@ export type InitUpdateAuthorityInstruction<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -87,7 +84,7 @@ export type InitUpdateAuthorityInstructionWithSigners<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -106,7 +103,7 @@ export type InitUpdateAuthorityInstructionWithSigners<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -121,13 +118,9 @@ export type InitUpdateAuthorityInstructionDataArgs = {
   newOwner: OptionOrNullable<Address>;
 };
 
-export function getInitUpdateAuthorityInstructionDataEncoder() {
+export function getInitUpdateAuthorityInstructionDataEncoder(): Encoder<InitUpdateAuthorityInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: Array<number>;
-      newCosigner: OptionOrNullable<Address>;
-      newOwner: OptionOrNullable<Address>;
-    }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['newCosigner', getOptionEncoder(getAddressEncoder())],
       ['newOwner', getOptionEncoder(getAddressEncoder())],
@@ -136,15 +129,15 @@ export function getInitUpdateAuthorityInstructionDataEncoder() {
       ...value,
       discriminator: [53, 144, 79, 150, 196, 110, 22, 55],
     })
-  ) satisfies Encoder<InitUpdateAuthorityInstructionDataArgs>;
+  );
 }
 
-export function getInitUpdateAuthorityInstructionDataDecoder() {
-  return getStructDecoder<InitUpdateAuthorityInstructionData>([
+export function getInitUpdateAuthorityInstructionDataDecoder(): Decoder<InitUpdateAuthorityInstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['newCosigner', getOptionDecoder(getAddressDecoder())],
     ['newOwner', getOptionDecoder(getAddressDecoder())],
-  ]) satisfies Decoder<InitUpdateAuthorityInstructionData>;
+  ]);
 }
 
 export function getInitUpdateAuthorityInstructionDataCodec(): Codec<
@@ -161,7 +154,7 @@ export type InitUpdateAuthorityAsyncInput<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountOwner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelistAuthority?: Address<TAccountWhitelistAuthority>;
   /** both have to sign on any updates */
@@ -176,7 +169,7 @@ export type InitUpdateAuthorityAsyncInputWithSigners<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountOwner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelistAuthority?: Address<TAccountWhitelistAuthority>;
   /** both have to sign on any updates */
@@ -192,7 +185,7 @@ export async function getInitUpdateAuthorityInstructionAsync<
   TAccountCosigner extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: InitUpdateAuthorityAsyncInputWithSigners<
     TAccountWhitelistAuthority,
@@ -214,7 +207,7 @@ export async function getInitUpdateAuthorityInstructionAsync<
   TAccountCosigner extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: InitUpdateAuthorityAsyncInput<
     TAccountWhitelistAuthority,
@@ -236,7 +229,7 @@ export async function getInitUpdateAuthorityInstructionAsync<
   TAccountCosigner extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: InitUpdateAuthorityAsyncInput<
     TAccountWhitelistAuthority,
@@ -301,7 +294,7 @@ export type InitUpdateAuthorityInput<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountOwner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelistAuthority: Address<TAccountWhitelistAuthority>;
   /** both have to sign on any updates */
@@ -316,7 +309,7 @@ export type InitUpdateAuthorityInputWithSigners<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountOwner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelistAuthority: Address<TAccountWhitelistAuthority>;
   /** both have to sign on any updates */
@@ -332,7 +325,7 @@ export function getInitUpdateAuthorityInstruction<
   TAccountCosigner extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: InitUpdateAuthorityInputWithSigners<
     TAccountWhitelistAuthority,
@@ -352,7 +345,7 @@ export function getInitUpdateAuthorityInstruction<
   TAccountCosigner extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: InitUpdateAuthorityInput<
     TAccountWhitelistAuthority,
@@ -372,7 +365,7 @@ export function getInitUpdateAuthorityInstruction<
   TAccountCosigner extends string,
   TAccountOwner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: InitUpdateAuthorityInput<
     TAccountWhitelistAuthority,
@@ -438,7 +431,7 @@ export function getInitUpdateAuthorityInstructionRaw<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     whitelistAuthority: TAccountWhitelistAuthority extends string
@@ -484,7 +477,7 @@ export function getInitUpdateAuthorityInstructionRaw<
 
 export type ParsedInitUpdateAuthorityInstruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -499,7 +492,7 @@ export type ParsedInitUpdateAuthorityInstruction<
 
 export function parseInitUpdateAuthorityInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

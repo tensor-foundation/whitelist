@@ -1,11 +1,16 @@
 import test from 'ava';
-import { appendTransactionInstruction, pipe } from '@solana/web3.js';
 import {
-  createDefaultSolanaClient,
+  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  appendTransactionInstruction,
+  isSolanaError,
+  pipe,
+} from '@solana/web3.js';
+import {
   createDefaultTransaction,
-  generateKeyPairSignerWithSol,
   signAndSendTransaction,
-} from './_setup';
+  createDefaultSolanaClient,
+  generateKeyPairSignerWithSol,
+} from '@tensor-foundation/test-helpers';
 import {
   Mode,
   State,
@@ -15,8 +20,8 @@ import {
   getFreezeWhitelistV2Instruction,
   getUnfreezeWhitelistV2Instruction,
   operation,
-} from '../src';
-import { createWhitelist } from './_common';
+} from '../src/index.js';
+import { createWhitelist } from './_common.js';
 
 test('it can freeze and unfreeze a whitelist v2', async (t) => {
   const client = createDefaultSolanaClient();
@@ -155,8 +160,14 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  // Cannot update: 0x1780 / 6016 WhitelistIsFrozen
-  await t.throwsAsync(promise, {
-    message: /custom program error: 0x1780/,
-  });
+  const error = await t.throwsAsync<Error & { data: { logs: string[] } }>(
+    promise
+  );
+
+  if (isSolanaError(error.cause, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
+    t.assert(error.cause.context.code === 6016);
+  } else {
+    // Expected a custom error, but didn't get one.
+    t.assert(false);
+  }
 });

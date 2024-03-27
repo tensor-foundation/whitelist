@@ -3,11 +3,11 @@ import { appendTransactionInstruction, pipe } from '@solana/web3.js';
 import { generateKeyPairSigner } from '@solana/signers';
 import { none } from '@solana/options';
 import {
-  createDefaultSolanaClient,
   createDefaultTransaction,
-  generateKeyPairSignerWithSol,
   signAndSendTransaction,
-} from './_setup';
+  createDefaultSolanaClient,
+  generateKeyPairSignerWithSol,
+} from '@tensor-foundation/test-helpers';
 import {
   Condition,
   Mode,
@@ -15,12 +15,12 @@ import {
   fetchWhitelistV2,
   getUpdateWhitelistV2Instruction,
   operation,
-} from '../src';
+} from '../src/index.js';
 import {
   createWhitelist,
   getAccountDataLength,
   updateWhitelist,
-} from './_common';
+} from './_common.js';
 
 test('it can update a whitelist v2, reallocing to be larger', async (t) => {
   const client = createDefaultSolanaClient();

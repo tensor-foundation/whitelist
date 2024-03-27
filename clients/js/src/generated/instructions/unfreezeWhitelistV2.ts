@@ -12,15 +12,14 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import { getU8Decoder, getU8Encoder } from '@solana/codecs-numbers';
+  getU8Decoder,
+  getU8Encoder,
+  mapEncoder,
+} from '@solana/codecs';
 import {
   AccountRole,
   IAccountMeta,
@@ -41,7 +40,7 @@ export type UnfreezeWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
   TAccountFreezeAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -52,7 +51,7 @@ export type UnfreezeWhitelistV2Instruction<
       TAccountWhitelist extends string
         ? WritableAccount<TAccountWhitelist>
         : TAccountWhitelist,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -60,7 +59,7 @@ export type UnfreezeWhitelistV2InstructionWithSigners<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
   TAccountFreezeAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -72,7 +71,7 @@ export type UnfreezeWhitelistV2InstructionWithSigners<
       TAccountWhitelist extends string
         ? WritableAccount<TAccountWhitelist>
         : TAccountWhitelist,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -82,22 +81,22 @@ export type UnfreezeWhitelistV2InstructionData = {
 
 export type UnfreezeWhitelistV2InstructionDataArgs = {};
 
-export function getUnfreezeWhitelistV2InstructionDataEncoder() {
+export function getUnfreezeWhitelistV2InstructionDataEncoder(): Encoder<UnfreezeWhitelistV2InstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: Array<number> }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
     ]),
     (value) => ({
       ...value,
       discriminator: [51, 105, 214, 84, 252, 188, 26, 1],
     })
-  ) satisfies Encoder<UnfreezeWhitelistV2InstructionDataArgs>;
+  );
 }
 
-export function getUnfreezeWhitelistV2InstructionDataDecoder() {
-  return getStructDecoder<UnfreezeWhitelistV2InstructionData>([
+export function getUnfreezeWhitelistV2InstructionDataDecoder(): Decoder<UnfreezeWhitelistV2InstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-  ]) satisfies Decoder<UnfreezeWhitelistV2InstructionData>;
+  ]);
 }
 
 export function getUnfreezeWhitelistV2InstructionDataCodec(): Codec<
@@ -112,7 +111,7 @@ export function getUnfreezeWhitelistV2InstructionDataCodec(): Codec<
 
 export type UnfreezeWhitelistV2Input<
   TAccountFreezeAuthority extends string,
-  TAccountWhitelist extends string
+  TAccountWhitelist extends string,
 > = {
   freezeAuthority: Address<TAccountFreezeAuthority>;
   whitelist: Address<TAccountWhitelist>;
@@ -120,7 +119,7 @@ export type UnfreezeWhitelistV2Input<
 
 export type UnfreezeWhitelistV2InputWithSigners<
   TAccountFreezeAuthority extends string,
-  TAccountWhitelist extends string
+  TAccountWhitelist extends string,
 > = {
   freezeAuthority: TransactionSigner<TAccountFreezeAuthority>;
   whitelist: Address<TAccountWhitelist>;
@@ -129,7 +128,7 @@ export type UnfreezeWhitelistV2InputWithSigners<
 export function getUnfreezeWhitelistV2Instruction<
   TAccountFreezeAuthority extends string,
   TAccountWhitelist extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistV2InputWithSigners<
     TAccountFreezeAuthority,
@@ -143,7 +142,7 @@ export function getUnfreezeWhitelistV2Instruction<
 export function getUnfreezeWhitelistV2Instruction<
   TAccountFreezeAuthority extends string,
   TAccountWhitelist extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistV2Input<TAccountFreezeAuthority, TAccountWhitelist>
 ): UnfreezeWhitelistV2Instruction<
@@ -154,7 +153,7 @@ export function getUnfreezeWhitelistV2Instruction<
 export function getUnfreezeWhitelistV2Instruction<
   TAccountFreezeAuthority extends string,
   TAccountWhitelist extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: UnfreezeWhitelistV2Input<TAccountFreezeAuthority, TAccountWhitelist>
 ): IInstruction {
@@ -197,7 +196,7 @@ export function getUnfreezeWhitelistV2InstructionRaw<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
   TAccountFreezeAuthority extends string | IAccountMeta<string> = string,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     freezeAuthority: TAccountFreezeAuthority extends string
@@ -231,7 +230,7 @@ export function getUnfreezeWhitelistV2InstructionRaw<
 
 export type ParsedUnfreezeWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -243,7 +242,7 @@ export type ParsedUnfreezeWhitelistV2Instruction<
 
 export function parseUnfreezeWhitelistV2Instruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

@@ -29,22 +29,18 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getArrayDecoder,
   getArrayEncoder,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import {
   getU64Decoder,
   getU64Encoder,
   getU8Decoder,
   getU8Encoder,
-} from '@solana/codecs-numbers';
+  mapEncoder,
+} from '@solana/codecs';
 import { MintProofV2Seeds, findMintProofV2Pda } from '../pdas';
 
 export type MintProofV2<TAddress extends string = string> = Account<
@@ -72,15 +68,9 @@ export type MintProofV2AccountDataArgs = {
   payer: Address;
 };
 
-export function getMintProofV2AccountDataEncoder() {
+export function getMintProofV2AccountDataEncoder(): Encoder<MintProofV2AccountDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: Array<number>;
-      proofLen: number;
-      proof: Array<Uint8Array>;
-      creationSlot: number | bigint;
-      payer: Address;
-    }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['proofLen', getU8Encoder()],
       ['proof', getArrayEncoder(getBytesEncoder({ size: 32 }), { size: 28 })],
@@ -91,17 +81,17 @@ export function getMintProofV2AccountDataEncoder() {
       ...value,
       discriminator: [22, 197, 150, 178, 249, 225, 183, 75],
     })
-  ) satisfies Encoder<MintProofV2AccountDataArgs>;
+  );
 }
 
-export function getMintProofV2AccountDataDecoder() {
-  return getStructDecoder<MintProofV2AccountData>([
+export function getMintProofV2AccountDataDecoder(): Decoder<MintProofV2AccountData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['proofLen', getU8Decoder()],
     ['proof', getArrayDecoder(getBytesDecoder({ size: 32 }), { size: 28 })],
     ['creationSlot', getU64Decoder()],
     ['payer', getAddressDecoder()],
-  ]) satisfies Decoder<MintProofV2AccountData>;
+  ]);
 }
 
 export function getMintProofV2AccountDataCodec(): Codec<

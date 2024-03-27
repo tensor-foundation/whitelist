@@ -12,15 +12,14 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import { getU8Decoder, getU8Encoder } from '@solana/codecs-numbers';
+  getU8Decoder,
+  getU8Encoder,
+  mapEncoder,
+} from '@solana/codecs';
 import {
   AccountRole,
   IAccountMeta,
@@ -46,7 +45,7 @@ export type CloseMintProofV2Instruction<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -63,7 +62,7 @@ export type CloseMintProofV2Instruction<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -75,7 +74,7 @@ export type CloseMintProofV2InstructionWithSigners<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -93,7 +92,7 @@ export type CloseMintProofV2InstructionWithSigners<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -101,22 +100,22 @@ export type CloseMintProofV2InstructionData = { discriminator: Array<number> };
 
 export type CloseMintProofV2InstructionDataArgs = {};
 
-export function getCloseMintProofV2InstructionDataEncoder() {
+export function getCloseMintProofV2InstructionDataEncoder(): Encoder<CloseMintProofV2InstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: Array<number> }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
     ]),
     (value) => ({
       ...value,
       discriminator: [237, 78, 8, 208, 47, 148, 145, 170],
     })
-  ) satisfies Encoder<CloseMintProofV2InstructionDataArgs>;
+  );
 }
 
-export function getCloseMintProofV2InstructionDataDecoder() {
-  return getStructDecoder<CloseMintProofV2InstructionData>([
+export function getCloseMintProofV2InstructionDataDecoder(): Decoder<CloseMintProofV2InstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-  ]) satisfies Decoder<CloseMintProofV2InstructionData>;
+  ]);
 }
 
 export function getCloseMintProofV2InstructionDataCodec(): Codec<
@@ -133,7 +132,7 @@ export type CloseMintProofV2Input<
   TAccountPayer extends string,
   TAccountSigner extends string,
   TAccountMintProof extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   payer: Address<TAccountPayer>;
   signer: Address<TAccountSigner>;
@@ -145,7 +144,7 @@ export type CloseMintProofV2InputWithSigners<
   TAccountPayer extends string,
   TAccountSigner extends string,
   TAccountMintProof extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   payer: Address<TAccountPayer>;
   signer: TransactionSigner<TAccountSigner>;
@@ -158,7 +157,7 @@ export function getCloseMintProofV2Instruction<
   TAccountSigner extends string,
   TAccountMintProof extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: CloseMintProofV2InputWithSigners<
     TAccountPayer,
@@ -178,7 +177,7 @@ export function getCloseMintProofV2Instruction<
   TAccountSigner extends string,
   TAccountMintProof extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: CloseMintProofV2Input<
     TAccountPayer,
@@ -198,7 +197,7 @@ export function getCloseMintProofV2Instruction<
   TAccountSigner extends string,
   TAccountMintProof extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: CloseMintProofV2Input<
     TAccountPayer,
@@ -257,7 +256,7 @@ export function getCloseMintProofV2InstructionRaw<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     payer: TAccountPayer extends string
@@ -302,7 +301,7 @@ export function getCloseMintProofV2InstructionRaw<
 
 export type ParsedCloseMintProofV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -316,7 +315,7 @@ export type ParsedCloseMintProofV2Instruction<
 
 export function parseCloseMintProofV2Instruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

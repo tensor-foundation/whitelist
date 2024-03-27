@@ -12,15 +12,14 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import { getU8Decoder, getU8Encoder } from '@solana/codecs-numbers';
+  getU8Decoder,
+  getU8Encoder,
+  mapEncoder,
+} from '@solana/codecs';
 import {
   AccountRole,
   IAccountMeta,
@@ -47,7 +46,7 @@ export type ReallocWhitelistInstruction<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -64,7 +63,7 @@ export type ReallocWhitelistInstruction<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -76,7 +75,7 @@ export type ReallocWhitelistInstructionWithSigners<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -94,7 +93,7 @@ export type ReallocWhitelistInstructionWithSigners<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -102,22 +101,22 @@ export type ReallocWhitelistInstructionData = { discriminator: Array<number> };
 
 export type ReallocWhitelistInstructionDataArgs = {};
 
-export function getReallocWhitelistInstructionDataEncoder() {
+export function getReallocWhitelistInstructionDataEncoder(): Encoder<ReallocWhitelistInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: Array<number> }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
     ]),
     (value) => ({
       ...value,
       discriminator: [173, 147, 168, 152, 181, 46, 55, 60],
     })
-  ) satisfies Encoder<ReallocWhitelistInstructionDataArgs>;
+  );
 }
 
-export function getReallocWhitelistInstructionDataDecoder() {
-  return getStructDecoder<ReallocWhitelistInstructionData>([
+export function getReallocWhitelistInstructionDataDecoder(): Decoder<ReallocWhitelistInstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-  ]) satisfies Decoder<ReallocWhitelistInstructionData>;
+  ]);
 }
 
 export function getReallocWhitelistInstructionDataCodec(): Codec<
@@ -134,7 +133,7 @@ export type ReallocWhitelistAsyncInput<
   TAccountWhitelist extends string,
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
@@ -151,7 +150,7 @@ export type ReallocWhitelistAsyncInputWithSigners<
   TAccountWhitelist extends string,
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
@@ -169,7 +168,7 @@ export async function getReallocWhitelistInstructionAsync<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: ReallocWhitelistAsyncInputWithSigners<
     TAccountWhitelist,
@@ -191,7 +190,7 @@ export async function getReallocWhitelistInstructionAsync<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: ReallocWhitelistAsyncInput<
     TAccountWhitelist,
@@ -213,7 +212,7 @@ export async function getReallocWhitelistInstructionAsync<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: ReallocWhitelistAsyncInput<
     TAccountWhitelist,
@@ -274,7 +273,7 @@ export type ReallocWhitelistInput<
   TAccountWhitelist extends string,
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
@@ -291,7 +290,7 @@ export type ReallocWhitelistInputWithSigners<
   TAccountWhitelist extends string,
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
@@ -309,7 +308,7 @@ export function getReallocWhitelistInstruction<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: ReallocWhitelistInputWithSigners<
     TAccountWhitelist,
@@ -329,7 +328,7 @@ export function getReallocWhitelistInstruction<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: ReallocWhitelistInput<
     TAccountWhitelist,
@@ -349,7 +348,7 @@ export function getReallocWhitelistInstruction<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: ReallocWhitelistInput<
     TAccountWhitelist,
@@ -411,7 +410,7 @@ export function getReallocWhitelistInstructionRaw<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     whitelist: TAccountWhitelist extends string
@@ -456,7 +455,7 @@ export function getReallocWhitelistInstructionRaw<
 
 export type ParsedReallocWhitelistInstruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -475,7 +474,7 @@ export type ParsedReallocWhitelistInstruction<
 
 export function parseReallocWhitelistInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

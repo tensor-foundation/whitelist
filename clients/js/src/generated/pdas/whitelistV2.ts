@@ -12,8 +12,7 @@ import {
   getAddressEncoder,
   getProgramDerivedAddress,
 } from '@solana/addresses';
-import { getBytesEncoder } from '@solana/codecs-data-structures';
-import { getStringEncoder } from '@solana/codecs-strings';
+import { getBytesEncoder, getStringEncoder } from '@solana/codecs';
 
 export type WhitelistV2Seeds = {
   /** The namespace address */

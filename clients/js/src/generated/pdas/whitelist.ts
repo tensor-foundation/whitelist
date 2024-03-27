@@ -11,7 +11,7 @@ import {
   ProgramDerivedAddress,
   getProgramDerivedAddress,
 } from '@solana/addresses';
-import { getBytesEncoder } from '@solana/codecs-data-structures';
+import { getBytesEncoder } from '@solana/codecs';
 
 export type WhitelistSeeds = {
   /** UUID of the whitelist */

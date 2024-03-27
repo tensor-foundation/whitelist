@@ -6,11 +6,14 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Codec, Decoder, Encoder, combineCodec } from '@solana/codecs-core';
 import {
+  Codec,
+  Decoder,
+  Encoder,
+  combineCodec,
   getScalarEnumDecoder,
   getScalarEnumEncoder,
-} from '@solana/codecs-data-structures';
+} from '@solana/codecs';
 
 export enum State {
   Unfrozen,
@@ -19,12 +22,12 @@ export enum State {
 
 export type StateArgs = State;
 
-export function getStateEncoder() {
-  return getScalarEnumEncoder(State) satisfies Encoder<StateArgs>;
+export function getStateEncoder(): Encoder<StateArgs> {
+  return getScalarEnumEncoder(State);
 }
 
-export function getStateDecoder() {
-  return getScalarEnumDecoder(State) satisfies Decoder<State>;
+export function getStateDecoder(): Decoder<State> {
+  return getScalarEnumDecoder(State);
 }
 
 export function getStateCodec(): Codec<StateArgs, State> {

@@ -15,18 +15,21 @@ import {
   Codec,
   Decoder,
   Encoder,
+  Option,
+  OptionOrNullable,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getArrayDecoder,
   getArrayEncoder,
   getBytesDecoder,
   getBytesEncoder,
+  getOptionDecoder,
+  getOptionEncoder,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import { getU8Decoder, getU8Encoder } from '@solana/codecs-numbers';
+  getU8Decoder,
+  getU8Encoder,
+  mapEncoder,
+} from '@solana/codecs';
 import {
   AccountRole,
   IAccountMeta,
@@ -38,12 +41,6 @@ import {
   WritableAccount,
   WritableSignerAccount,
 } from '@solana/instructions';
-import {
-  Option,
-  OptionOrNullable,
-  getOptionDecoder,
-  getOptionEncoder,
-} from '@solana/options';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { findWhitelistPda } from '../pdas';
 import {
@@ -68,7 +65,7 @@ export type CreateWhitelistV2Instruction<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -88,7 +85,7 @@ export type CreateWhitelistV2Instruction<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -101,7 +98,7 @@ export type CreateWhitelistV2InstructionWithSigners<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -124,7 +121,7 @@ export type CreateWhitelistV2InstructionWithSigners<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -141,14 +138,9 @@ export type CreateWhitelistV2InstructionDataArgs = {
   conditions: Array<ConditionArgs>;
 };
 
-export function getCreateWhitelistV2InstructionDataEncoder() {
+export function getCreateWhitelistV2InstructionDataEncoder(): Encoder<CreateWhitelistV2InstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: Array<number>;
-      uuid: Uint8Array;
-      freezeAuthority: OptionOrNullable<Address>;
-      conditions: Array<ConditionArgs>;
-    }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['uuid', getBytesEncoder({ size: 32 })],
       ['freezeAuthority', getOptionEncoder(getAddressEncoder())],
@@ -158,16 +150,16 @@ export function getCreateWhitelistV2InstructionDataEncoder() {
       ...value,
       discriminator: [31, 207, 213, 77, 105, 13, 127, 98],
     })
-  ) satisfies Encoder<CreateWhitelistV2InstructionDataArgs>;
+  );
 }
 
-export function getCreateWhitelistV2InstructionDataDecoder() {
-  return getStructDecoder<CreateWhitelistV2InstructionData>([
+export function getCreateWhitelistV2InstructionDataDecoder(): Decoder<CreateWhitelistV2InstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['uuid', getBytesDecoder({ size: 32 })],
     ['freezeAuthority', getOptionDecoder(getAddressDecoder())],
     ['conditions', getArrayDecoder(getConditionDecoder())],
-  ]) satisfies Decoder<CreateWhitelistV2InstructionData>;
+  ]);
 }
 
 export function getCreateWhitelistV2InstructionDataCodec(): Codec<
@@ -185,7 +177,7 @@ export type CreateWhitelistV2AsyncInput<
   TAccountUpdateAuthority extends string,
   TAccountNamespace extends string,
   TAccountWhitelist extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   payer: Address<TAccountPayer>;
   updateAuthority: Address<TAccountUpdateAuthority>;
@@ -202,7 +194,7 @@ export type CreateWhitelistV2AsyncInputWithSigners<
   TAccountUpdateAuthority extends string,
   TAccountNamespace extends string,
   TAccountWhitelist extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   payer: TransactionSigner<TAccountPayer>;
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
@@ -220,7 +212,7 @@ export async function getCreateWhitelistV2InstructionAsync<
   TAccountNamespace extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: CreateWhitelistV2AsyncInputWithSigners<
     TAccountPayer,
@@ -245,7 +237,7 @@ export async function getCreateWhitelistV2InstructionAsync<
   TAccountNamespace extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: CreateWhitelistV2AsyncInput<
     TAccountPayer,
@@ -270,7 +262,7 @@ export async function getCreateWhitelistV2InstructionAsync<
   TAccountNamespace extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: CreateWhitelistV2AsyncInput<
     TAccountPayer,
@@ -338,7 +330,7 @@ export type CreateWhitelistV2Input<
   TAccountUpdateAuthority extends string,
   TAccountNamespace extends string,
   TAccountWhitelist extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   payer: Address<TAccountPayer>;
   updateAuthority: Address<TAccountUpdateAuthority>;
@@ -355,7 +347,7 @@ export type CreateWhitelistV2InputWithSigners<
   TAccountUpdateAuthority extends string,
   TAccountNamespace extends string,
   TAccountWhitelist extends string,
-  TAccountSystemProgram extends string
+  TAccountSystemProgram extends string,
 > = {
   payer: TransactionSigner<TAccountPayer>;
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
@@ -373,7 +365,7 @@ export function getCreateWhitelistV2Instruction<
   TAccountNamespace extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: CreateWhitelistV2InputWithSigners<
     TAccountPayer,
@@ -396,7 +388,7 @@ export function getCreateWhitelistV2Instruction<
   TAccountNamespace extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: CreateWhitelistV2Input<
     TAccountPayer,
@@ -419,7 +411,7 @@ export function getCreateWhitelistV2Instruction<
   TAccountNamespace extends string,
   TAccountWhitelist extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
+  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 >(
   input: CreateWhitelistV2Input<
     TAccountPayer,
@@ -486,7 +478,7 @@ export function getCreateWhitelistV2InstructionRaw<
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends Array<IAccountMeta<string>> = [],
 >(
   accounts: {
     payer: TAccountPayer extends string
@@ -540,7 +532,7 @@ export function getCreateWhitelistV2InstructionRaw<
 
 export type ParsedCreateWhitelistV2Instruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -555,7 +547,7 @@ export type ParsedCreateWhitelistV2Instruction<
 
 export function parseCreateWhitelistV2Instruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &

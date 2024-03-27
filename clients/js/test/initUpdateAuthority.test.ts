@@ -2,17 +2,17 @@ import { appendTransactionInstruction } from '@solana/transactions';
 import { pipe } from '@solana/web3.js';
 import test from 'ava';
 import {
+  createDefaultTransaction,
+  signAndSendTransaction,
+  createDefaultSolanaClient,
+} from '@tensor-foundation/test-helpers';
+import {
   Authority,
   fetchAuthority,
   findAuthorityPda,
   getInitUpdateAuthorityInstructionAsync,
-} from '../src';
-import {
-  createDefaultSolanaClient,
-  createDefaultTransaction,
-  setupSigners,
-  signAndSendTransaction,
-} from './_setup';
+} from '../src/index.js';
+import { setupSigners } from './_setup.js';
 
 test('it can initialize a new update authority', async (t) => {
   // Given a Umi instance and a new signer.
