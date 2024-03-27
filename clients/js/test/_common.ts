@@ -1,27 +1,19 @@
 import { ExecutionContext } from 'ava';
 import { v4 } from 'uuid';
 import { Address, address } from '@solana/addresses';
-import {
-  KeyPairSigner,
-  generateKeyPairSigner,
-  signTransactionWithSigners,
-} from '@solana/signers';
+import { KeyPairSigner, generateKeyPairSigner } from '@solana/signers';
 import { none } from '@solana/options';
 import {
-  Commitment,
-  CompilableTransaction,
-  ITransactionWithBlockhashLifetime,
   SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   appendTransactionInstruction,
-  getSignatureFromTransaction,
   isSolanaError,
   pipe,
-  sendAndConfirmTransactionFactory,
 } from '@solana/web3.js';
 import { Buffer } from 'buffer';
 import {
   Client,
   createDefaultTransaction,
+  signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
 import {
   Condition,
@@ -32,21 +24,6 @@ import {
   getUpdateWhitelistV2Instruction,
   operation,
 } from '../src/index.js';
-
-export const signAndSendTransaction = async (
-  client: Client,
-  transaction: CompilableTransaction & ITransactionWithBlockhashLifetime,
-  commitment: Commitment = 'confirmed'
-) => {
-  const signedTransaction = await signTransactionWithSigners(transaction);
-  const signature = getSignatureFromTransaction(signedTransaction);
-  await sendAndConfirmTransactionFactory(client)(signedTransaction, {
-    commitment,
-    // skipPreflight: true,
-  });
-
-  return signature;
-};
 
 export const DEFAULT_PUBKEY: Address = address(
   '11111111111111111111111111111111'
