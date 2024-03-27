@@ -131,10 +131,12 @@ export async function createWhitelistThrows({
   );
 
   if (isSolanaError(error.cause, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
-    t.assert(error.cause.context.code === code);
+    t.assert(
+      error.cause.context.code === code,
+      `expected error code ${code}, received ${error.cause.context.code}`
+    );
   } else {
-    // Expected a custom error, but didn't get one.
-    t.assert(false);
+    t.fail("expected a custom error, but didn't get one");
   }
 }
 
@@ -209,10 +211,12 @@ export async function updateWhitelistThrows({
   );
 
   if (isSolanaError(error.cause, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
-    t.assert(error.cause.context.code === code);
+    t.assert(
+      error.cause.context.code === code,
+      `expected error code ${code}, received ${error.cause.context.code}`
+    );
   } else {
-    // Expected a custom error, but didn't get one.
-    t.assert(false);
+    t.fail("expected a custom error, but didn't get one");
   }
 }
 
