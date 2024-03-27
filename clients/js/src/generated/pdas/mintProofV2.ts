@@ -12,7 +12,7 @@ import {
   getAddressEncoder,
   getProgramDerivedAddress,
 } from '@solana/addresses';
-import { getStringEncoder } from '@solana/codecs-strings';
+import { getStringEncoder } from '@solana/codecs';
 
 export type MintProofV2Seeds = {
   /** The address of the mint account */
@@ -28,7 +28,7 @@ export async function findMintProofV2Pda(
   const {
     programAddress = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>,
   } = config;
-  return getProgramDerivedAddress({
+  return await getProgramDerivedAddress({
     programAddress,
     seeds: [
       getStringEncoder({ size: 'variable' }).encode('mint_proof'),

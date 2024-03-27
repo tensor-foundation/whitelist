@@ -11,10 +11,13 @@ import {
   getAddressDecoder,
   getAddressEncoder,
 } from '@solana/addresses';
-import { Codec, Decoder, Encoder, combineCodec } from '@solana/codecs-core';
 import {
+  Codec,
+  Decoder,
+  Encoder,
   GetDataEnumKind,
   GetDataEnumKindContent,
+  combineCodec,
   getDataEnumDecoder,
   getDataEnumEncoder,
   getStructDecoder,
@@ -23,7 +26,7 @@ import {
   getTupleEncoder,
   getUnitDecoder,
   getUnitEncoder,
-} from '@solana/codecs-data-structures';
+} from '@solana/codecs';
 
 export type Operation =
   | { __kind: 'Noop' }
@@ -32,30 +35,26 @@ export type Operation =
 
 export type OperationArgs = Operation;
 
-export function getOperationEncoder() {
-  return getDataEnumEncoder<OperationArgs>([
+export function getOperationEncoder(): Encoder<OperationArgs> {
+  return getDataEnumEncoder([
     ['Noop', getUnitEncoder()],
     ['Clear', getUnitEncoder()],
     [
       'Set',
-      getStructEncoder<GetDataEnumKindContent<OperationArgs, 'Set'>>([
-        ['fields', getTupleEncoder([getAddressEncoder()])],
-      ]),
+      getStructEncoder([['fields', getTupleEncoder([getAddressEncoder()])]]),
     ],
-  ]) satisfies Encoder<OperationArgs>;
+  ]);
 }
 
-export function getOperationDecoder() {
-  return getDataEnumDecoder<Operation>([
+export function getOperationDecoder(): Decoder<Operation> {
+  return getDataEnumDecoder([
     ['Noop', getUnitDecoder()],
     ['Clear', getUnitDecoder()],
     [
       'Set',
-      getStructDecoder<GetDataEnumKindContent<Operation, 'Set'>>([
-        ['fields', getTupleDecoder([getAddressDecoder()])],
-      ]),
+      getStructDecoder([['fields', getTupleDecoder([getAddressDecoder()])]]),
     ],
-  ]) satisfies Decoder<Operation>;
+  ]);
 }
 
 export function getOperationCodec(): Codec<OperationArgs, Operation> {
@@ -71,10 +70,10 @@ export function operation(
   kind: 'Set',
   data: GetDataEnumKindContent<OperationArgs, 'Set'>['fields']
 ): GetDataEnumKind<OperationArgs, 'Set'>;
-export function operation<K extends OperationArgs['__kind']>(
+export function operation<K extends OperationArgs['__kind'], Data>(
   kind: K,
-  data?: any
-): Extract<OperationArgs, { __kind: K }> {
+  data?: Data
+) {
   return Array.isArray(data)
     ? { __kind: kind, fields: data }
     : { __kind: kind, ...(data ?? {}) };

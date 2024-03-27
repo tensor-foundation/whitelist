@@ -3,8 +3,18 @@ import { v4 } from 'uuid';
 import { Address, address } from '@solana/addresses';
 import { KeyPairSigner, generateKeyPairSigner } from '@solana/signers';
 import { none } from '@solana/options';
-import { appendTransactionInstruction, pipe } from '@solana/web3.js';
+import {
+  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
+  appendTransactionInstruction,
+  isSolanaError,
+  pipe,
+} from '@solana/web3.js';
 import { Buffer } from 'buffer';
+import {
+  Client,
+  createDefaultTransaction,
+  signAndSendTransaction,
+} from '@tensor-foundation/test-helpers';
 import {
   Condition,
   Mode,
@@ -13,12 +23,7 @@ import {
   getCreateWhitelistV2Instruction,
   getUpdateWhitelistV2Instruction,
   operation,
-} from '../src';
-import {
-  Client,
-  createDefaultTransaction,
-  signAndSendTransaction,
-} from './_setup';
+} from '../src/index.js';
 
 export const DEFAULT_PUBKEY: Address = address(
   '11111111111111111111111111111111'
@@ -43,7 +48,7 @@ export interface CreateWhitelistParams {
 
 export interface CreateWhitelistThrowsParams extends CreateWhitelistParams {
   t: ExecutionContext;
-  message: RegExp;
+  code: number;
 }
 
 export interface CreateWhitelistReturns {
@@ -95,8 +100,8 @@ export async function createWhitelistThrows({
   freezeAuthority = DEFAULT_PUBKEY,
   conditions = [{ mode: Mode.FVC, value: updateAuthority.address }],
   t,
-  message,
-}: CreateWhitelistThrowsParams): Promise<CreateWhitelistReturns> {
+  code,
+}: CreateWhitelistThrowsParams): Promise<void> {
   const uuid = generateUuid();
   namespace = namespace || (await generateKeyPairSigner());
 
@@ -121,11 +126,16 @@ export async function createWhitelistThrows({
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  await t.throwsAsync(promise, {
-    message,
-  });
+  const error = await t.throwsAsync<Error & { data: { logs: string[] } }>(
+    promise
+  );
 
-  return { whitelist, uuid, conditions };
+  if (isSolanaError(error.cause, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
+    t.assert(error.cause.context.code === code);
+  } else {
+    // Expected a custom error, but didn't get one.
+    t.assert(false);
+  }
 }
 
 export interface UpdateWhitelistParams {
@@ -140,7 +150,7 @@ export interface UpdateWhitelistParams {
 
 export interface UpdateWhitelistThrowsParams extends UpdateWhitelistParams {
   t: ExecutionContext;
-  message: RegExp;
+  code: number;
 }
 
 export async function updateWhitelist({
@@ -177,7 +187,7 @@ export async function updateWhitelistThrows({
   newFreezeAuthority,
   newConditions,
   t,
-  message,
+  code,
 }: UpdateWhitelistThrowsParams) {
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
     payer,
@@ -194,9 +204,16 @@ export async function updateWhitelistThrows({
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  await t.throwsAsync(promise, {
-    message,
-  });
+  const error = await t.throwsAsync<Error & { data: { logs: string[] } }>(
+    promise
+  );
+
+  if (isSolanaError(error.cause, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
+    t.assert(error.cause.context.code === code);
+  } else {
+    // Expected a custom error, but didn't get one.
+    t.assert(false);
+  }
 }
 
 export async function getAccountDataLength(

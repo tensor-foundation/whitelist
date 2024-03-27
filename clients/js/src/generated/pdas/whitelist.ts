@@ -11,7 +11,7 @@ import {
   ProgramDerivedAddress,
   getProgramDerivedAddress,
 } from '@solana/addresses';
-import { getBytesEncoder } from '@solana/codecs-data-structures';
+import { getBytesEncoder } from '@solana/codecs';
 
 export type WhitelistSeeds = {
   /** UUID of the whitelist */
@@ -25,7 +25,7 @@ export async function findWhitelistPda(
   const {
     programAddress = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>,
   } = config;
-  return getProgramDerivedAddress({
+  return await getProgramDerivedAddress({
     programAddress,
     seeds: [getBytesEncoder({ size: 32 }).encode(seeds.uuid)],
   });

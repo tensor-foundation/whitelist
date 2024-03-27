@@ -29,17 +29,16 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getArrayDecoder,
   getArrayEncoder,
   getBytesDecoder,
   getBytesEncoder,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import { getU8Decoder, getU8Encoder } from '@solana/codecs-numbers';
+  getU8Decoder,
+  getU8Encoder,
+  mapEncoder,
+} from '@solana/codecs';
 import { WhitelistV2Seeds, findWhitelistV2Pda } from '../pdas';
 import {
   Condition,
@@ -85,19 +84,9 @@ export type WhitelistV2AccountDataArgs = {
   conditions: Array<ConditionArgs>;
 };
 
-export function getWhitelistV2AccountDataEncoder() {
+export function getWhitelistV2AccountDataEncoder(): Encoder<WhitelistV2AccountDataArgs> {
   return mapEncoder(
-    getStructEncoder<{
-      discriminator: Array<number>;
-      version: number;
-      bump: number;
-      uuid: Uint8Array;
-      state: StateArgs;
-      updateAuthority: Address;
-      namespace: Address;
-      freezeAuthority: Address;
-      conditions: Array<ConditionArgs>;
-    }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
       ['version', getU8Encoder()],
       ['bump', getU8Encoder()],
@@ -112,11 +101,11 @@ export function getWhitelistV2AccountDataEncoder() {
       ...value,
       discriminator: [136, 184, 45, 191, 85, 203, 191, 119],
     })
-  ) satisfies Encoder<WhitelistV2AccountDataArgs>;
+  );
 }
 
-export function getWhitelistV2AccountDataDecoder() {
-  return getStructDecoder<WhitelistV2AccountData>([
+export function getWhitelistV2AccountDataDecoder(): Decoder<WhitelistV2AccountData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
     ['version', getU8Decoder()],
     ['bump', getU8Decoder()],
@@ -126,7 +115,7 @@ export function getWhitelistV2AccountDataDecoder() {
     ['namespace', getAddressDecoder()],
     ['freezeAuthority', getAddressDecoder()],
     ['conditions', getArrayDecoder(getConditionDecoder())],
-  ]) satisfies Decoder<WhitelistV2AccountData>;
+  ]);
 }
 
 export function getWhitelistV2AccountDataCodec(): Codec<
@@ -213,5 +202,5 @@ export async function fetchMaybeWhitelistV2FromSeeds(
 ): Promise<MaybeWhitelistV2> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findWhitelistV2Pda(seeds, { programAddress });
-  return fetchMaybeWhitelistV2(rpc, address, fetchConfig);
+  return await fetchMaybeWhitelistV2(rpc, address, fetchConfig);
 }

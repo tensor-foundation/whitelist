@@ -11,29 +11,32 @@ import {
   getAddressDecoder,
   getAddressEncoder,
 } from '@solana/addresses';
-import { Codec, Decoder, Encoder, combineCodec } from '@solana/codecs-core';
 import {
+  Codec,
+  Decoder,
+  Encoder,
+  combineCodec,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
+} from '@solana/codecs';
 import { Mode, ModeArgs, getModeDecoder, getModeEncoder } from '.';
 
 export type Condition = { mode: Mode; value: Address };
 
 export type ConditionArgs = { mode: ModeArgs; value: Address };
 
-export function getConditionEncoder() {
-  return getStructEncoder<ConditionArgs>([
+export function getConditionEncoder(): Encoder<ConditionArgs> {
+  return getStructEncoder([
     ['mode', getModeEncoder()],
     ['value', getAddressEncoder()],
-  ]) satisfies Encoder<ConditionArgs>;
+  ]);
 }
 
-export function getConditionDecoder() {
-  return getStructDecoder<Condition>([
+export function getConditionDecoder(): Decoder<Condition> {
+  return getStructDecoder([
     ['mode', getModeDecoder()],
     ['value', getAddressDecoder()],
-  ]) satisfies Decoder<Condition>;
+  ]);
 }
 
 export function getConditionCodec(): Codec<ConditionArgs, Condition> {

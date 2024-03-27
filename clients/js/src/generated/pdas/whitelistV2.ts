@@ -12,8 +12,7 @@ import {
   getAddressEncoder,
   getProgramDerivedAddress,
 } from '@solana/addresses';
-import { getBytesEncoder } from '@solana/codecs-data-structures';
-import { getStringEncoder } from '@solana/codecs-strings';
+import { getBytesEncoder, getStringEncoder } from '@solana/codecs';
 
 export type WhitelistV2Seeds = {
   /** The namespace address */
@@ -29,7 +28,7 @@ export async function findWhitelistV2Pda(
   const {
     programAddress = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>,
   } = config;
-  return getProgramDerivedAddress({
+  return await getProgramDerivedAddress({
     programAddress,
     seeds: [
       getStringEncoder({ size: 'variable' }).encode('whitelist'),

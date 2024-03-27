@@ -6,11 +6,14 @@
  * @see https://github.com/metaplex-foundation/kinobi
  */
 
-import { Codec, Decoder, Encoder, combineCodec } from '@solana/codecs-core';
 import {
+  Codec,
+  Decoder,
+  Encoder,
+  combineCodec,
   getScalarEnumDecoder,
   getScalarEnumEncoder,
-} from '@solana/codecs-data-structures';
+} from '@solana/codecs';
 
 export enum Mode {
   VOC,
@@ -20,12 +23,12 @@ export enum Mode {
 
 export type ModeArgs = Mode;
 
-export function getModeEncoder() {
-  return getScalarEnumEncoder(Mode) satisfies Encoder<ModeArgs>;
+export function getModeEncoder(): Encoder<ModeArgs> {
+  return getScalarEnumEncoder(Mode);
 }
 
-export function getModeDecoder() {
-  return getScalarEnumDecoder(Mode) satisfies Decoder<Mode>;
+export function getModeDecoder(): Decoder<Mode> {
+  return getScalarEnumDecoder(Mode);
 }
 
 export function getModeCodec(): Codec<ModeArgs, Mode> {

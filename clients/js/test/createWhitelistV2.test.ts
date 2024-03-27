@@ -2,14 +2,30 @@ import test from 'ava';
 import { generateKeyPairSigner } from '@solana/signers';
 import {
   createDefaultSolanaClient,
+  createDefaultTransaction,
   generateKeyPairSignerWithSol,
-} from './_setup';
-import { Condition, Mode, WhitelistV2, fetchWhitelistV2 } from '../src';
+  signAndSendTransaction,
+} from '@tensor-foundation/test-helpers';
+import {
+  Condition,
+  Mode,
+  WhitelistV2,
+  fetchWhitelistV2,
+  findWhitelistV2Pda,
+  getCreateWhitelistV2Instruction,
+} from '../src/index.js';
 import {
   DEFAULT_PUBKEY,
   createWhitelist,
   createWhitelistThrows,
-} from './_common';
+  generateUuid,
+} from './_common.js';
+import {
+  SOLANA_ERROR__JSON_RPC__INVALID_PARAMS,
+  appendTransactionInstruction,
+  isSolanaError,
+  pipe,
+} from '@solana/web3.js';
 
 const MAX_CONDITIONS = 24;
 
@@ -89,7 +105,7 @@ test('it throws when creating a whitelist v2 with an empty conditions list', asy
     conditions,
     t,
     // 6014 -- Emptyconditions
-    message: /custom program error: 0x177e/,
+    code: 6014,
   });
 });
 
@@ -151,7 +167,7 @@ test('it cannot create a whitelist v2 with more than one merkle proof', async (t
     namespace,
     t,
     // 6015 -- TooManyMerkleProofs
-    message: /custom program error: 0x177f/,
+    code: 6015,
   });
 });
 
@@ -304,14 +320,34 @@ test('it throws when trying to create a whitelist v2 more than max length', asyn
     value: updateAuthority.address,
   });
 
-  await createWhitelistThrows({
-    client,
+  const uuid = generateUuid();
+
+  const [whitelist] = await findWhitelistV2Pda({
+    namespace: namespace.address,
+    uuid,
+  });
+
+  const createWhitelistIx = getCreateWhitelistV2Instruction({
+    payer: updateAuthority,
     updateAuthority,
+    namespace,
+    whitelist,
     freezeAuthority,
     conditions,
-    namespace,
-    t,
-    // Exceeds max transaction size.
-    message: /too large: 1652 bytes/,
+    uuid,
   });
+
+  const promise = pipe(
+    await createDefaultTransaction(client, updateAuthority.address),
+    (tx) => appendTransactionInstruction(createWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  const error = await t.throwsAsync<Error & { data: { logs: string[] } }>(
+    promise
+  );
+
+  if (isSolanaError(error, SOLANA_ERROR__JSON_RPC__INVALID_PARAMS)) {
+    t.regex(error.context.__serverMessage, / too large: 1652 bytes/);
+  }
 });

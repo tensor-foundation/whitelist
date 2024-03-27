@@ -12,17 +12,15 @@ import {
   Decoder,
   Encoder,
   combineCodec,
-  mapEncoder,
-} from '@solana/codecs-core';
-import {
   getArrayDecoder,
   getArrayEncoder,
   getStructDecoder,
   getStructEncoder,
-} from '@solana/codecs-data-structures';
-import { getU8Decoder, getU8Encoder } from '@solana/codecs-numbers';
+  getU8Decoder,
+  getU8Encoder,
+  mapEncoder,
+} from '@solana/codecs';
 import {
-  AccountRole,
   IAccountMeta,
   IInstruction,
   IInstructionWithAccounts,
@@ -33,50 +31,18 @@ import {
 } from '@solana/instructions';
 import { IAccountSignerMeta, TransactionSigner } from '@solana/signers';
 import { findAuthorityPda } from '../pdas';
-import {
-  ResolvedAccount,
-  accountMetaWithDefault,
-  getAccountMetasWithSigners,
-} from '../shared';
+import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
+import { ResolvedAccount, getAccountMetaFactory } from '../shared';
 
 export type ReallocWhitelistInstruction<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
+  TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountWhitelist extends string | IAccountMeta<string> = string,
   TAccountWhitelistAuthority extends string | IAccountMeta<string> = string,
   TAccountCosigner extends string | IAccountMeta<string> = string,
   TAccountSystemProgram extends
     | string
     | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
-> = IInstruction<TProgram> &
-  IInstructionWithData<Uint8Array> &
-  IInstructionWithAccounts<
-    [
-      TAccountWhitelist extends string
-        ? WritableAccount<TAccountWhitelist>
-        : TAccountWhitelist,
-      TAccountWhitelistAuthority extends string
-        ? ReadonlyAccount<TAccountWhitelistAuthority>
-        : TAccountWhitelistAuthority,
-      TAccountCosigner extends string
-        ? WritableSignerAccount<TAccountCosigner>
-        : TAccountCosigner,
-      TAccountSystemProgram extends string
-        ? ReadonlyAccount<TAccountSystemProgram>
-        : TAccountSystemProgram,
-      ...TRemainingAccounts
-    ]
-  >;
-
-export type ReallocWhitelistInstructionWithSigners<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TAccountWhitelistAuthority extends string | IAccountMeta<string> = string,
-  TAccountCosigner extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
+  TRemainingAccounts extends readonly IAccountMeta<string>[] = [],
 > = IInstruction<TProgram> &
   IInstructionWithData<Uint8Array> &
   IInstructionWithAccounts<
@@ -94,7 +60,7 @@ export type ReallocWhitelistInstructionWithSigners<
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
-      ...TRemainingAccounts
+      ...TRemainingAccounts,
     ]
   >;
 
@@ -102,22 +68,22 @@ export type ReallocWhitelistInstructionData = { discriminator: Array<number> };
 
 export type ReallocWhitelistInstructionDataArgs = {};
 
-export function getReallocWhitelistInstructionDataEncoder() {
+export function getReallocWhitelistInstructionDataEncoder(): Encoder<ReallocWhitelistInstructionDataArgs> {
   return mapEncoder(
-    getStructEncoder<{ discriminator: Array<number> }>([
+    getStructEncoder([
       ['discriminator', getArrayEncoder(getU8Encoder(), { size: 8 })],
     ]),
     (value) => ({
       ...value,
       discriminator: [173, 147, 168, 152, 181, 46, 55, 60],
     })
-  ) satisfies Encoder<ReallocWhitelistInstructionDataArgs>;
+  );
 }
 
-export function getReallocWhitelistInstructionDataDecoder() {
-  return getStructDecoder<ReallocWhitelistInstructionData>([
+export function getReallocWhitelistInstructionDataDecoder(): Decoder<ReallocWhitelistInstructionData> {
+  return getStructDecoder([
     ['discriminator', getArrayDecoder(getU8Decoder(), { size: 8 })],
-  ]) satisfies Decoder<ReallocWhitelistInstructionData>;
+  ]);
 }
 
 export function getReallocWhitelistInstructionDataCodec(): Codec<
@@ -131,34 +97,16 @@ export function getReallocWhitelistInstructionDataCodec(): Codec<
 }
 
 export type ReallocWhitelistAsyncInput<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountSystemProgram extends string
+  TAccountWhitelist extends string = string,
+  TAccountWhitelistAuthority extends string = string,
+  TAccountCosigner extends string = string,
+  TAccountSystemProgram extends string = string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
    * there can only be 1 whitelist authority (due to seeds),
    * and we're checking that 1)the correct cosigner is present on it, and 2)is a signer
    */
-
-  whitelistAuthority?: Address<TAccountWhitelistAuthority>;
-  cosigner: Address<TAccountCosigner>;
-  systemProgram?: Address<TAccountSystemProgram>;
-};
-
-export type ReallocWhitelistAsyncInputWithSigners<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountSystemProgram extends string
-> = {
-  whitelist: Address<TAccountWhitelist>;
-  /**
-   * there can only be 1 whitelist authority (due to seeds),
-   * and we're checking that 1)the correct cosigner is present on it, and 2)is a signer
-   */
-
   whitelistAuthority?: Address<TAccountWhitelistAuthority>;
   cosigner: TransactionSigner<TAccountCosigner>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -169,29 +117,6 @@ export async function getReallocWhitelistInstructionAsync<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
->(
-  input: ReallocWhitelistAsyncInputWithSigners<
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountSystemProgram
-  >
-): Promise<
-  ReallocWhitelistInstructionWithSigners<
-    TProgram,
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountSystemProgram
-  >
->;
-export async function getReallocWhitelistInstructionAsync<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: ReallocWhitelistAsyncInput<
     TAccountWhitelist,
@@ -201,42 +126,18 @@ export async function getReallocWhitelistInstructionAsync<
   >
 ): Promise<
   ReallocWhitelistInstruction<
-    TProgram,
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
     TAccountWhitelist,
     TAccountWhitelistAuthority,
     TAccountCosigner,
     TAccountSystemProgram
   >
->;
-export async function getReallocWhitelistInstructionAsync<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
->(
-  input: ReallocWhitelistAsyncInput<
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountSystemProgram
-  >
-): Promise<IInstruction> {
+> {
   // Program address.
-  const programAddress =
-    'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>;
+  const programAddress = TENSOR_WHITELIST_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getReallocWhitelistInstructionRaw<
-      TProgram,
-      TAccountWhitelist,
-      TAccountWhitelistAuthority,
-      TAccountCosigner,
-      TAccountSystemProgram
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     whitelist: { value: input.whitelist ?? null, isWritable: true },
     whitelistAuthority: {
       value: input.whitelistAuthority ?? null,
@@ -245,6 +146,10 @@ export async function getReallocWhitelistInstructionAsync<
     cosigner: { value: input.cosigner ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.whitelistAuthority.value) {
@@ -255,50 +160,38 @@ export async function getReallocWhitelistInstructionAsync<
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
   }
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getReallocWhitelistInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.whitelist),
+      getAccountMeta(accounts.whitelistAuthority),
+      getAccountMeta(accounts.cosigner),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    programAddress,
+    data: getReallocWhitelistInstructionDataEncoder().encode({}),
+  } as ReallocWhitelistInstruction<
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
+    TAccountWhitelist,
+    TAccountWhitelistAuthority,
+    TAccountCosigner,
+    TAccountSystemProgram
+  >;
 
   return instruction;
 }
 
 export type ReallocWhitelistInput<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountSystemProgram extends string
+  TAccountWhitelist extends string = string,
+  TAccountWhitelistAuthority extends string = string,
+  TAccountCosigner extends string = string,
+  TAccountSystemProgram extends string = string,
 > = {
   whitelist: Address<TAccountWhitelist>;
   /**
    * there can only be 1 whitelist authority (due to seeds),
    * and we're checking that 1)the correct cosigner is present on it, and 2)is a signer
    */
-
-  whitelistAuthority: Address<TAccountWhitelistAuthority>;
-  cosigner: Address<TAccountCosigner>;
-  systemProgram?: Address<TAccountSystemProgram>;
-};
-
-export type ReallocWhitelistInputWithSigners<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountSystemProgram extends string
-> = {
-  whitelist: Address<TAccountWhitelist>;
-  /**
-   * there can only be 1 whitelist authority (due to seeds),
-   * and we're checking that 1)the correct cosigner is present on it, and 2)is a signer
-   */
-
   whitelistAuthority: Address<TAccountWhitelistAuthority>;
   cosigner: TransactionSigner<TAccountCosigner>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -309,27 +202,6 @@ export function getReallocWhitelistInstruction<
   TAccountWhitelistAuthority extends string,
   TAccountCosigner extends string,
   TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
->(
-  input: ReallocWhitelistInputWithSigners<
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountSystemProgram
-  >
-): ReallocWhitelistInstructionWithSigners<
-  TProgram,
-  TAccountWhitelist,
-  TAccountWhitelistAuthority,
-  TAccountCosigner,
-  TAccountSystemProgram
->;
-export function getReallocWhitelistInstruction<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
 >(
   input: ReallocWhitelistInput<
     TAccountWhitelist,
@@ -338,41 +210,17 @@ export function getReallocWhitelistInstruction<
     TAccountSystemProgram
   >
 ): ReallocWhitelistInstruction<
-  TProgram,
+  typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountWhitelist,
   TAccountWhitelistAuthority,
   TAccountCosigner,
   TAccountSystemProgram
->;
-export function getReallocWhitelistInstruction<
-  TAccountWhitelist extends string,
-  TAccountWhitelistAuthority extends string,
-  TAccountCosigner extends string,
-  TAccountSystemProgram extends string,
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'
->(
-  input: ReallocWhitelistInput<
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountSystemProgram
-  >
-): IInstruction {
+> {
   // Program address.
-  const programAddress =
-    'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW'>;
+  const programAddress = TENSOR_WHITELIST_PROGRAM_ADDRESS;
 
   // Original accounts.
-  type AccountMetas = Parameters<
-    typeof getReallocWhitelistInstructionRaw<
-      TProgram,
-      TAccountWhitelist,
-      TAccountWhitelistAuthority,
-      TAccountCosigner,
-      TAccountSystemProgram
-    >
-  >[0];
-  const accounts: Record<keyof AccountMetas, ResolvedAccount> = {
+  const originalAccounts = {
     whitelist: { value: input.whitelist ?? null, isWritable: true },
     whitelistAuthority: {
       value: input.whitelistAuthority ?? null,
@@ -381,6 +229,10 @@ export function getReallocWhitelistInstruction<
     cosigner: { value: input.cosigner ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
+  const accounts = originalAccounts as Record<
+    keyof typeof originalAccounts,
+    ResolvedAccount
+  >;
 
   // Resolve default values.
   if (!accounts.systemProgram.value) {
@@ -388,75 +240,30 @@ export function getReallocWhitelistInstruction<
       '11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>;
   }
 
-  // Get account metas and signers.
-  const accountMetas = getAccountMetasWithSigners(
-    accounts,
-    'programId',
-    programAddress
-  );
-
-  const instruction = getReallocWhitelistInstructionRaw(
-    accountMetas as Record<keyof AccountMetas, IAccountMeta>,
-    programAddress
-  );
+  const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
+  const instruction = {
+    accounts: [
+      getAccountMeta(accounts.whitelist),
+      getAccountMeta(accounts.whitelistAuthority),
+      getAccountMeta(accounts.cosigner),
+      getAccountMeta(accounts.systemProgram),
+    ],
+    programAddress,
+    data: getReallocWhitelistInstructionDataEncoder().encode({}),
+  } as ReallocWhitelistInstruction<
+    typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
+    TAccountWhitelist,
+    TAccountWhitelistAuthority,
+    TAccountCosigner,
+    TAccountSystemProgram
+  >;
 
   return instruction;
 }
 
-export function getReallocWhitelistInstructionRaw<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountWhitelist extends string | IAccountMeta<string> = string,
-  TAccountWhitelistAuthority extends string | IAccountMeta<string> = string,
-  TAccountCosigner extends string | IAccountMeta<string> = string,
-  TAccountSystemProgram extends
-    | string
-    | IAccountMeta<string> = '11111111111111111111111111111111',
-  TRemainingAccounts extends Array<IAccountMeta<string>> = []
->(
-  accounts: {
-    whitelist: TAccountWhitelist extends string
-      ? Address<TAccountWhitelist>
-      : TAccountWhitelist;
-    whitelistAuthority: TAccountWhitelistAuthority extends string
-      ? Address<TAccountWhitelistAuthority>
-      : TAccountWhitelistAuthority;
-    cosigner: TAccountCosigner extends string
-      ? Address<TAccountCosigner>
-      : TAccountCosigner;
-    systemProgram?: TAccountSystemProgram extends string
-      ? Address<TAccountSystemProgram>
-      : TAccountSystemProgram;
-  },
-  programAddress: Address<TProgram> = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW' as Address<TProgram>,
-  remainingAccounts?: TRemainingAccounts
-) {
-  return {
-    accounts: [
-      accountMetaWithDefault(accounts.whitelist, AccountRole.WRITABLE),
-      accountMetaWithDefault(accounts.whitelistAuthority, AccountRole.READONLY),
-      accountMetaWithDefault(accounts.cosigner, AccountRole.WRITABLE_SIGNER),
-      accountMetaWithDefault(
-        accounts.systemProgram ??
-          ('11111111111111111111111111111111' as Address<'11111111111111111111111111111111'>),
-        AccountRole.READONLY
-      ),
-      ...(remainingAccounts ?? []),
-    ],
-    data: getReallocWhitelistInstructionDataEncoder().encode({}),
-    programAddress,
-  } as ReallocWhitelistInstruction<
-    TProgram,
-    TAccountWhitelist,
-    TAccountWhitelistAuthority,
-    TAccountCosigner,
-    TAccountSystemProgram,
-    TRemainingAccounts
-  >;
-}
-
 export type ParsedReallocWhitelistInstruction<
-  TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
-  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[]
+  TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
+  TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
@@ -475,7 +282,7 @@ export type ParsedReallocWhitelistInstruction<
 
 export function parseReallocWhitelistInstruction<
   TProgram extends string,
-  TAccountMetas extends readonly IAccountMeta[]
+  TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &
