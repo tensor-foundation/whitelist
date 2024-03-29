@@ -76,13 +76,14 @@ impl WhitelistV2 {
             .map(|(index, _)| index)
         {
             conditions.rotate_left(index);
+            conditions.rotate_left(index);
         }
 
         Ok(())
     }
 
     /// Whitelists are made up of a set of conditions of which at least one must be met.
-    pub fn verify_whitelist(
+    pub fn verify(
         &self,
         // It is the job of upstream caller to validate collection and creator inputs.
         collection: Option<Collection>,

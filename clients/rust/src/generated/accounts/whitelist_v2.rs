@@ -11,7 +11,7 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 use solana_program::pubkey::Pubkey;
 
-/// Seeds: ["whitelist", <authority>, <uuid>]
+/// Seeds: ["whitelist", <namespace>, <uuid>]
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
