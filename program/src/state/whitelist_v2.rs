@@ -76,7 +76,6 @@ impl WhitelistV2 {
             .map(|(index, _)| index)
         {
             conditions.rotate_left(index);
-            conditions.rotate_left(index);
         }
 
         Ok(())
