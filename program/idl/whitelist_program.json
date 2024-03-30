@@ -623,7 +623,7 @@
     {
       "name": "WhitelistV2",
       "docs": [
-        "Seeds: [\"whitelist\", <authority>, <uuid>]"
+        "Seeds: [\"whitelist\", <namespace>, <uuid>]"
       ],
       "type": {
         "kind": "struct",

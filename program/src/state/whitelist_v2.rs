@@ -22,7 +22,7 @@ pub const WHITELIST_V2_BASE_SIZE: usize =
 #[constant]
 pub const WHITELIST_V2_CONDITIONS_LENGTH: usize = 24;
 
-/// Seeds: ["whitelist", <authority>, <uuid>]
+/// Seeds: ["whitelist", <namespace>, <uuid>]
 #[account]
 pub struct WhitelistV2 {
     pub version: u8,
@@ -82,7 +82,7 @@ impl WhitelistV2 {
     }
 
     /// Whitelists are made up of a set of conditions of which at least one must be met.
-    pub fn verify_whitelist(
+    pub fn verify(
         &self,
         // It is the job of upstream caller to validate collection and creator inputs.
         collection: Option<Collection>,
