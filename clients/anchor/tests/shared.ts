@@ -47,6 +47,7 @@ import {
   TensorWhitelistSDK,
   TLIST_ADDR,
 } from "../src";
+import { fundTestWallets } from "./tswap/common";
 
 // Exporting these here vs in each .test.ts file prevents weird undefined issues.
 export { waitMS } from "@tensor-hq/tensor-common";
@@ -203,6 +204,8 @@ export const bidSdk = new TensorBidSDK({ provider: TEST_PROVIDER });
 const tlistOwner = Keypair.generate();
 
 export const testInitWLAuthority = async () => {
+  await fundTestWallets();
+
   const {
     tx: { ixs },
     authPda,
