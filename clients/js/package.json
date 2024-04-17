@@ -37,17 +37,17 @@
   "author": "Tensor Protocol Foundation <maintainers.foundation>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@solana/accounts": "^2.0.0-preview",
-    "@solana/addresses": "^2.0.0-preview",
-    "@solana/codecs": "^2.0.0-preview",
-    "@solana/errors": "2.0.0-preview.1.20240323070910.9370133e414bfa863517248d97905449e9a867eb",
-    "@solana/instructions": "^2.0.0-preview",
-    "@solana/keys": "^2.0.0-preview",
-    "@solana/options": "^2.0.0-preview",
-    "@solana/programs": "^2.0.0-preview",
-    "@solana/signers": "^2.0.0-preview",
-    "@solana/transactions": "^2.0.0-preview",
-    "@solana/web3.js": "^2.0.0-preview"
+    "@solana/accounts": "2.0.0-preview.2",
+    "@solana/addresses": "2.0.0-preview.2",
+    "@solana/codecs": "2.0.0-preview.2",
+    "@solana/errors": "2.0.0-preview.2",
+    "@solana/instructions": "2.0.0-preview.2",
+    "@solana/keys": "2.0.0-preview.2",
+    "@solana/options": "2.0.0-preview.2",
+    "@solana/programs": "2.0.0-preview.2",
+    "@solana/signers": "2.0.0-preview.2",
+    "@solana/transactions": "2.0.0-preview.2",
+    "@solana/web3.js": "2.0.0-preview.2"
   },
   "devDependencies": {
     "@ava/typescript": "^4.1.0",
@@ -56,7 +56,7 @@
     "@metaplex-foundation/umi-bundle-defaults": "^0.9.1",
     "@noble/hashes": "^1.4.0",
     "@solana/eslint-config-solana": "^3.0.0",
-    "@solana/webcrypto-ed25519-polyfill": "^2.0.0-preview",
+    "@solana/webcrypto-ed25519-polyfill": "2.0.0-preview.2",
     "@tensor-foundation/test-helpers": "0.0.1-alpha.1",
     "@types/node": "^20.11.26",
     "@types/uuid": "9.0.8",
@@ -91,5 +91,5 @@
       }
     }
   },
-  "packageManager": "pnpm@8.2.0"
+  "packageManager": "pnpm@8.9.0"
 }

@@ -6,37 +6,37 @@ settings:
 
 dependencies:
   '@solana/accounts':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
   '@solana/addresses':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
   '@solana/codecs':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
   '@solana/errors':
-    specifier: 2.0.0-preview.1.20240323070910.9370133e414bfa863517248d97905449e9a867eb
-    version: 2.0.0-preview.1.20240323070910.9370133e414bfa863517248d97905449e9a867eb
+    specifier: 2.0.0-preview.2
+    version: 2.0.0-preview.2
   '@solana/instructions':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2
   '@solana/keys':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
   '@solana/options':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2
   '@solana/programs':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2
   '@solana/signers':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
   '@solana/transactions':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
   '@solana/web3.js':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)(ws@8.16.0)
 
 devDependencies:
@@ -59,7 +59,7 @@ devDependencies:
     specifier: ^3.0.0
     version: 3.0.3(@typescript-eslint/eslint-plugin@7.4.0)(@typescript-eslint/parser@7.4.0)(eslint-plugin-jest@27.9.0)(eslint-plugin-react-hooks@4.6.0)(eslint-plugin-simple-import-sort@10.0.0)(eslint-plugin-sort-keys-fix@1.1.2)(eslint-plugin-typescript-sort-keys@3.2.0)(eslint@8.57.0)(typescript@5.4.3)
   '@solana/webcrypto-ed25519-polyfill':
-    specifier: ^2.0.0-preview
+    specifier: 2.0.0-preview.2
     version: 2.0.0-preview.2
   '@tensor-foundation/test-helpers':
     specifier: 0.0.1-alpha.1
@@ -2651,14 +2651,6 @@ packages:
       '@solana/options': 2.0.0-preview.2
     transitivePeerDependencies:
       - fastestsmallesttextencoderdecoder
-
-  /@solana/errors@2.0.0-preview.1.20240323070910.9370133e414bfa863517248d97905449e9a867eb:
-    resolution: {integrity: sha512-tBBpPfxR24vPOFTjRWyB43FGYVwsYuyNe4upLiZE0BsG8CwtOVJGZTqYIspsnv0BelRbeb3j+ovpkR51p7/EKA==}
-    hasBin: true
-    dependencies:
-      chalk: 5.3.0
-      commander: 12.0.0
-    dev: false
 
   /@solana/errors@2.0.0-preview.2:
     resolution: {integrity: sha512-H2DZ1l3iYF5Rp5pPbJpmmtCauWeQXRJapkDg8epQ8BJ7cA2Ut/QEtC3CMmw/iMTcuS6uemFNLcWvlOfoQhvQuA==}
