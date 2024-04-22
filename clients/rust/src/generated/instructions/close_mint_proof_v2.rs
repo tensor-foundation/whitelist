@@ -56,12 +56,12 @@ impl CloseMintProofV2 {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct CloseMintProofV2InstructionData {
+pub struct CloseMintProofV2InstructionData {
     discriminator: [u8; 8],
 }
 
 impl CloseMintProofV2InstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             discriminator: [237, 78, 8, 208, 47, 148, 145, 170],
         }

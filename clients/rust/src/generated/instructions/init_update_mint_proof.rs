@@ -69,12 +69,12 @@ impl InitUpdateMintProof {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct InitUpdateMintProofInstructionData {
+pub struct InitUpdateMintProofInstructionData {
     discriminator: [u8; 8],
 }
 
 impl InitUpdateMintProofInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             discriminator: [30, 77, 123, 9, 191, 37, 52, 159],
         }
