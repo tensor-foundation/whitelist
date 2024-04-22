@@ -53,12 +53,12 @@ impl ReallocAuthority {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct ReallocAuthorityInstructionData {
+pub struct ReallocAuthorityInstructionData {
     discriminator: [u8; 8],
 }
 
 impl ReallocAuthorityInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             discriminator: [128, 120, 16, 197, 85, 34, 2, 91],
         }

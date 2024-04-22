@@ -65,12 +65,12 @@ impl InitUpdateAuthority {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct InitUpdateAuthorityInstructionData {
+pub struct InitUpdateAuthorityInstructionData {
     discriminator: [u8; 8],
 }
 
 impl InitUpdateAuthorityInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             discriminator: [53, 144, 79, 150, 196, 110, 22, 55],
         }

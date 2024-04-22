@@ -79,12 +79,12 @@ impl UpdateWhitelistV2 {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct UpdateWhitelistV2InstructionData {
+pub struct UpdateWhitelistV2InstructionData {
     discriminator: [u8; 8],
 }
 
 impl UpdateWhitelistV2InstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             discriminator: [184, 188, 157, 214, 205, 49, 74, 226],
         }
