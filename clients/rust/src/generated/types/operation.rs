@@ -14,5 +14,9 @@ use solana_program::pubkey::Pubkey;
 pub enum Operation {
     Noop,
     Clear,
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
     Set(Pubkey),
 }

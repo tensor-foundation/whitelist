@@ -63,7 +63,7 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
   });
 
   await pipe(
-    await createDefaultTransaction(client, updateAuthority.address),
+    await createDefaultTransaction(client, updateAuthority),
     (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -82,7 +82,7 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
   t.true(newAccountSize > originalAccountSize);
 });
 
-test('it can edit a whitelist v2 reallocing to be smaller', async (t) => {
+test('it can update a whitelist v2 reallocing to be smaller', async (t) => {
   const client = createDefaultSolanaClient();
   const updateAuthority = await generateKeyPairSignerWithSol(client);
   const voc = (await generateKeyPairSigner()).address;
@@ -125,7 +125,7 @@ test('it can edit a whitelist v2 reallocing to be smaller', async (t) => {
   });
 
   await pipe(
-    await createDefaultTransaction(client, updateAuthority.address),
+    await createDefaultTransaction(client, updateAuthority),
     (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -178,7 +178,7 @@ test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
   });
 
   const promise = pipe(
-    await createDefaultTransaction(client, wrongAuthority.address),
+    await createDefaultTransaction(client, wrongAuthority),
     (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -216,7 +216,7 @@ test('it can change the update authority of a whitelist v2', async (t) => {
   });
 
   await pipe(
-    await createDefaultTransaction(client, updateAuthority.address),
+    await createDefaultTransaction(client, updateAuthority),
     (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -272,7 +272,7 @@ test('it cannot update a whitelist v2 with more than one merkle proof', async (t
   });
 
   const promise = pipe(
-    await createDefaultTransaction(client, updateAuthority.address),
+    await createDefaultTransaction(client, updateAuthority),
     (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );

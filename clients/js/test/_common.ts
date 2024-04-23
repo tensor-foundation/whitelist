@@ -19,7 +19,9 @@ import {
   Condition,
   Mode,
   Operation,
+  findMintProofV2Pda,
   findWhitelistV2Pda,
+  getCreateMintProofV2Instruction,
   getCreateWhitelistV2Instruction,
   getUpdateWhitelistV2Instruction,
   operation,
@@ -84,7 +86,7 @@ export async function createWhitelist({
   });
 
   await pipe(
-    await createDefaultTransaction(client, payer.address),
+    await createDefaultTransaction(client, payer),
     (tx) => appendTransactionInstruction(createWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -121,7 +123,7 @@ export async function createWhitelistThrows({
   });
 
   const promise = pipe(
-    await createDefaultTransaction(client, payer.address),
+    await createDefaultTransaction(client, payer),
     (tx) => appendTransactionInstruction(createWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -174,7 +176,7 @@ export async function updateWhitelist({
   });
 
   await pipe(
-    await createDefaultTransaction(client, payer.address),
+    await createDefaultTransaction(client, payer),
     (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -201,7 +203,7 @@ export async function updateWhitelistThrows({
   });
 
   const promise = pipe(
-    await createDefaultTransaction(client, payer.address),
+    await createDefaultTransaction(client, payer),
     (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -237,4 +239,86 @@ export async function getAccountDataLength(
   const originalAccountSize = decodedData?.length ?? 0;
 
   return originalAccountSize;
+}
+
+export interface CreateMintProofParams {
+  client: Client;
+  payer: KeyPairSigner;
+  mint: Address;
+  whitelist: Address;
+  proof: Uint8Array[];
+}
+
+export interface CreateMintProofThrowsParams extends CreateMintProofParams {
+  t: ExecutionContext;
+  code: BigInt;
+}
+
+export interface CreateMintProofReturns {
+  mintProof: Address;
+}
+
+export async function createMintProof({
+  client,
+  payer,
+  mint,
+  whitelist,
+  proof,
+}: CreateMintProofParams): Promise<CreateMintProofReturns> {
+  const [mintProof] = await findMintProofV2Pda({ mint, whitelist });
+
+  const createMintProofIx = getCreateMintProofV2Instruction({
+    payer,
+    mint,
+    mintProof,
+    whitelist,
+    proof,
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, payer),
+    (tx) => appendTransactionInstruction(createMintProofIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  return { mintProof };
+}
+
+export async function createMintProofThrows({
+  client,
+  payer,
+  mint,
+  whitelist,
+  proof,
+  t,
+  code,
+}: CreateMintProofThrowsParams) {
+  const [mintProof] = await findMintProofV2Pda({ mint, whitelist });
+
+  const createMintProofIx = getCreateMintProofV2Instruction({
+    payer,
+    mint,
+    mintProof,
+    whitelist,
+    proof,
+  });
+
+  const promise = pipe(
+    await createDefaultTransaction(client, payer),
+    (tx) => appendTransactionInstruction(createMintProofIx, tx),
+    (tx) => signAndSendTransaction(client, tx, { skipPreflight: true })
+  );
+
+  const error = await t.throwsAsync<Error & { data: { logs: string[] } }>(
+    promise
+  );
+
+  if (isSolanaError(error, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
+    t.assert(
+      BigInt(error.context.code) === code,
+      `expected error code ${code}, received ${error.context.code}`
+    );
+  } else {
+    t.fail('expected a custom error, but received: ' + error);
+  }
 }

@@ -58,12 +58,12 @@ impl ReallocWhitelist {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct ReallocWhitelistInstructionData {
+pub struct ReallocWhitelistInstructionData {
     discriminator: [u8; 8],
 }
 
 impl ReallocWhitelistInstructionData {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             discriminator: [173, 147, 168, 152, 181, 46, 55, 60],
         }

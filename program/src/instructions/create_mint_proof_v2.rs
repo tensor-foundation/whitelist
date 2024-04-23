@@ -54,7 +54,6 @@ pub fn process_create_mint_proof_v2(
     let leaf = anchor_lang::solana_program::keccak::hash(ctx.accounts.mint.key().as_ref());
 
     // This won't happen currently b/c transaction size is hit before we can run into this.
-    // TODO: revisit + test.
     if proof.len() > MAX_PROOF_LEN {
         throw_err!(ErrorCode::ProofTooLong);
     }
