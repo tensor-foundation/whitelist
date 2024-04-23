@@ -53,7 +53,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
   });
 
   await pipe(
-    await createDefaultTransaction(client, freezeAuthority.address),
+    await createDefaultTransaction(client, freezeAuthority),
     (tx) => appendTransactionInstruction(freezeWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -76,7 +76,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
   });
 
   await pipe(
-    await createDefaultTransaction(client, freezeAuthority.address),
+    await createDefaultTransaction(client, freezeAuthority),
     (tx) => appendTransactionInstruction(unfreezeWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -124,7 +124,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
   });
 
   await pipe(
-    await createDefaultTransaction(client, freezeAuthority.address),
+    await createDefaultTransaction(client, freezeAuthority),
     (tx) => appendTransactionInstruction(freezeWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -155,7 +155,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
   });
 
   const promise = pipe(
-    await createDefaultTransaction(client, updateAuthority.address),
+    await createDefaultTransaction(client, updateAuthority),
     (tx) => appendTransactionInstruction(editWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );

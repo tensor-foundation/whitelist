@@ -2,6 +2,7 @@ import { MerkleTree } from 'merkletreejs';
 import { keccak_256 } from '@noble/hashes/sha3';
 import { Address, getAddressEncoder } from '@solana/addresses';
 import { generateKeyPairSigner } from '@solana/signers';
+import { fromAddress } from '../src/index.js';
 
 /**
  * Describes the required data input for
@@ -74,11 +75,13 @@ export const generateTreeOfSize = async (
 
   const tree = getMerkleTree(leaves);
 
-  const proofs: { mint: Address; proof: Buffer[] }[] = targetMints.map(
+  const proofs: { mint: Address; proof: Uint8Array[] }[] = targetMints.map(
     (targetMint) => {
-      const leaf = keccak_256(Buffer.from(targetMint, 'base64'));
+      const leaf = keccak_256(fromAddress(targetMint));
       const proof = tree.getProof(Buffer.from(leaf)); // Convert Uint8Array to Buffer
-      const validProof: Buffer[] = proof.map((p) => p.data);
+      const validProof: Uint8Array[] = proof.map((p) =>
+        Uint8Array.from(p.data)
+      );
       return { mint: targetMint, proof: validProof };
     }
   );

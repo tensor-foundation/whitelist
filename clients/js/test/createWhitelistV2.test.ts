@@ -338,7 +338,7 @@ test('it throws when trying to create a whitelist v2 more than max length', asyn
   });
 
   const promise = pipe(
-    await createDefaultTransaction(client, updateAuthority.address),
+    await createDefaultTransaction(client, updateAuthority),
     (tx) => appendTransactionInstruction(createWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
