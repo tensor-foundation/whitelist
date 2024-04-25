@@ -64,11 +64,11 @@ importers:
         specifier: 2.0.0-preview.2
         version: 2.0.0-preview.2
       '@tensor-foundation/test-helpers':
-        specifier: 0.0.1-alpha.3
-        version: 0.0.1-alpha.3(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)
+        specifier: 0.0.2
+        version: 0.0.2(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)
       '@tensor-foundation/toolkit-token-metadata':
-        specifier: 0.0.1-alpha.3
-        version: 0.0.1-alpha.3(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)
+        specifier: 0.0.1
+        version: 0.0.1(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)
       '@types/node':
         specifier: ^20.11.26
         version: 20.12.7
@@ -1620,11 +1620,11 @@ packages:
     resolution: {integrity: sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==}
     engines: {node: '>=10'}
 
-  '@tensor-foundation/test-helpers@0.0.1-alpha.3':
-    resolution: {integrity: sha512-FEH2xjPS31fgNYBapk9QJ/qQfj84TiQJCZH9/OIWME4/SeuAEf28CZQTxyzs8OLViyvCke0sWFGqq7T6EmQRKA==}
+  '@tensor-foundation/test-helpers@0.0.2':
+    resolution: {integrity: sha512-iLIkIcAknFmLD0LPfO59HsPsO0FjglPLy16j2XD6LB4Akp6Ff5YxE3AJLUwmz0ct3qYxKvOyUaAaC/rM46zDQw==, tarball: https://npm.pkg.github.com/download/@tensor-foundation/test-helpers/0.0.2/feb5036985113625d2192948ecf0ca2328d64d9c}
 
-  '@tensor-foundation/toolkit-token-metadata@0.0.1-alpha.3':
-    resolution: {integrity: sha512-fqTwz+33oB2afV/1BW9CYI/xOR/X8bEiCIpscK4d/LCmYoMZ4f81f0HVI5pZ3brrcEUHxGys8amkp1idC+uhSQ==}
+  '@tensor-foundation/toolkit-token-metadata@0.0.1':
+    resolution: {integrity: sha512-kv0m7JW811RQujQFuIfRZ9snf/18p/vrmxPkey+taUOYOht+rgsdQTsZ/s0HDsRkwfcS1RGs+GhcIHb/NCkB9w==, tarball: https://npm.pkg.github.com/download/@tensor-foundation/toolkit-token-metadata/0.0.1/04659a7ed2db2cde694955a62bfc02f4e1fbc9ab}
 
   '@tootallnate/once@1.1.2':
     resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
@@ -6896,7 +6896,7 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tensor-foundation/test-helpers@0.0.1-alpha.3(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)':
+  '@tensor-foundation/test-helpers@0.0.2(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)':
     dependencies:
       '@solana/accounts': 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
       '@solana/addresses': 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
@@ -6909,7 +6909,7 @@ snapshots:
       - fastestsmallesttextencoderdecoder
       - ws
 
-  '@tensor-foundation/toolkit-token-metadata@0.0.1-alpha.3(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)':
+  '@tensor-foundation/toolkit-token-metadata@0.0.1(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)':
     dependencies:
       '@solana/accounts': 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
       '@solana/addresses': 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
@@ -6918,7 +6918,7 @@ snapshots:
       '@solana/programs': 2.0.0-preview.2
       '@solana/signers': 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
       '@solana/web3.js': 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)
-      '@tensor-foundation/test-helpers': 0.0.1-alpha.3(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)
+      '@tensor-foundation/test-helpers': 0.0.2(fastestsmallesttextencoderdecoder@1.0.22)(ws@7.5.9)
     transitivePeerDependencies:
       - fastestsmallesttextencoderdecoder
       - ws

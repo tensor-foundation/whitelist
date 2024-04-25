@@ -41,12 +41,7 @@ test('it can create a mint proof v2', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint, metadata, masterEdition } = await createDefaultNft(
-    client,
-    nftOwner,
-    nftOwner,
-    nftOwner
-  );
+  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
 
   // Setup a merkle tree with our mint as a leaf
   const {
@@ -58,13 +53,14 @@ test('it can create a mint proof v2', async (t) => {
     { mode: Mode.MerkleTree, value: intoAddress(root) },
   ];
 
-  const { whitelist, uuid } = await createWhitelist({
+  const { whitelist } = await createWhitelist({
     client,
     updateAuthority,
     freezeAuthority,
     conditions,
     namespace,
   });
+
   const { mintProof } = await createMintProof({
     client,
     payer: nftOwner,
@@ -92,22 +88,17 @@ test('invalid proof fails', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint, metadata, masterEdition } = await createDefaultNft(
-    client,
-    nftOwner,
-    nftOwner,
-    nftOwner
-  );
+  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
 
   // Setup a merkle tree with our mint as a leaf
-  const { root, proofs } = await generateTreeOfSize(10, [mint]);
+  const { root } = await generateTreeOfSize(10, [mint]);
 
   // Use the real root.
   const conditions: Condition[] = [
     { mode: Mode.MerkleTree, value: intoAddress(root) },
   ];
 
-  const { whitelist, uuid } = await createWhitelist({
+  const { whitelist } = await createWhitelist({
     client,
     updateAuthority,
     freezeAuthority,
@@ -139,22 +130,17 @@ test('too long proof fails', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint, metadata, masterEdition } = await createDefaultNft(
-    client,
-    nftOwner,
-    nftOwner,
-    nftOwner
-  );
+  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
 
   // Setup a merkle tree with our mint as a leaf
-  const { root, proofs } = await generateTreeOfSize(10, [mint]);
+  const { root } = await generateTreeOfSize(10, [mint]);
 
   // Use the real root.
   const conditions: Condition[] = [
     { mode: Mode.MerkleTree, value: intoAddress(root) },
   ];
 
-  const { whitelist, uuid } = await createWhitelist({
+  const { whitelist } = await createWhitelist({
     client,
     updateAuthority,
     freezeAuthority,
@@ -205,12 +191,7 @@ test('invalid condition fails', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint, metadata, masterEdition } = await createDefaultNft(
-    client,
-    nftOwner,
-    nftOwner,
-    nftOwner
-  );
+  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
 
   // Setup a merkle tree with our mint as a leaf
   const {
@@ -223,7 +204,7 @@ test('invalid condition fails', async (t) => {
     { mode: Mode.FVC, value: intoAddress(root) },
   ];
 
-  const { whitelist, uuid } = await createWhitelist({
+  const { whitelist } = await createWhitelist({
     client,
     updateAuthority,
     freezeAuthority,
