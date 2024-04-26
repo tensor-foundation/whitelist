@@ -10,16 +10,16 @@ importers:
     devDependencies:
       '@metaplex-foundation/amman':
         specifier: ^0.12.1
-        version: 0.12.1(bufferutil@4.0.8)(typescript@4.9.5)(utf-8-validate@5.0.10)
+        version: 0.12.1(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)
       '@metaplex-foundation/kinobi':
-        specifier: ^0.18.4
+        specifier: ^0.18.5
         version: 0.18.5(fastestsmallesttextencoderdecoder@1.0.22)
       '@metaplex-foundation/shank-js':
         specifier: ^0.1.0
         version: 0.1.7
       typescript:
-        specifier: ^4.9.4
-        version: 4.9.5
+        specifier: ^5.4.2
+        version: 5.4.5
 
 packages:
 
@@ -446,8 +446,8 @@ packages:
     engines: {node: '>=8'}
     hasBin: true
 
-  joi@17.12.3:
-    resolution: {integrity: sha512-2RRziagf555owrm9IRVtdKynOBeITiDpuZqIpgwqXShPncPKNiRQoiGsl/T8SQdq+8ugRzH2LqY67irr2y/d+g==}
+  joi@17.13.0:
+    resolution: {integrity: sha512-9qcrTyoBmFZRNHeVP4edKqIUEgFzq7MHvTNSDuHSqkpOPtiBkgNgcmTSqmiw1kw9tdKaiddvIDv/eCJDxmqWCA==}
 
   js-sha3@0.8.0:
     resolution: {integrity: sha512-gF1cRrHhIzNfToc802P800N8PpXS+evLLXfsVpowqmAFR9uwbi89WvXg2QspOmXL8QL86J4T1EpFu+yUkwJY3Q==}
@@ -701,9 +701,9 @@ packages:
   tweetnacl@1.0.3:
     resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
 
-  typescript@4.9.5:
-    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
-    engines: {node: '>=4.2.0'}
+  typescript@5.4.5:
+    resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==}
+    engines: {node: '>=14.17'}
     hasBin: true
 
   undici-types@5.26.5:
@@ -829,7 +829,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@metaplex-foundation/amman@0.12.1(bufferutil@4.0.8)(typescript@4.9.5)(utf-8-validate@5.0.10)':
+  '@metaplex-foundation/amman@0.12.1(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)':
     dependencies:
       '@metaplex-foundation/amman-client': 0.2.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@solana/spl-token': 0.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -846,7 +846,7 @@ snapshots:
       socket.io: 4.7.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       text-table: 0.2.0
       timeago.js: 4.0.2
-      ts-essentials: 9.4.2(typescript@4.9.5)
+      ts-essentials: 9.4.2(typescript@5.4.5)
       wait-on: 6.0.1(debug@4.3.4)
       yargs: 17.7.2
     transitivePeerDependencies:
@@ -1331,7 +1331,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  joi@17.12.3:
+  joi@17.13.0:
     dependencies:
       '@hapi/hoek': 9.3.0
       '@hapi/topo': 5.1.0
@@ -1571,15 +1571,15 @@ snapshots:
 
   tr46@0.0.3: {}
 
-  ts-essentials@9.4.2(typescript@4.9.5):
+  ts-essentials@9.4.2(typescript@5.4.5):
     optionalDependencies:
-      typescript: 4.9.5
+      typescript: 5.4.5
 
   tslib@2.6.2: {}
 
   tweetnacl@1.0.3: {}
 
-  typescript@4.9.5: {}
+  typescript@5.4.5: {}
 
   undici-types@5.26.5: {}
 
@@ -1595,7 +1595,7 @@ snapshots:
   wait-on@6.0.1(debug@4.3.4):
     dependencies:
       axios: 0.25.0(debug@4.3.4)
-      joi: 17.12.3
+      joi: 17.13.0
       lodash: 4.17.21
       minimist: 1.2.8
       rxjs: 7.8.1
@@ -1605,7 +1605,7 @@ snapshots:
   wait-on@7.0.1(debug@4.3.4):
     dependencies:
       axios: 0.27.2(debug@4.3.4)
-      joi: 17.12.3
+      joi: 17.13.0
       lodash: 4.17.21
       minimist: 1.2.8
       rxjs: 7.8.1
