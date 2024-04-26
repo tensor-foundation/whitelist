@@ -1,7 +1,6 @@
 name: Test JS client
 
-on:
-  workflow_call:
+on: [workflow_dispatch, workflow_call]
 
 env:
   CACHE: true
@@ -26,6 +25,11 @@ jobs:
           node: ${{ matrix.node }}
           solana: ${{ env.SOLANA_VERSION }}
           cache: ${{ env.CACHE }}
+
+      - name: Configure npm authentication
+        run: |
+          echo "@tensor-foundation:registry=https://npm.pkg.github.com" > ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> ~/.npmrc
 
       - name: Install dependencies
         uses: tensor-foundation/actions/install-node-dependencies@v1
@@ -57,6 +61,11 @@ jobs:
         with:
           version: ${{ env.NODE_VERSION }}
           cache: ${{ env.CACHE }}
+
+      - name: Configure npm authentication
+        run: |
+          echo "@tensor-foundation:registry=https://npm.pkg.github.com" > ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> ~/.npmrc
 
       - name: Install dependencies
         uses: tensor-foundation/actions/install-node-dependencies@v1

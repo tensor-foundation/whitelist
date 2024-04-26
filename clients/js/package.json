@@ -1,6 +1,6 @@
 {
   "name": "@tensor-foundation/whitelist",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.2",
   "description": "Verify your collection on-chain",
   "sideEffects": false,
   "module": "./dist/src/index.js",
@@ -29,8 +29,7 @@
     "format:fix": "prettier --write src test"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://npm.pkg.github.com"
   },
   "homepage": "https://github.com/tensor-foundation",
   "repository": "https://github.com/tensor-foundation/whitelist.git",
@@ -57,8 +56,8 @@
     "@noble/hashes": "^1.4.0",
     "@solana/eslint-config-solana": "^3.0.0",
     "@solana/webcrypto-ed25519-polyfill": "2.0.0-preview.2",
-    "@tensor-foundation/test-helpers": "0.0.1-alpha.3",
-    "@tensor-foundation/toolkit-token-metadata": "0.0.1-alpha.3",
+    "@tensor-foundation/test-helpers": "0.0.2",
+    "@tensor-foundation/toolkit-token-metadata": "0.0.1",
     "@types/node": "^20.11.26",
     "@types/uuid": "9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.3.1",
@@ -92,5 +91,5 @@
       }
     }
   },
-  "packageManager": "pnpm@9.0.5"
+  "packageManager": "pnpm@9.0.6"
 }
