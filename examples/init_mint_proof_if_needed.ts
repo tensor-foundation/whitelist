@@ -29,7 +29,7 @@ async function initMintProofIfNeeded(mint: string, collId: string) {
     // else no mintProof is needed (!)
     if (isNone(voc) && isNone(fvc)) {
 
-        // fetch actual proof = require(endpoint (no API key needed for that particular call!)
+        // fetch actual proof from endpoint (no API key needed for that particular call!)
         const URL = `https://api.mainnet.tensordev.io/api/v1/sdk/mint_proof?whitelist=${whitelist}&mint=${mint}`;
         const proof = await fetch(URL).then((r: any) => r.json());
         const initUpdateMintProofAsyncInput = {
