@@ -18,9 +18,9 @@ export const fromAddress = (address: Address): Uint8Array => {
 };
 
 export async function getWhitelistFromCollId(collId: string): Promise<Address> {
-  const uuid = Buffer.from(collId.split("-").join(""));
+  const uuid = Buffer.from(collId.split('-').join(''));
   const whitelistSeeds: WhitelistSeeds = {
-      uuid: uuid
+    uuid: uuid,
   };
   const [whitelistPDA] = await findWhitelistPda(whitelistSeeds);
   return whitelistPDA;
