@@ -22,6 +22,6 @@ export async function getWhitelistFromCollId(collId: string): Promise<Address> {
   const whitelistSeeds: WhitelistSeeds = {
     uuid: uuid,
   };
-  const [whitelistPDA] = await findWhitelistPda(whitelistSeeds);
-  return whitelistPDA;
+  const [whitelistPda] = await findWhitelistPda(whitelistSeeds);
+  return whitelistPda;
 }
