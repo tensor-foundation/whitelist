@@ -3,8 +3,15 @@ name = "whitelist-program"
 version = "0.0.0"
 edition = "2021"
 readme = "./README.md"
-license-file = "../../LICENSE"
+license-file = "../LICENSE"
 publish = false
+
+[package.metadata.solana]
+program-id = "TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW"
+program-dependencies = [
+    "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+]
 
 [lib]
 crate-type = ["cdylib", "lib"]
