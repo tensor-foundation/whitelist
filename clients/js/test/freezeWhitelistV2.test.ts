@@ -1,27 +1,26 @@
-import test from 'ava';
 import {
   SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  appendTransactionInstruction,
+  appendTransactionMessageInstruction,
   isSolanaError,
   pipe,
 } from '@solana/web3.js';
 import {
-  createDefaultTransaction,
-  signAndSendTransaction,
   createDefaultSolanaClient,
+  createDefaultTransaction,
   generateKeyPairSignerWithSol,
+  signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
+import test from 'ava';
 import {
   Mode,
   State,
-  WhitelistV2,
   fetchWhitelistV2,
-  getUpdateWhitelistV2Instruction,
   getFreezeWhitelistV2Instruction,
   getUnfreezeWhitelistV2Instruction,
+  getUpdateWhitelistV2Instruction,
   operation,
-} from '../src/index.js';
-import { createWhitelist } from './_common.js';
+} from '../src';
+import { createWhitelist } from './_common';
 
 test('it can freeze and unfreeze a whitelist v2', async (t) => {
   const client = createDefaultSolanaClient();
@@ -36,7 +35,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
   });
 
   // It was created correctly, and is unfrozen.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -54,11 +53,11 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
 
   await pipe(
     await createDefaultTransaction(client, freezeAuthority),
-    (tx) => appendTransactionInstruction(freezeWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(freezeWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -77,11 +76,11 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
 
   await pipe(
     await createDefaultTransaction(client, freezeAuthority),
-    (tx) => appendTransactionInstruction(unfreezeWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(unfreezeWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -107,7 +106,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
   });
 
   // It was created correctly, and is unfrozen.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -125,11 +124,11 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
 
   await pipe(
     await createDefaultTransaction(client, freezeAuthority),
-    (tx) => appendTransactionInstruction(freezeWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(freezeWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -156,7 +155,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
 
   const promise = pipe(
     await createDefaultTransaction(client, updateAuthority),
-    (tx) => appendTransactionInstruction(editWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(editWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 

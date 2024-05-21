@@ -27,7 +27,7 @@ kinobi.update(
     mintProof: {
       size: 28,
       seeds: [
-        k.constantPdaSeedNodeFromString("mint_proof"),
+        k.constantPdaSeedNodeFromString("utf8", "mint_proof"),
         k.variablePdaSeedNode(
           "mint",
           k.publicKeyTypeNode(),
@@ -43,7 +43,7 @@ kinobi.update(
     mintProofV2: {
       size: 945,
       seeds: [
-        k.constantPdaSeedNodeFromString("mint_proof"),
+        k.constantPdaSeedNodeFromString("utf8", "mint_proof"),
         k.variablePdaSeedNode(
           "mint",
           k.publicKeyTypeNode(),
@@ -61,7 +61,7 @@ kinobi.update(
       seeds: [
         k.variablePdaSeedNode(
           "uuid",
-          k.bytesTypeNode(k.fixedSizeNode(32)),
+          k.fixedSizeTypeNode(k.bytesTypeNode(), 32),
           "UUID of the whitelist"
         ),
       ],
@@ -69,7 +69,7 @@ kinobi.update(
     whitelistV2: {
       size: 239,
       seeds: [
-        k.constantPdaSeedNodeFromString("whitelist"),
+        k.constantPdaSeedNodeFromString("utf8", "whitelist"),
         k.variablePdaSeedNode(
           "namespace",
           k.publicKeyTypeNode(),
@@ -77,7 +77,7 @@ kinobi.update(
         ),
         k.variablePdaSeedNode(
           "uuid",
-          k.bytesTypeNode(k.fixedSizeNode(32)),
+          k.fixedSizeTypeNode(k.bytesTypeNode(), 32),
           "UUID of the whitelist"
         ),
       ],

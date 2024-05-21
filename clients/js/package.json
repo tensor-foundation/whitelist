@@ -35,21 +35,22 @@
   "repository": "https://github.com/tensor-foundation/whitelist.git",
   "author": "Tensor Protocol Foundation <maintainers@tensor.foundation>",
   "license": "Apache-2.0",
+  "dependencies": {
+    "@types/node": "^20.11.26"
+  },
   "peerDependencies": {
     "@solana/web3.js": "2.0.0-preview.3"
   },
   "devDependencies": {
     "@ava/typescript": "^4.1.0",
-    "@metaplex-foundation/mpl-token-metadata": "^3.2.1",
-    "@metaplex-foundation/umi": "^0.9.1",
-    "@metaplex-foundation/umi-bundle-defaults": "^0.9.1",
     "@noble/hashes": "^1.4.0",
     "@solana/eslint-config-solana": "^3.0.0",
-    "@solana/webcrypto-ed25519-polyfill": "2.0.0-preview.2",
-    "@tensor-foundation/test-helpers": "0.0.2",
-    "@tensor-foundation/toolkit-token-metadata": "0.0.1",
-    "@typescript-eslint/eslint-plugin": "^7.3.1",
-    "@typescript-eslint/parser": "^7.3.1",
+    "@solana/webcrypto-ed25519-polyfill": "2.0.0-preview.3",
+    "@tensor-foundation/mpl-token-metadata": "0.0.1",
+    "@tensor-foundation/test-helpers": "0.0.5",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@types/uuid": "^9.0.8",
     "ava": "^6.1.2",
     "eslint": "^8.57.0",
     "merkletreejs": "^0.3.11",
@@ -58,7 +59,9 @@
     "tsup": "^8.0.2",
     "typedoc": "^0.25.12",
     "typedoc-plugin-missing-exports": "^2.2.0",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.2",
+    "uuid": "^9.0.1",
+    "ws": "^8.14.0"
   },
   "ava": {
     "require": [
@@ -69,7 +72,8 @@
       "rewritePaths": {
         "test/": "dist/test/"
       }
-    }
+    },
+    "nodeArguments": ["--no-warnings"]
   },
   "packageManager": "pnpm@9.1.0"
 }
