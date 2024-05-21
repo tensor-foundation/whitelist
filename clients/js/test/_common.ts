@@ -1,8 +1,10 @@
 import { ExecutionContext } from 'ava';
 import { v4 } from 'uuid';
 import {
-  Address, address,
-  KeyPairSigner, generateKeyPairSigner,
+  Address,
+  address,
+  KeyPairSigner,
+  generateKeyPairSigner,
   none,
   SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   isSolanaError,
