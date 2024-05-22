@@ -64,6 +64,7 @@
     "ws": "^8.14.0"
   },
   "ava": {
+    "nodeArguments": ["--no-warnings"],
     "require": [
       "@solana/webcrypto-ed25519-polyfill"
     ],
@@ -72,8 +73,7 @@
       "rewritePaths": {
         "test/": "dist/test/"
       }
-    },
-    "nodeArguments": ["--no-warnings"]
+    }
   },
   "packageManager": "pnpm@9.1.0"
 }
