@@ -1,31 +1,30 @@
-import test from 'ava';
-import { generateKeyPairSigner } from '@solana/signers';
+import {
+  SOLANA_ERROR__JSON_RPC__INVALID_PARAMS,
+  appendTransactionMessageInstruction,
+  generateKeyPairSigner,
+  isSolanaError,
+  pipe,
+} from '@solana/web3.js';
 import {
   createDefaultSolanaClient,
   createDefaultTransaction,
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
+import test from 'ava';
 import {
   Condition,
   Mode,
-  WhitelistV2,
   fetchWhitelistV2,
   findWhitelistV2Pda,
   getCreateWhitelistV2Instruction,
-} from '../src/index.js';
+} from '../src';
 import {
   DEFAULT_PUBKEY,
   createWhitelist,
   createWhitelistThrows,
   generateUuid,
-} from './_common.js';
-import {
-  SOLANA_ERROR__JSON_RPC__INVALID_PARAMS,
-  appendTransactionInstruction,
-  isSolanaError,
-  pipe,
-} from '@solana/web3.js';
+} from './_common';
 
 const MAX_CONDITIONS = 24;
 
@@ -50,7 +49,7 @@ test('it can create a whitelist v2', async (t) => {
   });
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -81,7 +80,7 @@ test('creating a whitelist v2 with no freeze authority defaults to system pubkey
   });
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -133,7 +132,7 @@ test('it can create a whitelist v2 funded by a separate payer', async (t) => {
   });
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -198,7 +197,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
   ];
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -235,7 +234,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
   ];
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -264,7 +263,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
   }));
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -297,7 +296,7 @@ test('it can create a whitelist v2 of max length', async (t) => {
   });
 
   // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -339,7 +338,7 @@ test('it throws when trying to create a whitelist v2 more than max length', asyn
 
   const promise = pipe(
     await createDefaultTransaction(client, updateAuthority),
-    (tx) => appendTransactionInstruction(createWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(createWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 

@@ -1,26 +1,30 @@
-import test from 'ava';
-import { appendTransactionInstruction, pipe } from '@solana/web3.js';
-import { generateKeyPairSigner } from '@solana/signers';
-import { none } from '@solana/options';
 import {
-  createDefaultTransaction,
-  signAndSendTransaction,
+  appendTransactionMessageInstruction,
+  generateKeyPairSigner,
+  none,
+  pipe,
+} from '@solana/web3.js';
+import {
   createDefaultSolanaClient,
+  createDefaultTransaction,
   generateKeyPairSignerWithSol,
+  signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
+import test from 'ava';
 import {
   Condition,
   Mode,
-  WhitelistV2,
+  TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY,
+  TENSOR_WHITELIST_ERROR__TOO_MANY_MERKLE_PROOFS,
   fetchWhitelistV2,
   getUpdateWhitelistV2Instruction,
   operation,
-} from '../src/index.js';
+} from '../src';
 import {
   createWhitelist,
   getAccountDataLength,
   updateWhitelist,
-} from './_common.js';
+} from './_common';
 
 test('it can update a whitelist v2, reallocing to be larger', async (t) => {
   const client = createDefaultSolanaClient();
@@ -33,7 +37,7 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
     updateAuthority,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -64,11 +68,11 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
 
   await pipe(
     await createDefaultTransaction(client, updateAuthority),
-    (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -104,7 +108,7 @@ test('it can update a whitelist v2 reallocing to be smaller', async (t) => {
 
   const originalAccountSize = await getAccountDataLength(client, whitelist);
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -126,13 +130,13 @@ test('it can update a whitelist v2 reallocing to be smaller', async (t) => {
 
   await pipe(
     await createDefaultTransaction(client, updateAuthority),
-    (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
   const newAccountSize = await getAccountDataLength(client, whitelist);
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -155,7 +159,7 @@ test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
     updateAuthority,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -177,14 +181,22 @@ test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
     freezeAuthority: operation('Noop'),
   });
 
-  const promise = pipe(
-    await createDefaultTransaction(client, wrongAuthority),
-    (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
-    (tx) => signAndSendTransaction(client, tx)
-  );
-
-  // 0x177a - Error Number: 6010. Error Message: invalid authority.'
-  await t.throwsAsync(promise, { message: /0x177a/ });
+  try {
+    await pipe(
+      await createDefaultTransaction(client, wrongAuthority),
+      (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
+      (tx) => signAndSendTransaction(client, tx)
+    );
+    t.fail('Too many merkle proofs');
+  } catch (error) {
+    t.like(error, {
+      cause: {
+        context: {
+          code: TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY,
+        },
+      },
+    });
+  }
 });
 
 test('it can change the update authority of a whitelist v2', async (t) => {
@@ -197,7 +209,7 @@ test('it can change the update authority of a whitelist v2', async (t) => {
     updateAuthority,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -217,11 +229,11 @@ test('it can change the update authority of a whitelist v2', async (t) => {
 
   await pipe(
     await createDefaultTransaction(client, updateAuthority),
-    (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: newUpdateAuthority.address,
@@ -248,7 +260,7 @@ test('it cannot update a whitelist v2 with more than one merkle proof', async (t
     conditions,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -271,14 +283,22 @@ test('it cannot update a whitelist v2 with more than one merkle proof', async (t
     freezeAuthority: operation('Noop'),
   });
 
-  const promise = pipe(
-    await createDefaultTransaction(client, updateAuthority),
-    (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
-    (tx) => signAndSendTransaction(client, tx)
-  );
-
-  // 6015 - TooManyMerkleProofs
-  await t.throwsAsync(promise, { message: /0x177f/ });
+  try {
+    await pipe(
+      await createDefaultTransaction(client, updateAuthority),
+      (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
+      (tx) => signAndSendTransaction(client, tx)
+    );
+    t.fail('Too many merkle proofs');
+  } catch (error) {
+    t.like(error, {
+      cause: {
+        context: {
+          code: TENSOR_WHITELIST_ERROR__TOO_MANY_MERKLE_PROOFS,
+        },
+      },
+    });
+  }
 });
 
 test('it moves the merkle proof to the first index for a whitelist v2', async (t) => {
@@ -316,7 +336,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
     newConditions,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -349,7 +369,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
     newConditions,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
@@ -373,7 +393,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
     newConditions,
   });
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), <WhitelistV2>{
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,

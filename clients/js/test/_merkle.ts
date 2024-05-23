@@ -1,7 +1,10 @@
 import { MerkleTree } from 'merkletreejs';
 import { keccak_256 } from '@noble/hashes/sha3';
-import { Address, getAddressEncoder } from '@solana/addresses';
-import { generateKeyPairSigner } from '@solana/signers';
+import {
+  Address,
+  getAddressEncoder,
+  generateKeyPairSigner,
+} from '@solana/web3.js';
 import { fromAddress } from '../src/index.js';
 
 /**
@@ -65,7 +68,6 @@ export const generateTreeOfSize = async (
   const encoder = getAddressEncoder();
 
   const leaves = targetMints.map((mint) => encoder.encode(mint));
-
   const promises = Array(size).fill(generateKeyPairSigner());
   const signers = await Promise.all(promises);
   signers.map((signer) => {
@@ -73,11 +75,11 @@ export const generateTreeOfSize = async (
     return signer;
   });
 
-  const tree = getMerkleTree(leaves);
+  const tree = getMerkleTree(leaves as Uint8Array[]);
 
   const proofs: { mint: Address; proof: Uint8Array[] }[] = targetMints.map(
     (targetMint) => {
-      const leaf = keccak_256(fromAddress(targetMint));
+      const leaf = keccak_256(fromAddress(targetMint) as Uint8Array);
       const proof = tree.getProof(Buffer.from(leaf)); // Convert Uint8Array to Buffer
       const validProof: Uint8Array[] = proof.map((p) =>
         Uint8Array.from(p.data)

@@ -1,8 +1,9 @@
 import {
   Address,
+  ReadonlyUint8Array,
   getAddressDecoder,
   getAddressEncoder,
-} from '@solana/addresses';
+} from '@solana/web3.js';
 import { WhitelistSeeds, findWhitelistPda } from './generated';
 
 export type NumberData = number[] | Uint8Array | Buffer;
@@ -12,7 +13,7 @@ export const intoAddress = (data: NumberData): Address => {
   return decoder.decode(Uint8Array.from(data));
 };
 
-export const fromAddress = (address: Address): Uint8Array => {
+export const fromAddress = (address: Address): ReadonlyUint8Array => {
   const encoder = getAddressEncoder();
   return encoder.encode(address);
 };

@@ -1,12 +1,18 @@
-import test from 'ava';
-import { generateKeyPairSigner } from '@solana/signers';
+import {
+  SOLANA_ERROR__JSON_RPC__INVALID_PARAMS,
+  appendTransactionMessageInstruction,
+  generateKeyPairSigner,
+  isSolanaError,
+  pipe,
+} from '@solana/web3.js';
+import { createDefaultNft } from '@tensor-foundation/mpl-token-metadata';
 import {
   createDefaultSolanaClient,
   createDefaultTransaction,
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
-import { createDefaultNft } from '@tensor-foundation/toolkit-token-metadata';
+import test from 'ava';
 import {
   Condition,
   MintProofV2,
@@ -15,19 +21,13 @@ import {
   findMintProofV2Pda,
   getCreateMintProofV2Instruction,
   intoAddress,
-} from '../src/index.js';
+} from '../src';
 import {
   createMintProof,
   createMintProofThrows,
   createWhitelist,
-} from './_common.js';
-import { generateTreeOfSize } from './_merkle.js';
-import {
-  SOLANA_ERROR__JSON_RPC__INVALID_PARAMS,
-  appendTransactionInstruction,
-  isSolanaError,
-  pipe,
-} from '@solana/web3.js';
+} from './_common';
+import { generateTreeOfSize } from './_merkle';
 
 const MAX_PROOF_LENGTH = 28;
 
@@ -164,7 +164,7 @@ test('too long proof fails', async (t) => {
 
   const promise = pipe(
     await createDefaultTransaction(client, nftOwner),
-    (tx) => appendTransactionInstruction(createMintProofIx, tx),
+    (tx) => appendTransactionMessageInstruction(createMintProofIx, tx),
     (tx) => signAndSendTransaction(client, tx, { skipPreflight: true })
   );
 
@@ -193,7 +193,7 @@ test('invalid condition fails', async (t) => {
   // Mint NFT
   const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
 
-  // Setup a merkle tree with our mint as a leaf
+  // Setup a merkle tree with our mint as a leaf∏
   const {
     root,
     proofs: [p],

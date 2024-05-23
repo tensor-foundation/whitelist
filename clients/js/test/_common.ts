@@ -1,15 +1,16 @@
 import { ExecutionContext } from 'ava';
 import { v4 } from 'uuid';
-import { Address, address } from '@solana/addresses';
-import { KeyPairSigner, generateKeyPairSigner } from '@solana/signers';
-import { none } from '@solana/options';
 import {
+  Address,
+  address,
+  KeyPairSigner,
+  generateKeyPairSigner,
+  none,
   SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  appendTransactionInstruction,
   isSolanaError,
   pipe,
+  appendTransactionMessageInstruction,
 } from '@solana/web3.js';
-import { Buffer } from 'buffer';
 import {
   Client,
   createDefaultTransaction,
@@ -87,7 +88,7 @@ export async function createWhitelist({
 
   await pipe(
     await createDefaultTransaction(client, payer),
-    (tx) => appendTransactionInstruction(createWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(createWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
@@ -124,7 +125,7 @@ export async function createWhitelistThrows({
 
   const promise = pipe(
     await createDefaultTransaction(client, payer),
-    (tx) => appendTransactionInstruction(createWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(createWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
@@ -177,7 +178,7 @@ export async function updateWhitelist({
 
   await pipe(
     await createDefaultTransaction(client, payer),
-    (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 }
@@ -204,7 +205,7 @@ export async function updateWhitelistThrows({
 
   const promise = pipe(
     await createDefaultTransaction(client, payer),
-    (tx) => appendTransactionInstruction(updateWhitelistIx, tx),
+    (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
@@ -277,7 +278,7 @@ export async function createMintProof({
 
   await pipe(
     await createDefaultTransaction(client, payer),
-    (tx) => appendTransactionInstruction(createMintProofIx, tx),
+    (tx) => appendTransactionMessageInstruction(createMintProofIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
@@ -305,7 +306,7 @@ export async function createMintProofThrows({
 
   const promise = pipe(
     await createDefaultTransaction(client, payer),
-    (tx) => appendTransactionInstruction(createMintProofIx, tx),
+    (tx) => appendTransactionMessageInstruction(createMintProofIx, tx),
     (tx) => signAndSendTransaction(client, tx, { skipPreflight: true })
   );
 
