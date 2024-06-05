@@ -39,7 +39,11 @@ pub const TOKEN_PROGRAM_ID: Pubkey = pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9S
 
 pub async fn program_context() -> ProgramTestContext {
     let mut program_test = ProgramTest::new("whitelist_program", tensor_whitelist::ID, None);
-    program_test.add_program("mpl_token_metadata", mpl_token_metadata::ID, None);
+    program_test.add_program(
+        &mpl_token_metadata::ID.to_string(),
+        mpl_token_metadata::ID,
+        None,
+    );
     program_test.start_with_context().await
 }
 

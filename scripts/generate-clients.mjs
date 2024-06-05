@@ -8,7 +8,7 @@ import { getAllProgramIdls } from "./utils.mjs";
 
 // Instanciate Kinobi.
 const [idl, ...additionalIdls] = getAllProgramIdls().map((idl) =>
-  rootNodeFromAnchor(require(idl))
+  rootNodeFromAnchor(require(idl)),
 );
 const kinobi = k.createFromRoot(idl, additionalIdls);
 
@@ -18,7 +18,7 @@ kinobi.update(
     whitelistProgram: {
       name: "tensorWhitelist",
     },
-  })
+  }),
 );
 
 // Update accounts.
@@ -31,12 +31,12 @@ kinobi.update(
         k.variablePdaSeedNode(
           "mint",
           k.publicKeyTypeNode(),
-          "The address of the mint account"
+          "The address of the mint account",
         ),
         k.variablePdaSeedNode(
           "whitelist",
           k.publicKeyTypeNode(),
-          "The address of the whitelist pda"
+          "The address of the whitelist pda",
         ),
       ],
     },
@@ -47,12 +47,12 @@ kinobi.update(
         k.variablePdaSeedNode(
           "mint",
           k.publicKeyTypeNode(),
-          "The address of the mint account"
+          "The address of the mint account",
         ),
         k.variablePdaSeedNode(
           "whitelist",
           k.publicKeyTypeNode(),
-          "The address of the whitelist pda"
+          "The address of the whitelist pda",
         ),
       ],
     },
@@ -62,7 +62,7 @@ kinobi.update(
         k.variablePdaSeedNode(
           "uuid",
           k.fixedSizeTypeNode(k.bytesTypeNode(), 32),
-          "UUID of the whitelist"
+          "UUID of the whitelist",
         ),
       ],
     },
@@ -73,12 +73,12 @@ kinobi.update(
         k.variablePdaSeedNode(
           "namespace",
           k.publicKeyTypeNode(),
-          "The namespace address"
+          "The namespace address",
         ),
         k.variablePdaSeedNode(
           "uuid",
           k.fixedSizeTypeNode(k.bytesTypeNode(), 32),
-          "UUID of the whitelist"
+          "UUID of the whitelist",
         ),
       ],
     },
@@ -86,7 +86,7 @@ kinobi.update(
       size: 137,
       seeds: [],
     },
-  })
+  }),
 );
 
 // Set default values for instruction accounts.
@@ -106,7 +106,7 @@ kinobi.update(
       account: "whitelistAuthority",
       defaultValue: k.pdaValueNode("authority"),
     },
-  ])
+  ]),
 );
 
 // Render JavaScript.
@@ -114,7 +114,7 @@ const jsClient = path.join(__dirname, "..", "clients", "js");
 kinobi.accept(
   renderJavaScriptVisitor(path.join(jsClient, "src", "generated"), {
     prettier: require(path.join(jsClient, ".prettierrc.json")),
-  })
+  }),
 );
 
 // Render Rust.
@@ -123,5 +123,5 @@ kinobi.accept(
   renderRustVisitor(path.join(rustClient, "src", "generated"), {
     formatCode: true,
     crateFolder: rustClient,
-  })
+  }),
 );

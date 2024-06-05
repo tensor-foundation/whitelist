@@ -17,6 +17,7 @@ use crate::{
 pub const WHITELIST_SIZE: usize = 8 + 1 + 1 + 1 + (32 * 3) + 1 + (33 * 2) + 64;
 
 #[account]
+#[derive(Debug, Eq, PartialEq)]
 pub struct Whitelist {
     pub version: u8,
     pub bump: u8,
