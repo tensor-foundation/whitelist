@@ -1,3 +1,4 @@
+import test from 'ava';
 import {
   appendTransactionMessageInstruction,
   generateKeyPairSigner,
@@ -10,7 +11,6 @@ import {
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
-import test from 'ava';
 import {
   Condition,
   Mode,

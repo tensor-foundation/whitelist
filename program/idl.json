@@ -895,13 +895,13 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "VOC"
-          },
-          {
             "name": "FVC"
           },
           {
             "name": "MerkleTree"
+          },
+          {
+            "name": "VOC"
           }
         ]
       }

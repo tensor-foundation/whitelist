@@ -24,6 +24,7 @@ pub const WHITELIST_V2_CONDITIONS_LENGTH: usize = 24;
 
 /// Seeds: ["whitelist", <namespace>, <uuid>]
 #[account]
+#[derive(Debug, Default, Eq, PartialEq)]
 pub struct WhitelistV2 {
     pub version: u8,
     pub bump: u8,
@@ -111,13 +112,14 @@ impl WhitelistV2 {
 }
 
 #[repr(u8)]
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, Eq, PartialEq)]
 pub enum State {
+    #[default]
     Unfrozen,
     Frozen,
 }
 
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, Eq, PartialEq)]
 pub struct Condition {
     pub mode: Mode,
     pub value: Pubkey,
@@ -172,9 +174,10 @@ impl Condition {
 }
 
 #[repr(u8)]
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, Eq, PartialEq)]
 pub enum Mode {
-    VOC,
+    #[default]
     FVC,
     MerkleTree,
+    VOC,
 }

@@ -21,12 +21,14 @@ use vipers::throw_err;
 
 use crate::error::ErrorCode;
 
-/// Constant for zero array.
+// Constant for zero array.
 pub const ZERO_ARRAY: [u8; 32] = [0; 32];
 
 /// Borsh prefix size for a vector.
 pub const VEC_LENGTH: usize = 4;
 
+/// Decode a whitelist account.
+// Upgrade to V2 after migration.
 #[inline(never)]
 pub fn assert_decode_whitelist(whitelist_info: &AccountInfo) -> Result<Whitelist> {
     let mut data: &[u8] = &whitelist_info.try_borrow_data()?;
