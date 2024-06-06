@@ -61,6 +61,9 @@ pub enum TensorWhitelistError {
     /// 6016 - whitelist is frozen
     #[error("whitelist is frozen")]
     WhitelistIsFrozen = 0x1780,
+    /// 6017 - bad mint proof
+    #[error("bad mint proof")]
+    BadMintProof = 0x1781,
 }
 
 impl solana_program::program_error::PrintProgramError for TensorWhitelistError {

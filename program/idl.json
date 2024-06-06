@@ -905,6 +905,54 @@
           }
         ]
       }
+    },
+    {
+      "name": "WhitelistType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "V1",
+            "fields": [
+              {
+                "defined": "Whitelist"
+              }
+            ]
+          },
+          {
+            "name": "V2",
+            "fields": [
+              {
+                "defined": "WhitelistV2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintProofType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "V1",
+            "fields": [
+              {
+                "defined": "MintProof"
+              }
+            ]
+          },
+          {
+            "name": "V2",
+            "fields": [
+              {
+                "defined": "MintProofV2"
+              }
+            ]
+          }
+        ]
+      }
     }
   ],
   "errors": [
@@ -992,6 +1040,11 @@
       "code": 6016,
       "name": "WhitelistIsFrozen",
       "msg": "whitelist is frozen"
+    },
+    {
+      "code": 6017,
+      "name": "BadMintProof",
+      "msg": "bad mint proof"
     }
   ],
   "metadata": {

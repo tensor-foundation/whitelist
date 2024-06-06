@@ -15,6 +15,7 @@ pub const MINT_PROOF_V2_SIZE: usize =
 
 /// Seeds: ["mint_proof", mint, whitelist]
 #[account]
+#[derive(Debug, Default, Eq, PartialEq)]
 pub struct MintProofV2 {
     // Length of proof (w/o padding).
     pub proof_len: u8,
