@@ -17,7 +17,6 @@ pub use mint_proof_v2::*;
 pub use whitelist_v2::*;
 
 use anchor_lang::{prelude::*, AccountDeserialize};
-use solana_program::{account_info::AccountInfo, pubkey::Pubkey};
 use vipers::throw_err;
 
 use crate::error::ErrorCode;
@@ -184,7 +183,7 @@ pub fn assert_decode_mint_proof_generic(
     }
     // Check program owner (redundant because of find_program_address above, but why not).
     if *mint_proof.owner != crate::ID {
-        throw_err!(ErrorCode::BadMintProof);
+        return Err(ProgramError::InvalidAccountOwner.into());
     }
 
     let mut data: &[u8] = &mint_proof.try_borrow_data()?;
