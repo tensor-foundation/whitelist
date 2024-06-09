@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "@tensor-foundation/whitelist": "file:../clients/js",
-    "ts-node": "^10.9.2"
+    "@tensor-foundation/common-helpers": "0.0.1",
+    "@solana/web3.js": "2.0.0-preview.3",
+    "tsx": "^4.11.0"
   }
 }

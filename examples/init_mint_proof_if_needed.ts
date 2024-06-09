@@ -1,83 +1,167 @@
-const {
-  createTransaction,
-  setTransactionFeePayer,
-  appendTransactionInstruction,
-  getBase64EncodedWireTransaction,
-  setTransactionLifetimeUsingBlockhash,
-} = require("@solana/transactions");
-const { address, getAddressEncoder } = require("@solana/addresses");
-const { createSolanaRpc } = require("@solana/rpc");
-const { createKeyPairSignerFromBytes } = require("@solana/signers");
-const { isNone } = require("@solana/options");
-const {
+import {
+  createKeyPairSignerFromBytes,
+  address,
+  Address,
+  KeyPairSigner,
+  fetchEncodedAccount,
+  getAddressEncoder,
+  getAddressDecoder,
+  assertAccountExists,
+  IInstruction,
+  ReadonlyUint8Array
+} from "@solana/web3.js";
+import {
   fetchWhitelist,
-  getWhitelistFromCollId,
-  getInitUpdateMintProofInstructionAsync,
-} = require("@tensor-foundation/whitelist");
-const { pipe } = require("@solana/functional");
+  fetchWhitelistV2,
+  CloseMintProofV2Input,
+  identifyTensorWhitelistAccount,
+  Whitelist,
+  TensorWhitelistAccount,
+  Mode,
+  WhitelistV2,
+  Condition,
+  fetchMaybeMintProofFromSeeds,
+  fetchMaybeMintProofV2FromSeeds,
+  CreateMintProofV2AsyncInput,
+  getCreateMintProofV2InstructionAsync,
+  InitUpdateMintProofAsyncInput,
+  getCloseMintProofV2Instruction,
+  getInitUpdateMintProofInstructionAsync
+} from "@tensor-foundation/whitelist";
+import { keypairBytes, rpc } from "./common";
+import { simulateTxWithIxs } from "@tensor-foundation/common-helpers";
 
-async function initMintProofIfNeeded(mint: string, collId: string) {
-  // First 32 bytes == private key
-  // Last 32 bytes == public key
-  // If you want to actually sign + send tx, you need to prepend your private key bytes instead of 32 zero-bytes.
-  // For simulations, having only the publickey part is sufficient! You can leave the first 32 bytes as zero-bytes since nothing needs to get signed.
-  const keypairBytes = new Uint8Array([
-    ...new Uint8Array(32).map(() => 0),
-    ...getAddressEncoder().encode(
-      address("2VQA3FT8tWRPgiwVPh2oKm1JTA44ocGspKn8yRZRvXiS"),
-    ),
-  ]);
-  const keypairSigner = await createKeyPairSignerFromBytes(
+// upserts the off-chain merkle proof to the mintProof/mintProofV2 account
+// if needed (if the collection is verified via a custom mint list)
+// This only has to be done once per mint assuming the mint list 
+// of the corresponding collection does not change!
+async function initMintProofIfNeeded(mint: string, whitelist: string) {
+  const keypairSigner: KeyPairSigner = await createKeyPairSignerFromBytes(
     Buffer.from(keypairBytes),
     false,
   );
 
-  const whitelist = await getWhitelistFromCollId(collId);
+  // fetch whitelist account data to check whether it's a Whitelist or a WhitelistV2
+  const maybeWhitelistAccount = await fetchEncodedAccount(rpc, address(whitelist));
+  assertAccountExists(maybeWhitelistAccount);
+  const whitelistAccountType = identifyTensorWhitelistAccount(maybeWhitelistAccount.data);
 
-  // fetch whitelist account data
-  const rpc = createSolanaRpc("https://api.mainnet-beta.solana.com/");
-  const whitelistAccountData = await fetchWhitelist(rpc, whitelist);
-  // voc == Verified On-chain Collection
-  const voc = whitelistAccountData.data.voc;
-  // fvc == First Verified Creator
-  const fvc = whitelistAccountData.data.fvc;
+  // check if Whitelist/WhitelistV2 account has a non-zero merkle tree root hash
+  // which indicates that one possible way of verifying would be to 
+  // have a valid merkle proof in the MintProof/MintProofV2 account
+  var hasNonZeroRootHash: boolean;
 
-  // if voc and fvc are both null, fetch mint proof and simulate/send tx
-  // else no mintProof is needed (!)
-  if (isNone(voc) && isNone(fvc)) {
+  // whitelist account is of type Whitelist 
+  if (whitelistAccountType === TensorWhitelistAccount.Whitelist) {
+    const whitelistData: Whitelist = await fetchWhitelist(rpc, address(whitelist)).then(whitelistResponse => whitelistResponse.data);
+    const rootHash = whitelistData.rootHash;
+    hasNonZeroRootHash = !rootHash.every(value => value === 0);
+  }
+
+  // whitelist account is of type WhitelistV2
+  else if (whitelistAccountType == TensorWhitelistAccount.WhitelistV2) {
+    const whitelistV2Data: WhitelistV2 = await fetchWhitelistV2(rpc, address(whitelist)).then(whitelistV2Response => whitelistV2Response.data);
+    const conditions: Condition[] = whitelistV2Data.conditions;
+    // if the WhitelistAccountV2 account has a root hash, it's enforced to be the first item
+    // of the conditions array => if present, check if non-zero
+    const firstConditionValueBytes = getAddressEncoder().encode(conditions[0].value);
+    hasNonZeroRootHash = conditions[0].mode === Mode.MerkleTree && !firstConditionValueBytes.every(value => value === 0);
+  }
+  else {
+    throw new Error(`Whitelist argument ${whitelist} is neither of type Whitelist nor of type WhitelistV2`);
+  }
+
+  // if there is a non-zero rootHash as part of the whitelist account, 
+  // check first if mintProof is already initialized and matches 
+  // the proof. If not => fetch mint proof and initialize/update mint proof account
+  if (hasNonZeroRootHash) {
     // fetch actual proof from endpoint (no API key needed for that particular call!)
     const URL = `https://api.mainnet.tensordev.io/api/v1/sdk/mint_proof?whitelist=${whitelist}&mint=${mint}`;
-    const proof = await fetch(URL).then((r: any) => r.json());
-    const initUpdateMintProofAsyncInput = {
-      whitelist: whitelist,
-      mint: address(mint),
-      user: keypairSigner,
-      proof: proof,
-    };
-    const mintProofInstruction = await getInitUpdateMintProofInstructionAsync(
-      initUpdateMintProofAsyncInput,
-    );
+    const proofResponse = await fetch(URL);
+    if (!proofResponse.ok) {
+      console.log(`Mint ${mint} is not verified for Merkle Tree of Whitelist ${whitelist}, it might be verified via other condition fields though.`);
+      console.log(`If that's the case, there is no need for a valid mint proof!`);
+      return;
+    }
+    const proofArray: number[][] = await proofResponse.json();
+    const proof: Uint8Array[] = proofArray.map(proof => new Uint8Array(proof));
 
-    // TODO: will get outsourced to toolkit
-    const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
-    const simPipe = pipe(
-      createTransaction({ version: 0 }),
-      (tx: any) => appendTransactionInstruction(mintProofInstruction, tx),
-      (tx: any) => setTransactionFeePayer(keypairSigner.address, tx),
-      (tx: any) => setTransactionLifetimeUsingBlockhash(latestBlockhash, tx),
-      (tx: any) => getBase64EncodedWireTransaction(tx),
-    );
-    const simulationResponse = await rpc
-      .simulateTransaction(simPipe, {
-        encoding: "base64",
-        sigVerify: false,
-        replaceRecentBlockhash: true,
-      })
-      .send();
-    console.log(simulationResponse);
+    var upsertMintProofInstructions: IInstruction[] = [];
+
+    // if whitelist is of type Whitelist, check if mintProof account exists with valid proof
+    // by converting each proof into an Address and checking if the fetched mintProof
+    // contains every one of these proofs
+    if (whitelistAccountType === TensorWhitelistAccount.Whitelist) {
+      const mintProof = await fetchMaybeMintProofFromSeeds(rpc, {
+        mint: address(mint),
+        whitelist: address(whitelist)
+      });
+      if (mintProof.exists) {
+        const proofAddresses: Address[]= proof.map((proofArray: Uint8Array) => getAddressDecoder().decode(proofArray));
+        const fetchedProofAddresses: Address[] = mintProof.data.proof.map((proofBytes: ReadonlyUint8Array) => getAddressDecoder().decode(proofBytes));
+        const onchainProofValid = proofAddresses.every((proofAddress: Address)=> fetchedProofAddresses.includes(proofAddress));
+        if(onchainProofValid){
+          console.log("On-chain mint proof is already up-to-date!");
+          return;
+        }
+      }
+      // if either the mintProof account doesn't exist or if it contains an
+      // invalid proof, construct initialization/update instruction
+      const initUpdateMintProofAsyncInput: InitUpdateMintProofAsyncInput = {
+        whitelist: address(whitelist),
+        mint: address(mint),
+        user: keypairSigner,
+        proof: proof,
+      };
+      const mintProofInstruction = await getInitUpdateMintProofInstructionAsync(
+        initUpdateMintProofAsyncInput,
+      );
+      upsertMintProofInstructions.push(mintProofInstruction);
+    }
+
+    // if whitelist is of type WhitelistV2, check if mintProofV2 account exists with valid proof 
+    // similar to how mintProof's validity got checked above
+    else if (whitelistAccountType === TensorWhitelistAccount.WhitelistV2) {
+      const mintProofV2 = await fetchMaybeMintProofV2FromSeeds(rpc, {
+        mint: address(mint),
+        whitelist: address(whitelist)
+      });
+      if (mintProofV2.exists) {
+        const proofAddresses: Address[]= proof.map((proofArray: Uint8Array) => getAddressDecoder().decode(proofArray));
+        const fetchedProofAddresses: Address[] = mintProofV2.data.proof.map((proofBytes: ReadonlyUint8Array) => getAddressDecoder().decode(proofBytes));
+        const onchainProofValid = proofAddresses.every((proofAddress: Address)=> fetchedProofAddresses.includes(proofAddress));
+        if(onchainProofValid){
+          console.log("On-chain mint proof is already up-to-date!");
+          return;
+        }
+      }
+      // construct instruction to close mintProofV2 account (if given)
+      if (mintProofV2.exists) {
+        const closeMintProofV2Input: CloseMintProofV2Input = {
+          payer: mintProofV2.data.payer,
+          signer: keypairSigner,
+          mintProof: mintProofV2.address,
+        };
+        const closeProofIx = getCloseMintProofV2Instruction(closeMintProofV2Input);
+        upsertMintProofInstructions.push(closeProofIx);
+      }
+      // create new mintProofV2 account with correct proof
+      const createMintProofV2AsyncInput: CreateMintProofV2AsyncInput = {
+        payer: keypairSigner,
+        mint: address(mint),
+        whitelist: address(whitelist),
+        proof: proof,
+      };
+      const createProofIx = await getCreateMintProofV2InstructionAsync(createMintProofV2AsyncInput);
+      upsertMintProofInstructions.push(createProofIx);
+    }
+
+    // construct and simulate a transaction containing either close+create 
+    // instructions or just the create/initUpdate instruction
+    await simulateTxWithIxs(rpc, upsertMintProofInstructions, keypairSigner);
   }
 }
 initMintProofIfNeeded(
-  "AWdYtzjDCSjEohVFjmU7djbPdcnKd55NmU6kp1tZHFb5",
-  "5866e4e4-3dca-4649-ad3f-710bbd15af66",
+  "2CNP3MVmCj5FEFja676PkvS8Rm7ZVCxdsPWkLgqHb87e",
+  "ExGjYcjK1GNtQ5WnN3gy22132s6WMzrgFUHDNi6sT6nL",
 );
