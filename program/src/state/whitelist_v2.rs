@@ -177,7 +177,7 @@ impl Condition {
 #[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, Eq, PartialEq)]
 pub enum Mode {
     #[default]
-    FVC,
     MerkleTree,
     VOC,
+    FVC,
 }

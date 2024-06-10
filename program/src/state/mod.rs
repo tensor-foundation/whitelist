@@ -183,7 +183,7 @@ pub fn assert_decode_mint_proof_generic(
     }
     // Check program owner (redundant because of find_program_address above, but why not).
     if *mint_proof.owner != crate::ID {
-        return Err(ProgramError::InvalidAccountOwner.into());
+        return Err(ErrorCode::BadMintProof.into());
     }
 
     let mut data: &[u8] = &mint_proof.try_borrow_data()?;

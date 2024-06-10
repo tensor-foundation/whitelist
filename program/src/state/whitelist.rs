@@ -52,7 +52,7 @@ impl Default for Whitelist {
 
 impl Whitelist {
     /// Passed in verification method has to match the verification method stored on the whitelist
-    /// Passing neither of the 3 will result in failure
+    /// Passing none of the 3 will result in failure
     pub fn verify_whitelist(
         &self,
         // It is the job of upstream caller to verify that Metadata account passed in is actually correct
