@@ -31,7 +31,7 @@ export async function findMintProofV2Pda(
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [
-      getUtf8Encoder().encode('mint_proof'),
+      getUtf8Encoder().encode('mint_proof_v2'),
       getAddressEncoder().encode(seeds.mint),
       getAddressEncoder().encode(seeds.whitelist),
     ],

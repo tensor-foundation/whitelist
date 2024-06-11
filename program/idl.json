@@ -419,7 +419,7 @@
       ]
     },
     {
-      "name": "createMintProofV2",
+      "name": "initUpdateMintProofV2",
       "accounts": [
         {
           "name": "payer",
@@ -560,7 +560,7 @@
     {
       "name": "MintProofV2",
       "docs": [
-        "Seeds: [\"mint_proof\", mint, whitelist]"
+        "Seeds: [\"mint_proof_v2\", mint, whitelist]"
       ],
       "type": {
         "kind": "struct",

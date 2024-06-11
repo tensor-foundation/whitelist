@@ -43,7 +43,7 @@ kinobi.update(
     mintProofV2: {
       size: 945,
       seeds: [
-        k.constantPdaSeedNodeFromString("utf8", "mint_proof"),
+        k.constantPdaSeedNodeFromString("utf8", "mint_proof_v2"),
         k.variablePdaSeedNode(
           "mint",
           k.publicKeyTypeNode(),

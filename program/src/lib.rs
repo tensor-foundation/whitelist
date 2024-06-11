@@ -91,11 +91,11 @@ pub mod whitelist_program {
         process_update_whitelist_v2(ctx, args)
     }
 
-    pub fn create_mint_proof_v2(
-        ctx: Context<CreateMintProofV2>,
+    pub fn init_update_mint_proof_v2(
+        ctx: Context<InitUpdateMintProofV2>,
         proof: Vec<[u8; 32]>,
     ) -> Result<()> {
-        process_create_mint_proof_v2(ctx, proof)
+        process_init_update_mint_proof_v2(ctx, proof)
     }
 
     pub fn close_mint_proof_v2(ctx: Context<CloseMintProofV2>) -> Result<()> {

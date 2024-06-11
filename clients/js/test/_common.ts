@@ -22,7 +22,7 @@ import {
   Operation,
   findMintProofV2Pda,
   findWhitelistV2Pda,
-  getCreateMintProofV2Instruction,
+  getInitUpdateMintProofV2InstructionAsync,
   getCreateWhitelistV2Instruction,
   getUpdateWhitelistV2Instruction,
   operation,
@@ -242,7 +242,7 @@ export async function getAccountDataLength(
   return originalAccountSize;
 }
 
-export interface CreateMintProofParams {
+export interface initUpdateMintProofV2Params {
   client: Client;
   payer: KeyPairSigner;
   mint: Address;
@@ -250,25 +250,26 @@ export interface CreateMintProofParams {
   proof: Uint8Array[];
 }
 
-export interface CreateMintProofThrowsParams extends CreateMintProofParams {
+export interface initUpdateMintProofV2ThrowsParams
+  extends initUpdateMintProofV2Params {
   t: ExecutionContext;
   code: BigInt;
 }
 
-export interface CreateMintProofReturns {
+export interface initUpdateMintProofV2Returns {
   mintProof: Address;
 }
 
-export async function createMintProof({
+export async function upsertMintProof({
   client,
   payer,
   mint,
   whitelist,
   proof,
-}: CreateMintProofParams): Promise<CreateMintProofReturns> {
+}: initUpdateMintProofV2Params): Promise<initUpdateMintProofV2Returns> {
   const [mintProof] = await findMintProofV2Pda({ mint, whitelist });
 
-  const createMintProofIx = getCreateMintProofV2Instruction({
+  const createMintProofIx = await getInitUpdateMintProofV2InstructionAsync({
     payer,
     mint,
     mintProof,
@@ -293,10 +294,10 @@ export async function createMintProofThrows({
   proof,
   t,
   code,
-}: CreateMintProofThrowsParams) {
+}: initUpdateMintProofV2ThrowsParams) {
   const [mintProof] = await findMintProofV2Pda({ mint, whitelist });
 
-  const createMintProofIx = getCreateMintProofV2Instruction({
+  const createMintProofIx = await getInitUpdateMintProofV2InstructionAsync({
     payer,
     mint,
     mintProof,

@@ -13,7 +13,7 @@ pub const MINT_PROOF_V2_SIZE: usize =
     + 32                    // authority
 ;
 
-/// Seeds: ["mint_proof", mint, whitelist]
+/// Seeds: ["mint_proof_v2", mint, whitelist]
 #[account]
 #[derive(Debug, Default, Eq, PartialEq)]
 pub struct MintProofV2 {
