@@ -37,6 +37,8 @@ pub struct WhitelistV2 {
 }
 
 impl WhitelistV2 {
+    pub const PREFIX: &'static [u8] = b"whitelist";
+
     pub const BASE_SIZE: usize = WHITELIST_V2_BASE_SIZE;
     // 33 bytes for Mode + Pubkey
     pub const CONDITION_SIZE: usize = std::mem::size_of::<u8>() + std::mem::size_of::<Pubkey>();

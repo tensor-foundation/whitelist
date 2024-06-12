@@ -18,3 +18,7 @@ pub struct MintProof {
     pub proof_len: u8,
     pub proof: [[u8; 32]; MAX_PROOF_LEN],
 }
+
+impl MintProof {
+    pub const PREFIX: &'static [u8] = b"mint_proof";
+}

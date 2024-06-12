@@ -3,7 +3,6 @@ mod full_merkle_proof;
 mod mint_proof;
 mod whitelist;
 
-use anchor_spl::token_interface::Mint;
 pub use authority::*;
 pub use full_merkle_proof::*;
 pub use mint_proof::*;
@@ -43,14 +42,45 @@ const MINT_PROOF_V2_DISCRIMINATOR: [u8; 8] = [22, 197, 150, 178, 249, 225, 183, 
 // Upgrade to V2 after migration.
 #[inline(never)]
 pub fn assert_decode_whitelist(whitelist_info: &AccountInfo) -> Result<Whitelist> {
+    // Deserialize.
     let mut data: &[u8] = &whitelist_info.try_borrow_data()?;
     let whitelist: Whitelist = AccountDeserialize::try_deserialize(&mut data)?;
 
+    // PDA check.
     let (key, _) = Pubkey::find_program_address(&[&whitelist.uuid], &crate::ID);
     if key != *whitelist_info.key {
         throw_err!(ErrorCode::BadWhitelist);
     }
-    // Check account owner (redundant because of find_program_address above, but why not).
+
+    // Program owner check.
+    if *whitelist_info.owner != crate::ID {
+        throw_err!(ErrorCode::BadWhitelist);
+    }
+
+    Ok(whitelist)
+}
+
+/// Decode a whitelist_v2 account.
+#[inline(never)]
+pub fn assert_decode_whitelist_v2(whitelist_info: &AccountInfo) -> Result<WhitelistV2> {
+    // Deserialize.
+    let mut data: &[u8] = &whitelist_info.try_borrow_data()?;
+    let whitelist: WhitelistV2 = AccountDeserialize::try_deserialize(&mut data)?;
+
+    // PDA check.
+    let (key, _) = Pubkey::find_program_address(
+        &[
+            WhitelistV2::PREFIX,
+            whitelist.namespace.as_ref(),
+            &whitelist.uuid,
+        ],
+        &crate::ID,
+    );
+    if key != *whitelist_info.key {
+        return Err(ErrorCode::BadWhitelist.into());
+    }
+
+    // Program owner check.
     if *whitelist_info.owner != crate::ID {
         throw_err!(ErrorCode::BadWhitelist);
     }
@@ -66,141 +96,108 @@ pub enum WhitelistType {
 /// Temporary function to decode both whitelist versions, will be removed after WhitelistV1s are migrated to V2.
 #[inline(never)]
 pub fn assert_decode_whitelist_generic(whitelist_info: &AccountInfo) -> Result<WhitelistType> {
-    let mut data: &[u8] = &whitelist_info.try_borrow_data()?;
+    let data: &[u8] = &whitelist_info.try_borrow_data()?;
 
     let discriminator: [u8; 8] = data[0..8]
         .try_into()
         .map_err(|_| ProgramError::InvalidAccountData)?;
 
-    // Check account owner.
-    if *whitelist_info.owner != crate::ID {
-        return Err(ErrorCode::BadOwner.into());
-    }
-
     match discriminator {
-        WHITELIST_DISCRIMINATOR => {
-            let whitelist: Whitelist = AccountDeserialize::try_deserialize(&mut data)?;
-
-            let (key, _) = Pubkey::find_program_address(&[&whitelist.uuid], &crate::ID);
-            if key != *whitelist_info.key {
-                return Err(ErrorCode::BadWhitelist.into());
-            }
-
-            Ok(WhitelistType::V1(whitelist))
-        }
+        WHITELIST_DISCRIMINATOR => assert_decode_whitelist(whitelist_info).map(WhitelistType::V1),
         WHITELIST_V2_DISCRIMINATOR => {
-            let whitelist: WhitelistV2 = AccountDeserialize::try_deserialize(&mut data)?;
-
-            let (key, _) = Pubkey::find_program_address(
-                &[b"whitelist", whitelist.namespace.as_ref(), &whitelist.uuid],
-                &crate::ID,
-            );
-            if key != *whitelist_info.key {
-                return Err(ErrorCode::BadWhitelist.into());
-            }
-
-            Ok(WhitelistType::V2(whitelist))
+            assert_decode_whitelist_v2(whitelist_info).map(WhitelistType::V2)
         }
         _ => Err(ErrorCode::BadWhitelist.into()),
     }
 }
 
+/// Decode a mint proof account.
 #[inline(never)]
 pub fn assert_decode_mint_proof(
-    whitelist: &Account<Whitelist>,
-    nft_mint: &InterfaceAccount<Mint>,
-    mint_proof: &UncheckedAccount,
-) -> Result<Box<MintProof>> {
+    whitelist: &Pubkey,
+    nft_mint: &Pubkey,
+    mint_proof_info: &AccountInfo,
+) -> Result<MintProof> {
+    // Deserialize.
+    let mut data: &[u8] = &mint_proof_info.try_borrow_data()?;
+    let mint_proof: MintProof = AccountDeserialize::try_deserialize(&mut data)?;
+
+    // PDA check.
     let (key, _) = Pubkey::find_program_address(
         &[
-            b"mint_proof".as_ref(),
+            MintProof::PREFIX,
             nft_mint.key().as_ref(),
-            whitelist.key().as_ref(),
+            whitelist.as_ref(),
         ],
         &crate::ID,
     );
-    if key != *mint_proof.key {
-        throw_err!(ErrorCode::BadMintProof);
-    }
-    // Check program owner (redundant because of find_program_address above, but why not).
-    if *mint_proof.owner != crate::ID {
+    if key != *mint_proof_info.key {
         throw_err!(ErrorCode::BadMintProof);
     }
 
-    let mut data: &[u8] = &mint_proof.try_borrow_data()?;
-    let mint_proof: Box<MintProof> = Box::new(AccountDeserialize::try_deserialize(&mut data)?);
+    // Program owner check.
+    if *mint_proof_info.owner != crate::ID {
+        throw_err!(ErrorCode::BadMintProof);
+    }
+
     Ok(mint_proof)
 }
 
+/// Decode a mint proof v2 account.
 #[inline(never)]
 pub fn assert_decode_mint_proof_v2(
-    whitelist: &Account<WhitelistV2>,
-    nft_mint: &InterfaceAccount<Mint>,
-    mint_proof: &UncheckedAccount,
-) -> Result<Box<MintProofV2>> {
+    whitelist: &Pubkey,
+    nft_mint: &Pubkey,
+    mint_proof_info: &AccountInfo,
+) -> Result<MintProofV2> {
+    // Deserialize.
+    let mut data: &[u8] = &mint_proof_info.try_borrow_data()?;
+    let mint_proof: MintProofV2 = AccountDeserialize::try_deserialize(&mut data)?;
+
+    // PDA check.
     let (key, _) = Pubkey::find_program_address(
         &[
-            b"mint_proof".as_ref(),
+            MintProofV2::PREFIX,
             nft_mint.key().as_ref(),
-            whitelist.key().as_ref(),
+            whitelist.as_ref(),
         ],
         &crate::ID,
     );
-    if key != *mint_proof.key {
-        throw_err!(ErrorCode::BadMintProof);
-    }
-    // Check program owner (redundant because of find_program_address above, but why not).
-    if *mint_proof.owner != crate::ID {
+    if key != *mint_proof_info.key {
         throw_err!(ErrorCode::BadMintProof);
     }
 
-    let mut data: &[u8] = &mint_proof.try_borrow_data()?;
-    let mint_proof: Box<MintProofV2> = Box::new(AccountDeserialize::try_deserialize(&mut data)?);
+    // Program owner check.
+    if *mint_proof_info.owner != crate::ID {
+        throw_err!(ErrorCode::BadMintProof);
+    }
+
     Ok(mint_proof)
 }
 
 pub enum MintProofType {
-    V1(Box<MintProof>),
-    V2(Box<MintProofV2>),
+    V1(MintProof),
+    V2(MintProofV2),
 }
 
+/// Decode both mint proof versions.
 #[inline(never)]
 pub fn assert_decode_mint_proof_generic(
-    whitelist: &AccountInfo,
+    whitelist: &Pubkey,
     nft_mint: &Pubkey,
     mint_proof: &AccountInfo,
 ) -> Result<MintProofType> {
-    let (key, _) = Pubkey::find_program_address(
-        &[
-            b"mint_proof".as_ref(),
-            nft_mint.as_ref(),
-            whitelist.key().as_ref(),
-        ],
-        &crate::ID,
-    );
-    if key != *mint_proof.key {
-        throw_err!(ErrorCode::BadMintProof);
-    }
-    // Check program owner (redundant because of find_program_address above, but why not).
-    if *mint_proof.owner != crate::ID {
-        return Err(ErrorCode::BadMintProof.into());
-    }
-
-    let mut data: &[u8] = &mint_proof.try_borrow_data()?;
+    let data: &[u8] = &mint_proof.try_borrow_data()?;
     let discriminator: [u8; 8] = data[0..8]
         .try_into()
         .map_err(|_| ProgramError::InvalidAccountData)?;
 
     match discriminator {
         MINT_PROOF_DISCRIMINATOR => {
-            let mint_proof: Box<MintProof> =
-                Box::new(AccountDeserialize::try_deserialize(&mut data)?);
-            Ok(MintProofType::V1(mint_proof))
+            assert_decode_mint_proof(whitelist, nft_mint, mint_proof).map(MintProofType::V1)
         }
         MINT_PROOF_V2_DISCRIMINATOR => {
-            let mint_proof: Box<MintProofV2> =
-                Box::new(AccountDeserialize::try_deserialize(&mut data)?);
-            Ok(MintProofType::V2(mint_proof))
+            assert_decode_mint_proof_v2(whitelist, nft_mint, mint_proof).map(MintProofType::V2)
         }
         _ => Err(ErrorCode::BadMintProof.into()),
     }
@@ -330,7 +327,7 @@ mod test {
 
         let mint_proof_pubkey = Pubkey::find_program_address(
             &[
-                b"mint_proof".as_ref(),
+                MintProof::PREFIX,
                 mint_pubkey.key().as_ref(),
                 whitelist_pubkey.key().as_ref(),
             ],
@@ -350,15 +347,18 @@ mod test {
             executable: false,
         };
 
-        let decoded_mint_proof =
-            match assert_decode_mint_proof_generic(&whitelist_info, &mint_pubkey, &mint_proof_info)
-                .unwrap()
-            {
-                MintProofType::V1(mint_proof) => mint_proof,
-                MintProofType::V2(_) => panic!("Expected V1"),
-            };
+        let decoded_mint_proof = match assert_decode_mint_proof_generic(
+            &whitelist_info.key(),
+            &mint_pubkey,
+            &mint_proof_info,
+        )
+        .unwrap()
+        {
+            MintProofType::V1(mint_proof) => mint_proof,
+            MintProofType::V2(_) => panic!("Expected V1"),
+        };
 
-        assert_eq!(*decoded_mint_proof, mint_proof);
+        assert_eq!(decoded_mint_proof, mint_proof);
     }
 
     #[test]
@@ -396,7 +396,7 @@ mod test {
 
         let mint_proof_pubkey = Pubkey::find_program_address(
             &[
-                b"mint_proof".as_ref(),
+                MintProofV2::PREFIX,
                 mint_pubkey.key().as_ref(),
                 whitelist_pubkey.key().as_ref(),
             ],
@@ -416,14 +416,17 @@ mod test {
             executable: false,
         };
 
-        let decoded_mint_proof =
-            match assert_decode_mint_proof_generic(&whitelist_info, &mint_pubkey, &mint_proof_info)
-                .unwrap()
-            {
-                MintProofType::V1(_) => panic!("Expected V2"),
-                MintProofType::V2(mint_proof) => mint_proof,
-            };
+        let decoded_mint_proof = match assert_decode_mint_proof_generic(
+            &whitelist_info.key(),
+            &mint_pubkey,
+            &mint_proof_info,
+        )
+        .unwrap()
+        {
+            MintProofType::V1(_) => panic!("Expected V2"),
+            MintProofType::V2(mint_proof) => mint_proof,
+        };
 
-        assert_eq!(*decoded_mint_proof, mint_proof);
+        assert_eq!(decoded_mint_proof, mint_proof);
     }
 }

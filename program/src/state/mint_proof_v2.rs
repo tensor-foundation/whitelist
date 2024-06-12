@@ -23,3 +23,7 @@ pub struct MintProofV2 {
     pub creation_slot: u64,
     pub payer: Pubkey,
 }
+
+impl MintProofV2 {
+    pub const PREFIX: &'static [u8] = b"mint_proof_v2";
+}
