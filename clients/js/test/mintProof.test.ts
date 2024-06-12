@@ -125,6 +125,73 @@ test('it can create and update mint proof v2', async (t) => {
   }));
 });
 
+test('it cannot override the stored payer', async (t) => {
+  const client = createDefaultSolanaClient();
+
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const freezeAuthority = (await generateKeyPairSigner()).address;
+  const namespace = await generateKeyPairSigner();
+
+  const nftOwner = await generateKeyPairSignerWithSol(client);
+
+  // Mint NFT
+  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+
+  // Setup a merkle tree with our mint as a leaf
+  const {
+    root,
+    proofs: [p],
+  } = await generateTreeOfSize(10, [mint]);
+
+  const conditions: Condition[] = [
+    { mode: Mode.MerkleTree, value: intoAddress(root) },
+  ];
+
+  const { whitelist } = await createWhitelist({
+    client,
+    updateAuthority,
+    freezeAuthority,
+    conditions,
+    namespace,
+  });
+
+  const { mintProof } = await upsertMintProof({
+    client,
+    payer: nftOwner,
+    mint,
+    whitelist,
+    proof: p.proof,
+  });
+
+  t.like(await fetchMintProofV2(client.rpc, mintProof), <MintProofV2>(<unknown>{
+    address: mintProof,
+    data: {
+      proof: p.proof,
+      payer: nftOwner.address,
+    },
+  }));
+
+  // Try to update the payer.
+  const newPayer = await generateKeyPairSignerWithSol(client);
+
+  await upsertMintProof({
+    client,
+    payer: newPayer,
+    mint,
+    whitelist,
+    proof: p.proof,
+  });
+
+  // Payer should be the original payer.
+  t.like(await fetchMintProofV2(client.rpc, mintProof), <MintProofV2>(<unknown>{
+    address: mintProof,
+    data: {
+      proof: p.proof,
+      payer: nftOwner.address, // original payer
+    },
+  }));
+});
+
 test('invalid proof fails', async (t) => {
   const client = createDefaultSolanaClient();
 

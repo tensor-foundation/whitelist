@@ -57,8 +57,6 @@ pub fn process_init_update_mint_proof(
 
     // Upsert proof into the MintProof account.
     mint_proof.proof_len = unwrap_int!(u8::try_from(proof.len()).ok());
-    // let padded_proof = &mut proof.to_vec();
-    // padded_proof.resize(MAX_PROOF_LEN, [0; 32]);
 
     // Zero out array.
     for elem in mint_proof.proof.iter_mut() {

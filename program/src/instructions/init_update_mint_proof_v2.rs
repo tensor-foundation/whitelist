@@ -83,7 +83,13 @@ pub fn process_init_update_mint_proof_v2(
 
     let clock = Clock::get()?;
     mint_proof.creation_slot = clock.slot;
-    mint_proof.payer = *ctx.accounts.payer.key;
+
+    // We don't allow updating the payer, as we want the original payer to receive the rent
+    // back when the account is closed within 100 slots of creation date.
+    // Only set the payer if it's not already set.
+    if mint_proof.payer == Pubkey::default() {
+        mint_proof.payer = *ctx.accounts.payer.key;
+    }
 
     Ok(())
 }
