@@ -40,7 +40,7 @@ import {
   getAccountMetaFactory,
 } from '../shared';
 
-export type CreateMintProofV2Instruction<
+export type InitUpdateMintProofV2Instruction<
   TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountPayer extends string | IAccountMeta<string> = string,
   TAccountMint extends string | IAccountMeta<string> = string,
@@ -74,16 +74,16 @@ export type CreateMintProofV2Instruction<
     ]
   >;
 
-export type CreateMintProofV2InstructionData = {
+export type InitUpdateMintProofV2InstructionData = {
   discriminator: ReadonlyUint8Array;
   proof: Array<ReadonlyUint8Array>;
 };
 
-export type CreateMintProofV2InstructionDataArgs = {
+export type InitUpdateMintProofV2InstructionDataArgs = {
   proof: Array<ReadonlyUint8Array>;
 };
 
-export function getCreateMintProofV2InstructionDataEncoder(): Encoder<CreateMintProofV2InstructionDataArgs> {
+export function getInitUpdateMintProofV2InstructionDataEncoder(): Encoder<InitUpdateMintProofV2InstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ['discriminator', fixEncoderSize(getBytesEncoder(), 8)],
@@ -91,29 +91,29 @@ export function getCreateMintProofV2InstructionDataEncoder(): Encoder<CreateMint
     ]),
     (value) => ({
       ...value,
-      discriminator: new Uint8Array([219, 176, 21, 37, 145, 89, 154, 53]),
+      discriminator: new Uint8Array([35, 185, 181, 108, 143, 139, 228, 45]),
     })
   );
 }
 
-export function getCreateMintProofV2InstructionDataDecoder(): Decoder<CreateMintProofV2InstructionData> {
+export function getInitUpdateMintProofV2InstructionDataDecoder(): Decoder<InitUpdateMintProofV2InstructionData> {
   return getStructDecoder([
     ['discriminator', fixDecoderSize(getBytesDecoder(), 8)],
     ['proof', getArrayDecoder(fixDecoderSize(getBytesDecoder(), 32))],
   ]);
 }
 
-export function getCreateMintProofV2InstructionDataCodec(): Codec<
-  CreateMintProofV2InstructionDataArgs,
-  CreateMintProofV2InstructionData
+export function getInitUpdateMintProofV2InstructionDataCodec(): Codec<
+  InitUpdateMintProofV2InstructionDataArgs,
+  InitUpdateMintProofV2InstructionData
 > {
   return combineCodec(
-    getCreateMintProofV2InstructionDataEncoder(),
-    getCreateMintProofV2InstructionDataDecoder()
+    getInitUpdateMintProofV2InstructionDataEncoder(),
+    getInitUpdateMintProofV2InstructionDataDecoder()
   );
 }
 
-export type CreateMintProofV2AsyncInput<
+export type InitUpdateMintProofV2AsyncInput<
   TAccountPayer extends string = string,
   TAccountMint extends string = string,
   TAccountWhitelist extends string = string,
@@ -125,17 +125,17 @@ export type CreateMintProofV2AsyncInput<
   whitelist: Address<TAccountWhitelist>;
   mintProof?: Address<TAccountMintProof>;
   systemProgram?: Address<TAccountSystemProgram>;
-  proof: CreateMintProofV2InstructionDataArgs['proof'];
+  proof: InitUpdateMintProofV2InstructionDataArgs['proof'];
 };
 
-export async function getCreateMintProofV2InstructionAsync<
+export async function getInitUpdateMintProofV2InstructionAsync<
   TAccountPayer extends string,
   TAccountMint extends string,
   TAccountWhitelist extends string,
   TAccountMintProof extends string,
   TAccountSystemProgram extends string,
 >(
-  input: CreateMintProofV2AsyncInput<
+  input: InitUpdateMintProofV2AsyncInput<
     TAccountPayer,
     TAccountMint,
     TAccountWhitelist,
@@ -143,7 +143,7 @@ export async function getCreateMintProofV2InstructionAsync<
     TAccountSystemProgram
   >
 ): Promise<
-  CreateMintProofV2Instruction<
+  InitUpdateMintProofV2Instruction<
     typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
     TAccountPayer,
     TAccountMint,
@@ -193,10 +193,10 @@ export async function getCreateMintProofV2InstructionAsync<
       getAccountMeta(accounts.systemProgram),
     ],
     programAddress,
-    data: getCreateMintProofV2InstructionDataEncoder().encode(
-      args as CreateMintProofV2InstructionDataArgs
+    data: getInitUpdateMintProofV2InstructionDataEncoder().encode(
+      args as InitUpdateMintProofV2InstructionDataArgs
     ),
-  } as CreateMintProofV2Instruction<
+  } as InitUpdateMintProofV2Instruction<
     typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
     TAccountPayer,
     TAccountMint,
@@ -208,7 +208,7 @@ export async function getCreateMintProofV2InstructionAsync<
   return instruction;
 }
 
-export type CreateMintProofV2Input<
+export type InitUpdateMintProofV2Input<
   TAccountPayer extends string = string,
   TAccountMint extends string = string,
   TAccountWhitelist extends string = string,
@@ -220,24 +220,24 @@ export type CreateMintProofV2Input<
   whitelist: Address<TAccountWhitelist>;
   mintProof: Address<TAccountMintProof>;
   systemProgram?: Address<TAccountSystemProgram>;
-  proof: CreateMintProofV2InstructionDataArgs['proof'];
+  proof: InitUpdateMintProofV2InstructionDataArgs['proof'];
 };
 
-export function getCreateMintProofV2Instruction<
+export function getInitUpdateMintProofV2Instruction<
   TAccountPayer extends string,
   TAccountMint extends string,
   TAccountWhitelist extends string,
   TAccountMintProof extends string,
   TAccountSystemProgram extends string,
 >(
-  input: CreateMintProofV2Input<
+  input: InitUpdateMintProofV2Input<
     TAccountPayer,
     TAccountMint,
     TAccountWhitelist,
     TAccountMintProof,
     TAccountSystemProgram
   >
-): CreateMintProofV2Instruction<
+): InitUpdateMintProofV2Instruction<
   typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountPayer,
   TAccountMint,
@@ -280,10 +280,10 @@ export function getCreateMintProofV2Instruction<
       getAccountMeta(accounts.systemProgram),
     ],
     programAddress,
-    data: getCreateMintProofV2InstructionDataEncoder().encode(
-      args as CreateMintProofV2InstructionDataArgs
+    data: getInitUpdateMintProofV2InstructionDataEncoder().encode(
+      args as InitUpdateMintProofV2InstructionDataArgs
     ),
-  } as CreateMintProofV2Instruction<
+  } as InitUpdateMintProofV2Instruction<
     typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
     TAccountPayer,
     TAccountMint,
@@ -295,7 +295,7 @@ export function getCreateMintProofV2Instruction<
   return instruction;
 }
 
-export type ParsedCreateMintProofV2Instruction<
+export type ParsedInitUpdateMintProofV2Instruction<
   TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
   TAccountMetas extends readonly IAccountMeta[] = readonly IAccountMeta[],
 > = {
@@ -307,17 +307,17 @@ export type ParsedCreateMintProofV2Instruction<
     mintProof: TAccountMetas[3];
     systemProgram: TAccountMetas[4];
   };
-  data: CreateMintProofV2InstructionData;
+  data: InitUpdateMintProofV2InstructionData;
 };
 
-export function parseCreateMintProofV2Instruction<
+export function parseInitUpdateMintProofV2Instruction<
   TProgram extends string,
   TAccountMetas extends readonly IAccountMeta[],
 >(
   instruction: IInstruction<TProgram> &
     IInstructionWithAccounts<TAccountMetas> &
     IInstructionWithData<Uint8Array>
-): ParsedCreateMintProofV2Instruction<TProgram, TAccountMetas> {
+): ParsedInitUpdateMintProofV2Instruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
@@ -337,6 +337,8 @@ export function parseCreateMintProofV2Instruction<
       mintProof: getNextAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getCreateMintProofV2InstructionDataDecoder().decode(instruction.data),
+    data: getInitUpdateMintProofV2InstructionDataDecoder().decode(
+      instruction.data
+    ),
   };
 }

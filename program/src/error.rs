@@ -52,4 +52,7 @@ pub enum ErrorCode {
 
     #[msg("whitelist is frozen")]
     WhitelistIsFrozen = 16,
+
+    #[msg("bad mint proof")]
+    BadMintProof = 17,
 }

@@ -40,9 +40,12 @@ export const TENSOR_WHITELIST_ERROR__EMPTY_CONDITIONS = 0x177e; // 6014
 export const TENSOR_WHITELIST_ERROR__TOO_MANY_MERKLE_PROOFS = 0x177f; // 6015
 /** WhitelistIsFrozen: whitelist is frozen */
 export const TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN = 0x1780; // 6016
+/** BadMintProof: bad mint proof */
+export const TENSOR_WHITELIST_ERROR__BAD_MINT_PROOF = 0x1781; // 6017
 
 export type TensorWhitelistError =
   | typeof TENSOR_WHITELIST_ERROR__BAD_COSIGNER
+  | typeof TENSOR_WHITELIST_ERROR__BAD_MINT_PROOF
   | typeof TENSOR_WHITELIST_ERROR__BAD_OWNER
   | typeof TENSOR_WHITELIST_ERROR__BAD_WHITELIST
   | typeof TENSOR_WHITELIST_ERROR__EMPTY_CONDITIONS
@@ -66,6 +69,7 @@ let tensorWhitelistErrorMessages:
 if (__DEV__) {
   tensorWhitelistErrorMessages = {
     [TENSOR_WHITELIST_ERROR__BAD_COSIGNER]: `passed in cosigner doesnt have the rights to do this`,
+    [TENSOR_WHITELIST_ERROR__BAD_MINT_PROOF]: `bad mint proof`,
     [TENSOR_WHITELIST_ERROR__BAD_OWNER]: `passed in owner doesnt have the rights to do this`,
     [TENSOR_WHITELIST_ERROR__BAD_WHITELIST]: `bad whitelist`,
     [TENSOR_WHITELIST_ERROR__EMPTY_CONDITIONS]: `cannot have empty conditions`,

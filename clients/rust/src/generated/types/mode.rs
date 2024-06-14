@@ -14,7 +14,7 @@ use num_derive::FromPrimitive;
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Mode {
-    FVC,
     MerkleTree,
     VOC,
+    FVC,
 }

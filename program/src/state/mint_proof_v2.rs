@@ -13,12 +13,17 @@ pub const MINT_PROOF_V2_SIZE: usize =
     + 32                    // authority
 ;
 
-/// Seeds: ["mint_proof", mint, whitelist]
+/// Seeds: ["mint_proof_v2", mint, whitelist]
 #[account]
+#[derive(Debug, Default, Eq, PartialEq)]
 pub struct MintProofV2 {
     // Length of proof (w/o padding).
     pub proof_len: u8,
     pub proof: [[u8; 32]; MAX_PROOF_LEN],
     pub creation_slot: u64,
     pub payer: Pubkey,
+}
+
+impl MintProofV2 {
+    pub const PREFIX: &'static [u8] = b"mint_proof_v2";
 }

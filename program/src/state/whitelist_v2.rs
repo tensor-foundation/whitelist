@@ -37,6 +37,8 @@ pub struct WhitelistV2 {
 }
 
 impl WhitelistV2 {
+    pub const PREFIX: &'static [u8] = b"whitelist";
+
     pub const BASE_SIZE: usize = WHITELIST_V2_BASE_SIZE;
     // 33 bytes for Mode + Pubkey
     pub const CONDITION_SIZE: usize = std::mem::size_of::<u8>() + std::mem::size_of::<Pubkey>();
@@ -86,22 +88,22 @@ impl WhitelistV2 {
     pub fn verify(
         &self,
         // It is the job of upstream caller to validate collection and creator inputs.
-        collection: Option<Collection>,
-        creators: Option<Vec<Creator>>,
-        proof: Option<FullMerkleProof>,
+        collection: &Option<Collection>,
+        creators: &Option<Vec<Creator>>,
+        proof: &Option<FullMerkleProof>,
     ) -> Result<()> {
         // If any pass, then the whitelist is valid.
         let pass = self
             .conditions
             .iter()
-            .any(|condition| condition.validate(&collection, &creators, &proof).is_ok());
+            .any(|condition| condition.validate(collection, creators, proof).is_ok());
 
         // If none pass, then the whitelist is invalid, but we want to return the specific error that failed.
         if !pass {
             let err = self
                 .conditions
                 .iter()
-                .find_map(|condition| condition.validate(&collection, &creators, &proof).err())
+                .find_map(|condition| condition.validate(collection, creators, proof).err())
                 .unwrap();
 
             return Err(err);
@@ -177,7 +179,7 @@ impl Condition {
 #[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, Eq, PartialEq)]
 pub enum Mode {
     #[default]
-    FVC,
     MerkleTree,
     VOC,
+    FVC,
 }

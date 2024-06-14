@@ -14,12 +14,12 @@ import {
 } from '@solana/web3.js';
 import {
   ParsedCloseMintProofV2Instruction,
-  ParsedCreateMintProofV2Instruction,
   ParsedCreateWhitelistV2Instruction,
   ParsedFreezeWhitelistInstruction,
   ParsedFreezeWhitelistV2Instruction,
   ParsedInitUpdateAuthorityInstruction,
   ParsedInitUpdateMintProofInstruction,
+  ParsedInitUpdateMintProofV2Instruction,
   ParsedInitUpdateWhitelistInstruction,
   ParsedReallocAuthorityInstruction,
   ParsedReallocWhitelistInstruction,
@@ -113,7 +113,7 @@ export enum TensorWhitelistInstruction {
   UnfreezeWhitelist,
   CreateWhitelistV2,
   UpdateWhitelistV2,
-  CreateMintProofV2,
+  InitUpdateMintProofV2,
   CloseMintProofV2,
   FreezeWhitelistV2,
   UnfreezeWhitelistV2,
@@ -227,12 +227,12 @@ export function identifyTensorWhitelistInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([219, 176, 21, 37, 145, 89, 154, 53])
+        new Uint8Array([35, 185, 181, 108, 143, 139, 228, 45])
       ),
       0
     )
   ) {
-    return TensorWhitelistInstruction.CreateMintProofV2;
+    return TensorWhitelistInstruction.InitUpdateMintProofV2;
   }
   if (
     containsBytes(
@@ -303,8 +303,8 @@ export type ParsedTensorWhitelistInstruction<
       instructionType: TensorWhitelistInstruction.UpdateWhitelistV2;
     } & ParsedUpdateWhitelistV2Instruction<TProgram>)
   | ({
-      instructionType: TensorWhitelistInstruction.CreateMintProofV2;
-    } & ParsedCreateMintProofV2Instruction<TProgram>)
+      instructionType: TensorWhitelistInstruction.InitUpdateMintProofV2;
+    } & ParsedInitUpdateMintProofV2Instruction<TProgram>)
   | ({
       instructionType: TensorWhitelistInstruction.CloseMintProofV2;
     } & ParsedCloseMintProofV2Instruction<TProgram>)
