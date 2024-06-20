@@ -64,6 +64,9 @@ pub enum TensorWhitelistError {
     /// 6017 - bad mint proof
     #[error("bad mint proof")]
     BadMintProof = 0x1781,
+    /// 6018 - missing mint proof
+    #[error("missing mint proof")]
+    MissingMintProof = 0x1782,
 }
 
 impl solana_program::program_error::PrintProgramError for TensorWhitelistError {

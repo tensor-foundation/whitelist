@@ -6,6 +6,7 @@ mod whitelist;
 pub use authority::*;
 pub use full_merkle_proof::*;
 pub use mint_proof::*;
+use tensor_toolbox::assert_decode_metadata;
 pub use whitelist::*;
 
 // V2
@@ -15,7 +16,7 @@ mod whitelist_v2;
 pub use mint_proof_v2::*;
 pub use whitelist_v2::*;
 
-use anchor_lang::{prelude::*, AccountDeserialize};
+use anchor_lang::{prelude::*, solana_program::keccak, AccountDeserialize};
 use vipers::throw_err;
 
 use crate::error::ErrorCode;
@@ -37,6 +38,104 @@ const MINT_PROOF_DISCRIMINATOR: [u8; 8] = [227, 131, 106, 240, 190, 48, 219, 228
 
 /// MintProoV2 Anchor account discriminator.
 const MINT_PROOF_V2_DISCRIMINATOR: [u8; 8] = [22, 197, 150, 178, 249, 225, 183, 75];
+
+#[inline(never)]
+pub fn verify_whitelist(
+    whitelist: &Whitelist,
+    whitelist_pubkey: &Pubkey,
+    mint_proof: &AccountInfo,
+    mint_pubkey: &Pubkey,
+    metadata_opt: Option<&AccountInfo>,
+) -> Result<()> {
+    //prioritize merkle tree if proof present
+    if whitelist.root_hash != ZERO_ARRAY {
+        let mint_proof = assert_decode_mint_proof(whitelist_pubkey, mint_pubkey, mint_proof)?;
+
+        let leaf = anchor_lang::solana_program::keccak::hash(mint_pubkey.as_ref());
+        let proof = &mut mint_proof.proof.to_vec();
+        proof.truncate(mint_proof.proof_len as usize);
+        whitelist.verify_whitelist(
+            None,
+            Some(FullMerkleProof {
+                proof: proof.clone(),
+                leaf: leaf.0,
+            }),
+        )
+    } else if let Some(nft_metadata) = metadata_opt {
+        let metadata = &assert_decode_metadata(mint_pubkey, nft_metadata)?;
+        whitelist.verify_whitelist(Some(metadata), None)
+    } else {
+        throw_err!(ErrorCode::BadMintProof);
+    }
+}
+
+#[inline(never)]
+pub fn verify_whitelist_v2(
+    whitelist: &WhitelistV2,
+    whitelist_pubkey: &Pubkey,
+    mint_proof_opt: Option<&AccountInfo>,
+    mint: &Pubkey,
+    metadata_opt: Option<&AccountInfo>,
+) -> Result<()> {
+    let full_merkle_proof = if let Some(mint_proof_info) = &mint_proof_opt {
+        let mint_proof = assert_decode_mint_proof_v2(whitelist_pubkey, mint, mint_proof_info)?;
+
+        let leaf = keccak::hash(mint.key().as_ref());
+        let proof = &mut mint_proof.proof.to_vec();
+        proof.truncate(mint_proof.proof_len as usize);
+        Some(FullMerkleProof {
+            leaf: leaf.0,
+            proof: proof.clone(),
+        })
+    } else {
+        None
+    };
+
+    let metadata_opt = if let Some(metadata) = metadata_opt {
+        let metadata = assert_decode_metadata(&mint.key(), metadata)?;
+        Some(metadata)
+    } else {
+        None
+    };
+
+    let collection_opt = metadata_opt.as_ref().and_then(|m| m.collection.clone());
+    let creators_opt = metadata_opt.as_ref().and_then(|m| m.creators.clone());
+
+    whitelist.verify(&collection_opt, &creators_opt, &full_merkle_proof)
+}
+
+#[inline(never)]
+pub fn verify_whitelist_generic(
+    whitelist_info: &AccountInfo,
+    mint_proof_info_opt: Option<&AccountInfo>,
+    mint_info: &AccountInfo,
+    metadata_info_opt: Option<&AccountInfo>,
+) -> Result<()> {
+    let whitelist_type =
+        assert_decode_whitelist_generic(whitelist_info).map_err(|_| ErrorCode::BadWhitelist)?;
+
+    match whitelist_type {
+        WhitelistType::V1(whitelist) => {
+            // Must have a mint proof account.
+            require!(mint_proof_info_opt.is_some(), ErrorCode::MissingMintProof);
+
+            verify_whitelist(
+                &whitelist,
+                whitelist_info.key,
+                mint_proof_info_opt.unwrap(),
+                mint_info.key,
+                metadata_info_opt,
+            )
+        }
+        WhitelistType::V2(whitelist) => verify_whitelist_v2(
+            &whitelist,
+            whitelist_info.key,
+            mint_proof_info_opt,
+            mint_info.key,
+            metadata_info_opt,
+        ),
+    }
+}
 
 /// Decode a whitelist account.
 // Upgrade to V2 after migration.
