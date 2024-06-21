@@ -219,6 +219,11 @@ pub fn assert_decode_mint_proof(
 ) -> Result<MintProof> {
     // Deserialize.
     let mut data: &[u8] = &mint_proof_info.try_borrow_data()?;
+
+    if data.is_empty() {
+        return Err(ErrorCode::BadMintProof.into());
+    }
+
     let mint_proof: MintProof = AccountDeserialize::try_deserialize(&mut data)?;
 
     // PDA check.
@@ -251,6 +256,11 @@ pub fn assert_decode_mint_proof_v2(
 ) -> Result<MintProofV2> {
     // Deserialize.
     let mut data: &[u8] = &mint_proof_info.try_borrow_data()?;
+
+    if data.is_empty() {
+        return Err(ErrorCode::BadMintProof.into());
+    }
+
     let mint_proof: MintProofV2 = AccountDeserialize::try_deserialize(&mut data)?;
 
     // PDA check.
@@ -287,6 +297,11 @@ pub fn assert_decode_mint_proof_generic(
     mint_proof: &AccountInfo,
 ) -> Result<MintProofType> {
     let data: &[u8] = &mint_proof.try_borrow_data()?;
+
+    if data.is_empty() {
+        return Err(ErrorCode::BadMintProof.into());
+    }
+
     let discriminator: [u8; 8] = data[0..8]
         .try_into()
         .map_err(|_| ProgramError::InvalidAccountData)?;
