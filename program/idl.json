@@ -1045,6 +1045,11 @@
       "code": 6017,
       "name": "BadMintProof",
       "msg": "bad mint proof"
+    },
+    {
+      "code": 6018,
+      "name": "MissingMintProof",
+      "msg": "missing mint proof"
     }
   ],
   "metadata": {

@@ -55,4 +55,7 @@ pub enum ErrorCode {
 
     #[msg("bad mint proof")]
     BadMintProof = 17,
+
+    #[msg("missing mint proof")]
+    MissingMintProof = 18,
 }
