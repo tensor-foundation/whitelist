@@ -49,11 +49,24 @@ pub fn verify_whitelist(
 ) -> Result<()> {
     //prioritize merkle tree if proof present
     if whitelist.root_hash != ZERO_ARRAY {
-        let mint_proof = assert_decode_mint_proof(whitelist_pubkey, mint_pubkey, mint_proof)?;
+        let mint_proof_type =
+            assert_decode_mint_proof_generic(whitelist_pubkey, mint_pubkey, mint_proof)?;
 
         let leaf = anchor_lang::solana_program::keccak::hash(mint_pubkey.as_ref());
-        let proof = &mut mint_proof.proof.to_vec();
-        proof.truncate(mint_proof.proof_len as usize);
+
+        let proof = match mint_proof_type {
+            MintProofType::V1(mint_proof) => {
+                let mut proof = mint_proof.proof.to_vec();
+                proof.truncate(mint_proof.proof_len as usize);
+                proof
+            }
+            MintProofType::V2(mint_proof) => {
+                let mut proof = mint_proof.proof.to_vec();
+                proof.truncate(mint_proof.proof_len as usize);
+                proof
+            }
+        };
+
         whitelist.verify_whitelist(
             None,
             Some(FullMerkleProof {
@@ -78,11 +91,23 @@ pub fn verify_whitelist_v2(
     metadata_opt: Option<&AccountInfo>,
 ) -> Result<()> {
     let full_merkle_proof = if let Some(mint_proof_info) = &mint_proof_opt {
-        let mint_proof = assert_decode_mint_proof_v2(whitelist_pubkey, mint, mint_proof_info)?;
+        let mint_proof_type =
+            assert_decode_mint_proof_generic(whitelist_pubkey, mint, mint_proof_info)?;
 
         let leaf = keccak::hash(mint.key().as_ref());
-        let proof = &mut mint_proof.proof.to_vec();
-        proof.truncate(mint_proof.proof_len as usize);
+
+        let proof = match mint_proof_type {
+            MintProofType::V1(mint_proof) => {
+                let mut proof = mint_proof.proof.to_vec();
+                proof.truncate(mint_proof.proof_len as usize);
+                proof
+            }
+            MintProofType::V2(mint_proof) => {
+                let mut proof = mint_proof.proof.to_vec();
+                proof.truncate(mint_proof.proof_len as usize);
+                proof
+            }
+        };
         Some(FullMerkleProof {
             leaf: leaf.0,
             proof: proof.clone(),
