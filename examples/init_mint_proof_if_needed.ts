@@ -13,7 +13,6 @@ import {
 import {
   fetchWhitelist,
   fetchWhitelistV2,
-  CloseMintProofV2Input,
   identifyTensorWhitelistAccount,
   Whitelist,
   TensorWhitelistAccount,
@@ -22,11 +21,10 @@ import {
   Condition,
   fetchMaybeMintProofFromSeeds,
   fetchMaybeMintProofV2FromSeeds,
-  CreateMintProofV2AsyncInput,
-  getCreateMintProofV2InstructionAsync,
   InitUpdateMintProofAsyncInput,
-  getCloseMintProofV2Instruction,
   getInitUpdateMintProofInstructionAsync,
+  InitUpdateMintProofV2AsyncInput,
+  getInitUpdateMintProofV2InstructionAsync,
 } from "@tensor-foundation/whitelist";
 import { keypairBytes, rpc } from "./common";
 import { simulateTxWithIxs } from "@tensor-foundation/common-helpers";
@@ -173,33 +171,20 @@ async function initMintProofIfNeeded(mint: string, whitelist: string) {
           return;
         }
       }
-      // construct instruction to close mintProofV2 account (if given)
-      if (mintProofV2.exists) {
-        const closeMintProofV2Input: CloseMintProofV2Input = {
-          payer: mintProofV2.data.payer,
-          signer: keypairSigner,
-          mintProof: mintProofV2.address,
-        };
-        const closeProofIx = getCloseMintProofV2Instruction(
-          closeMintProofV2Input,
-        );
-        upsertMintProofInstructions.push(closeProofIx);
-      }
-      // create new mintProofV2 account with correct proof
-      const createMintProofV2AsyncInput: CreateMintProofV2AsyncInput = {
+      // upsert new mintProofV2 account with correct proof
+      const initUpdateMintProofV2AsyncInput: InitUpdateMintProofV2AsyncInput = {
         payer: keypairSigner,
         mint: address(mint),
         whitelist: address(whitelist),
         proof: proof,
       };
-      const createProofIx = await getCreateMintProofV2InstructionAsync(
-        createMintProofV2AsyncInput,
+      const createProofIx = await getInitUpdateMintProofV2InstructionAsync(
+        initUpdateMintProofV2AsyncInput,
       );
       upsertMintProofInstructions.push(createProofIx);
     }
 
-    // construct and simulate a transaction containing either close+create
-    // instructions or just the create/initUpdate instruction
+    // construct and simulate a transaction upserting the mintProof 
     await simulateTxWithIxs(rpc, upsertMintProofInstructions, keypairSigner);
   }
 }
