@@ -10,7 +10,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
-pub struct CreateMintProofV2<'info> {
+pub struct InitUpdateMintProofV2<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -30,10 +30,10 @@ pub struct CreateMintProofV2<'info> {
 
     // Seed derived from mint + whitelist addresses.
     #[account(
-        init,
+        init_if_needed,
         payer = payer,
         seeds = [
-            b"mint_proof".as_ref(),
+            b"mint_proof_v2".as_ref(),
             mint.key().as_ref(),
             whitelist.key().as_ref(),
         ],
@@ -45,8 +45,8 @@ pub struct CreateMintProofV2<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn process_create_mint_proof_v2(
-    ctx: Context<CreateMintProofV2>,
+pub fn process_init_update_mint_proof_v2(
+    ctx: Context<InitUpdateMintProofV2>,
     proof: Vec<[u8; 32]>,
 ) -> Result<()> {
     let mint_proof = &mut ctx.accounts.mint_proof;
@@ -83,7 +83,13 @@ pub fn process_create_mint_proof_v2(
 
     let clock = Clock::get()?;
     mint_proof.creation_slot = clock.slot;
-    mint_proof.payer = *ctx.accounts.payer.key;
+
+    // We don't allow updating the payer, as we want the original payer to receive the rent
+    // back when the account is closed within 100 slots of creation date.
+    // Only set the payer if it's not already set.
+    if mint_proof.payer == Pubkey::default() {
+        mint_proof.payer = *ctx.accounts.payer.key;
+    }
 
     Ok(())
 }

@@ -52,7 +52,7 @@ pub struct UpdateWhitelistV2<'info> {
     #[account(
         mut,
         // Realloc to new length; if no conditions are passed in, use the existing length--which should be no-op.
-        // args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() just get us either
+        // args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() just gets us either
         // 1) the length of the passed in conditions, or the length of the current conditions
         realloc = WhitelistV2::BASE_SIZE + VEC_LENGTH + args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() * WhitelistV2::CONDITION_SIZE,
         realloc::zero = false,
@@ -81,7 +81,7 @@ pub fn process_update_whitelist_v2(
         return Err(ErrorCode::WhitelistIsFrozen.into());
     }
 
-    // Update the freeze authority. If the Toggle is None, then there's nothing to do.
+    // Update the freeze authority. If the Operation is None, then there's nothing to do.
     // Update authority can change the freeze authority if the whitelist is unfrozen,
     // but cannot unfreeze the whitelist itself.
     if let Operation::Set(authority) = args.freeze_authority {

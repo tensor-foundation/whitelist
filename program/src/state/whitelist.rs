@@ -33,9 +33,26 @@ pub struct Whitelist {
     pub _reserved: [u8; 64],
 }
 
+impl Default for Whitelist {
+    fn default() -> Self {
+        Self {
+            version: 0,
+            bump: 0,
+            verified: false,
+            root_hash: ZERO_ARRAY,
+            uuid: [0; 32],
+            name: [0; 32],
+            frozen: false,
+            voc: None,
+            fvc: None,
+            _reserved: [0; 64],
+        }
+    }
+}
+
 impl Whitelist {
     /// Passed in verification method has to match the verification method stored on the whitelist
-    /// Passing neither of the 3 will result in failure
+    /// Passing none of the 3 will result in failure
     pub fn verify_whitelist(
         &self,
         // It is the job of upstream caller to verify that Metadata account passed in is actually correct

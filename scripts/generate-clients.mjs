@@ -43,7 +43,7 @@ kinobi.update(
     mintProofV2: {
       size: 945,
       seeds: [
-        k.constantPdaSeedNodeFromString("utf8", "mint_proof"),
+        k.constantPdaSeedNodeFromString("utf8", "mint_proof_v2"),
         k.variablePdaSeedNode(
           "mint",
           k.publicKeyTypeNode(),
@@ -108,6 +108,17 @@ kinobi.update(
     },
   ]),
 );
+
+// Remove WhitelistType and MintProofType from tree so clients don't render it.
+kinobi.update(
+  k.deleteNodesVisitor([
+    "[definedTypeNode]whitelistType",
+    "[definedTypeNode]mintProofType",
+  ]),
+);
+
+// Debug print the tree.
+// kinobi.accept(k.consoleLogVisitor(k.getDebugStringVisitor({ indent: true })));
 
 // Render JavaScript.
 const jsClient = path.join(__dirname, "..", "clients", "js");

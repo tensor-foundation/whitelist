@@ -9,7 +9,7 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct CreateMintProofV2 {
+pub struct InitUpdateMintProofV2 {
     pub payer: solana_program::pubkey::Pubkey,
 
     pub mint: solana_program::pubkey::Pubkey,
@@ -21,17 +21,17 @@ pub struct CreateMintProofV2 {
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
-impl CreateMintProofV2 {
+impl InitUpdateMintProofV2 {
     pub fn instruction(
         &self,
-        args: CreateMintProofV2InstructionArgs,
+        args: InitUpdateMintProofV2InstructionArgs,
     ) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: CreateMintProofV2InstructionArgs,
+        args: InitUpdateMintProofV2InstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
         let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
@@ -54,7 +54,7 @@ impl CreateMintProofV2 {
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = CreateMintProofV2InstructionData::new()
+        let mut data = InitUpdateMintProofV2InstructionData::new()
             .try_to_vec()
             .unwrap();
         let mut args = args.try_to_vec().unwrap();
@@ -69,19 +69,19 @@ impl CreateMintProofV2 {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-pub struct CreateMintProofV2InstructionData {
+pub struct InitUpdateMintProofV2InstructionData {
     discriminator: [u8; 8],
 }
 
-impl CreateMintProofV2InstructionData {
+impl InitUpdateMintProofV2InstructionData {
     pub fn new() -> Self {
         Self {
-            discriminator: [219, 176, 21, 37, 145, 89, 154, 53],
+            discriminator: [35, 185, 181, 108, 143, 139, 228, 45],
         }
     }
 }
 
-impl Default for CreateMintProofV2InstructionData {
+impl Default for InitUpdateMintProofV2InstructionData {
     fn default() -> Self {
         Self::new()
     }
@@ -89,11 +89,11 @@ impl Default for CreateMintProofV2InstructionData {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct CreateMintProofV2InstructionArgs {
+pub struct InitUpdateMintProofV2InstructionArgs {
     pub proof: Vec<[u8; 32]>,
 }
 
-/// Instruction builder for `CreateMintProofV2`.
+/// Instruction builder for `InitUpdateMintProofV2`.
 ///
 /// ### Accounts:
 ///
@@ -103,7 +103,7 @@ pub struct CreateMintProofV2InstructionArgs {
 ///   3. `[writable]` mint_proof
 ///   4. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
-pub struct CreateMintProofV2Builder {
+pub struct InitUpdateMintProofV2Builder {
     payer: Option<solana_program::pubkey::Pubkey>,
     mint: Option<solana_program::pubkey::Pubkey>,
     whitelist: Option<solana_program::pubkey::Pubkey>,
@@ -113,7 +113,7 @@ pub struct CreateMintProofV2Builder {
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl CreateMintProofV2Builder {
+impl InitUpdateMintProofV2Builder {
     pub fn new() -> Self {
         Self::default()
     }
@@ -168,7 +168,7 @@ impl CreateMintProofV2Builder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = CreateMintProofV2 {
+        let accounts = InitUpdateMintProofV2 {
             payer: self.payer.expect("payer is not set"),
             mint: self.mint.expect("mint is not set"),
             whitelist: self.whitelist.expect("whitelist is not set"),
@@ -177,7 +177,7 @@ impl CreateMintProofV2Builder {
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
-        let args = CreateMintProofV2InstructionArgs {
+        let args = InitUpdateMintProofV2InstructionArgs {
             proof: self.proof.clone().expect("proof is not set"),
         };
 
@@ -185,8 +185,8 @@ impl CreateMintProofV2Builder {
     }
 }
 
-/// `create_mint_proof_v2` CPI accounts.
-pub struct CreateMintProofV2CpiAccounts<'a, 'b> {
+/// `init_update_mint_proof_v2` CPI accounts.
+pub struct InitUpdateMintProofV2CpiAccounts<'a, 'b> {
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub mint: &'b solana_program::account_info::AccountInfo<'a>,
@@ -198,8 +198,8 @@ pub struct CreateMintProofV2CpiAccounts<'a, 'b> {
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-/// `create_mint_proof_v2` CPI instruction.
-pub struct CreateMintProofV2Cpi<'a, 'b> {
+/// `init_update_mint_proof_v2` CPI instruction.
+pub struct InitUpdateMintProofV2Cpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
 
@@ -213,14 +213,14 @@ pub struct CreateMintProofV2Cpi<'a, 'b> {
 
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
-    pub __args: CreateMintProofV2InstructionArgs,
+    pub __args: InitUpdateMintProofV2InstructionArgs,
 }
 
-impl<'a, 'b> CreateMintProofV2Cpi<'a, 'b> {
+impl<'a, 'b> InitUpdateMintProofV2Cpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: CreateMintProofV2CpiAccounts<'a, 'b>,
-        args: CreateMintProofV2InstructionArgs,
+        accounts: InitUpdateMintProofV2CpiAccounts<'a, 'b>,
+        args: InitUpdateMintProofV2InstructionArgs,
     ) -> Self {
         Self {
             __program: program,
@@ -293,7 +293,7 @@ impl<'a, 'b> CreateMintProofV2Cpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = CreateMintProofV2InstructionData::new()
+        let mut data = InitUpdateMintProofV2InstructionData::new()
             .try_to_vec()
             .unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
@@ -323,7 +323,7 @@ impl<'a, 'b> CreateMintProofV2Cpi<'a, 'b> {
     }
 }
 
-/// Instruction builder for `CreateMintProofV2` via CPI.
+/// Instruction builder for `InitUpdateMintProofV2` via CPI.
 ///
 /// ### Accounts:
 ///
@@ -333,13 +333,13 @@ impl<'a, 'b> CreateMintProofV2Cpi<'a, 'b> {
 ///   3. `[writable]` mint_proof
 ///   4. `[]` system_program
 #[derive(Clone, Debug)]
-pub struct CreateMintProofV2CpiBuilder<'a, 'b> {
-    instruction: Box<CreateMintProofV2CpiBuilderInstruction<'a, 'b>>,
+pub struct InitUpdateMintProofV2CpiBuilder<'a, 'b> {
+    instruction: Box<InitUpdateMintProofV2CpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> CreateMintProofV2CpiBuilder<'a, 'b> {
+impl<'a, 'b> InitUpdateMintProofV2CpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(CreateMintProofV2CpiBuilderInstruction {
+        let instruction = Box::new(InitUpdateMintProofV2CpiBuilderInstruction {
             __program: program,
             payer: None,
             mint: None,
@@ -431,10 +431,10 @@ impl<'a, 'b> CreateMintProofV2CpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let args = CreateMintProofV2InstructionArgs {
+        let args = InitUpdateMintProofV2InstructionArgs {
             proof: self.instruction.proof.clone().expect("proof is not set"),
         };
-        let instruction = CreateMintProofV2Cpi {
+        let instruction = InitUpdateMintProofV2Cpi {
             __program: self.instruction.__program,
 
             payer: self.instruction.payer.expect("payer is not set"),
@@ -459,7 +459,7 @@ impl<'a, 'b> CreateMintProofV2CpiBuilder<'a, 'b> {
 }
 
 #[derive(Clone, Debug)]
-struct CreateMintProofV2CpiBuilderInstruction<'a, 'b> {
+struct InitUpdateMintProofV2CpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     mint: Option<&'b solana_program::account_info::AccountInfo<'a>>,

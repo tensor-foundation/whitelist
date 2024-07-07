@@ -10,7 +10,7 @@ publish = false
 program-id = "TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW"
 program-dependencies = [
     "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
-    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+    "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
 ]
 
 [lib]
@@ -31,5 +31,4 @@ tensor-toolbox = { version = "0.0.2", git = "ssh://git@github.com/tensor-foundat
     "cnft",
 ] }
 mpl-token-metadata = "4.0.0"
-solana-program = "< 1.18"
 vipers = { version = "2.0.6", git = "ssh://git@github.com/tensor-foundation/toolbox.git" }

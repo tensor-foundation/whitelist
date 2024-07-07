@@ -7,12 +7,12 @@
  */
 
 export * from './closeMintProofV2';
-export * from './createMintProofV2';
 export * from './createWhitelistV2';
 export * from './freezeWhitelist';
 export * from './freezeWhitelistV2';
 export * from './initUpdateAuthority';
 export * from './initUpdateMintProof';
+export * from './initUpdateMintProofV2';
 export * from './initUpdateWhitelist';
 export * from './reallocAuthority';
 export * from './reallocWhitelist';

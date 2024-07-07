@@ -8,7 +8,7 @@ use solana_sdk::{
 use spl_merkle_tree_reference::{MerkleTree, EMPTY};
 use tensor_whitelist::{
     accounts::{MintProofV2, WhitelistV2},
-    instructions::{CloseMintProofV2, CreateMintProofV2, CreateMintProofV2InstructionArgs},
+    instructions::{CloseMintProofV2, InitUpdateMintProofV2, InitUpdateMintProofV2InstructionArgs},
     types::{Condition, Mode},
 };
 
@@ -82,13 +82,13 @@ async fn create_and_close_mint_proof_v2() {
     // Warp 100 slots so we can check the created at slot.
     context.warp_to_slot(100).unwrap();
 
-    let args = CreateMintProofV2InstructionArgs {
+    let args = InitUpdateMintProofV2InstructionArgs {
         proof: proof.clone(),
     };
 
     let mint_proof = MintProofV2::find_pda(&nft.mint, &test_whitelist.whitelist).0;
 
-    let ix = CreateMintProofV2 {
+    let ix = InitUpdateMintProofV2 {
         whitelist: test_whitelist.whitelist,
         payer: payer.pubkey(),
         mint: nft.mint,
@@ -226,13 +226,13 @@ async fn closing_refunds_signer_after_100_slots() {
     // Warp 100 slots so we can check the created at slot.
     context.warp_to_slot(100).unwrap();
 
-    let args = CreateMintProofV2InstructionArgs {
+    let args = InitUpdateMintProofV2InstructionArgs {
         proof: proof.clone(),
     };
 
     let mint_proof = MintProofV2::find_pda(&nft.mint, &test_whitelist.whitelist).0;
 
-    let ix = CreateMintProofV2 {
+    let ix = InitUpdateMintProofV2 {
         whitelist: test_whitelist.whitelist,
         payer: payer.pubkey(), // Payer is stored on MintProofV2 account
         mint: nft.mint,

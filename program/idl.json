@@ -419,7 +419,7 @@
       ]
     },
     {
-      "name": "createMintProofV2",
+      "name": "initUpdateMintProofV2",
       "accounts": [
         {
           "name": "payer",
@@ -560,7 +560,7 @@
     {
       "name": "MintProofV2",
       "docs": [
-        "Seeds: [\"mint_proof\", mint, whitelist]"
+        "Seeds: [\"mint_proof_v2\", mint, whitelist]"
       ],
       "type": {
         "kind": "struct",
@@ -895,13 +895,61 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "FVC"
-          },
-          {
             "name": "MerkleTree"
           },
           {
             "name": "VOC"
+          },
+          {
+            "name": "FVC"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "V1",
+            "fields": [
+              {
+                "defined": "Whitelist"
+              }
+            ]
+          },
+          {
+            "name": "V2",
+            "fields": [
+              {
+                "defined": "WhitelistV2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "MintProofType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "V1",
+            "fields": [
+              {
+                "defined": "MintProof"
+              }
+            ]
+          },
+          {
+            "name": "V2",
+            "fields": [
+              {
+                "defined": "MintProofV2"
+              }
+            ]
           }
         ]
       }
@@ -992,6 +1040,16 @@
       "code": 6016,
       "name": "WhitelistIsFrozen",
       "msg": "whitelist is frozen"
+    },
+    {
+      "code": 6017,
+      "name": "BadMintProof",
+      "msg": "bad mint proof"
+    },
+    {
+      "code": 6018,
+      "name": "MissingMintProof",
+      "msg": "missing mint proof"
     }
   ],
   "metadata": {

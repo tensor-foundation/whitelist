@@ -40,9 +40,14 @@ export const TENSOR_WHITELIST_ERROR__EMPTY_CONDITIONS = 0x177e; // 6014
 export const TENSOR_WHITELIST_ERROR__TOO_MANY_MERKLE_PROOFS = 0x177f; // 6015
 /** WhitelistIsFrozen: whitelist is frozen */
 export const TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN = 0x1780; // 6016
+/** BadMintProof: bad mint proof */
+export const TENSOR_WHITELIST_ERROR__BAD_MINT_PROOF = 0x1781; // 6017
+/** MissingMintProof: missing mint proof */
+export const TENSOR_WHITELIST_ERROR__MISSING_MINT_PROOF = 0x1782; // 6018
 
 export type TensorWhitelistError =
   | typeof TENSOR_WHITELIST_ERROR__BAD_COSIGNER
+  | typeof TENSOR_WHITELIST_ERROR__BAD_MINT_PROOF
   | typeof TENSOR_WHITELIST_ERROR__BAD_OWNER
   | typeof TENSOR_WHITELIST_ERROR__BAD_WHITELIST
   | typeof TENSOR_WHITELIST_ERROR__EMPTY_CONDITIONS
@@ -51,6 +56,7 @@ export type TensorWhitelistError =
   | typeof TENSOR_WHITELIST_ERROR__FAILED_VOC_VERIFICATION
   | typeof TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY
   | typeof TENSOR_WHITELIST_ERROR__INVALID_WHITELIST_INDEX
+  | typeof TENSOR_WHITELIST_ERROR__MISSING_MINT_PROOF
   | typeof TENSOR_WHITELIST_ERROR__MISSING_NAME
   | typeof TENSOR_WHITELIST_ERROR__MISSING_VERIFICATION
   | typeof TENSOR_WHITELIST_ERROR__NO_CONDITIONS
@@ -66,6 +72,7 @@ let tensorWhitelistErrorMessages:
 if (__DEV__) {
   tensorWhitelistErrorMessages = {
     [TENSOR_WHITELIST_ERROR__BAD_COSIGNER]: `passed in cosigner doesnt have the rights to do this`,
+    [TENSOR_WHITELIST_ERROR__BAD_MINT_PROOF]: `bad mint proof`,
     [TENSOR_WHITELIST_ERROR__BAD_OWNER]: `passed in owner doesnt have the rights to do this`,
     [TENSOR_WHITELIST_ERROR__BAD_WHITELIST]: `bad whitelist`,
     [TENSOR_WHITELIST_ERROR__EMPTY_CONDITIONS]: `cannot have empty conditions`,
@@ -74,6 +81,7 @@ if (__DEV__) {
     [TENSOR_WHITELIST_ERROR__FAILED_VOC_VERIFICATION]: `failed voc verification`,
     [TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY]: `invalid authority`,
     [TENSOR_WHITELIST_ERROR__INVALID_WHITELIST_INDEX]: `invalid whitelist index`,
+    [TENSOR_WHITELIST_ERROR__MISSING_MINT_PROOF]: `missing mint proof`,
     [TENSOR_WHITELIST_ERROR__MISSING_NAME]: `missing name`,
     [TENSOR_WHITELIST_ERROR__MISSING_VERIFICATION]: `missing all 3 verification methods: at least one must be present`,
     [TENSOR_WHITELIST_ERROR__NO_CONDITIONS]: `no whitelist conditions provided`,

@@ -16,9 +16,9 @@ import {
 } from '@solana/web3.js';
 
 export enum Mode {
-  FVC,
   MerkleTree,
   VOC,
+  FVC,
 }
 
 export type ModeArgs = Mode;
