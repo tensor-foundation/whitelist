@@ -64,3 +64,28 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Authority {
         Self::deserialize(&mut data)
     }
 }
+
+#[cfg(feature = "anchor")]
+impl anchor_lang::AccountDeserialize for Authority {
+    fn try_deserialize_unchecked(buf: &mut &[u8]) -> anchor_lang::Result<Self> {
+        Ok(Self::deserialize(buf)?)
+    }
+}
+
+#[cfg(feature = "anchor")]
+impl anchor_lang::AccountSerialize for Authority {}
+
+#[cfg(feature = "anchor")]
+impl anchor_lang::Owner for Authority {
+    fn owner() -> Pubkey {
+        crate::TENSOR_WHITELIST_ID
+    }
+}
+
+#[cfg(feature = "anchor-idl-build")]
+impl anchor_lang::IdlBuild for Authority {}
+
+#[cfg(feature = "anchor-idl-build")]
+impl anchor_lang::Discriminator for Authority {
+    const DISCRIMINATOR: [u8; 8] = [0; 8];
+}

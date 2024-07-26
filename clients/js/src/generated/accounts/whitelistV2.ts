@@ -7,17 +7,6 @@
  */
 
 import {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
@@ -37,17 +26,28 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from '@solana/web3.js';
 import { WhitelistV2Seeds, findWhitelistV2Pda } from '../pdas';
 import {
-  Condition,
-  ConditionArgs,
-  State,
-  StateArgs,
   getConditionDecoder,
   getConditionEncoder,
   getStateDecoder,
   getStateEncoder,
+  type Condition,
+  type ConditionArgs,
+  type State,
+  type StateArgs,
 } from '../types';
 
 export type WhitelistV2 = {

@@ -7,23 +7,6 @@
  */
 
 import {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  IAccountMeta,
-  IAccountSignerMeta,
-  IInstruction,
-  IInstructionWithAccounts,
-  IInstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
@@ -38,15 +21,36 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type IAccountMeta,
+  type IAccountSignerMeta,
+  type IInstruction,
+  type IInstructionWithAccounts,
+  type IInstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from '@solana/web3.js';
 import { findWhitelistPda } from '../pdas';
 import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
-import { ResolvedAccount, expectSome, getAccountMetaFactory } from '../shared';
 import {
-  Condition,
-  ConditionArgs,
+  expectSome,
+  getAccountMetaFactory,
+  type ResolvedAccount,
+} from '../shared';
+import {
   getConditionDecoder,
   getConditionEncoder,
+  type Condition,
+  type ConditionArgs,
 } from '../types';
 
 export type CreateWhitelistV2Instruction<

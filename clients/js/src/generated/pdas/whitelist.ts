@@ -7,12 +7,12 @@
  */
 
 import {
-  Address,
-  ProgramDerivedAddress,
-  ReadonlyUint8Array,
   fixEncoderSize,
   getBytesEncoder,
   getProgramDerivedAddress,
+  type Address,
+  type ProgramDerivedAddress,
+  type ReadonlyUint8Array,
 } from '@solana/web3.js';
 
 export type WhitelistSeeds = {

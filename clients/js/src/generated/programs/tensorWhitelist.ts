@@ -7,25 +7,25 @@
  */
 
 import {
-  Address,
   containsBytes,
   fixEncoderSize,
   getBytesEncoder,
+  type Address,
 } from '@solana/web3.js';
 import {
-  ParsedCloseMintProofV2Instruction,
-  ParsedCreateWhitelistV2Instruction,
-  ParsedFreezeWhitelistInstruction,
-  ParsedFreezeWhitelistV2Instruction,
-  ParsedInitUpdateAuthorityInstruction,
-  ParsedInitUpdateMintProofInstruction,
-  ParsedInitUpdateMintProofV2Instruction,
-  ParsedInitUpdateWhitelistInstruction,
-  ParsedReallocAuthorityInstruction,
-  ParsedReallocWhitelistInstruction,
-  ParsedUnfreezeWhitelistInstruction,
-  ParsedUnfreezeWhitelistV2Instruction,
-  ParsedUpdateWhitelistV2Instruction,
+  type ParsedCloseMintProofV2Instruction,
+  type ParsedCreateWhitelistV2Instruction,
+  type ParsedFreezeWhitelistInstruction,
+  type ParsedFreezeWhitelistV2Instruction,
+  type ParsedInitUpdateAuthorityInstruction,
+  type ParsedInitUpdateMintProofInstruction,
+  type ParsedInitUpdateMintProofV2Instruction,
+  type ParsedInitUpdateWhitelistInstruction,
+  type ParsedReallocAuthorityInstruction,
+  type ParsedReallocWhitelistInstruction,
+  type ParsedUnfreezeWhitelistInstruction,
+  type ParsedUnfreezeWhitelistV2Instruction,
+  type ParsedUpdateWhitelistV2Instruction,
 } from '../instructions';
 
 export const TENSOR_WHITELIST_PROGRAM_ADDRESS =

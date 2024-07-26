@@ -7,17 +7,17 @@
  */
 
 import {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
   combineCodec,
   getAddressDecoder,
   getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
 } from '@solana/web3.js';
-import { Mode, ModeArgs, getModeDecoder, getModeEncoder } from '.';
+import { getModeDecoder, getModeEncoder, type Mode, type ModeArgs } from '.';
 
 /**
  * Defines a whitelist condition that items are checked against.
