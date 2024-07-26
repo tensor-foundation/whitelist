@@ -1,29 +1,29 @@
 import {
-    SOLANA_ERROR__JSON_RPC__INVALID_PARAMS,
-    appendTransactionMessageInstruction,
-    generateKeyPairSigner,
-    isSolanaError,
-    pipe,
+  SOLANA_ERROR__JSON_RPC__INVALID_PARAMS,
+  appendTransactionMessageInstruction,
+  generateKeyPairSigner,
+  isSolanaError,
+  pipe,
 } from '@solana/web3.js';
 import {
-    createDefaultSolanaClient,
-    createDefaultTransaction,
-    generateKeyPairSignerWithSol,
-    signAndSendTransaction,
+  createDefaultSolanaClient,
+  createDefaultTransaction,
+  generateKeyPairSignerWithSol,
+  signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
 import test from 'ava';
 import {
-    Condition,
-    Mode,
-    fetchWhitelistV2,
-    findWhitelistV2Pda,
-    getCreateWhitelistV2Instruction,
+  Condition,
+  Mode,
+  fetchWhitelistV2,
+  findWhitelistV2Pda,
+  getCreateWhitelistV2Instruction,
 } from '../src';
 import {
-    DEFAULT_PUBKEY,
-    createWhitelist,
-    createWhitelistThrows,
-    generateUuid,
+  DEFAULT_PUBKEY,
+  createWhitelist,
+  createWhitelistThrows,
+  generateUuid,
 } from './_common';
 
 const MAX_CONDITIONS = 24;

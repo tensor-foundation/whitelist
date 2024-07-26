@@ -1,8 +1,11 @@
 module.exports = {
+  env: {
+    node: true,
+  },
   extends: ['@solana/eslint-config-solana'],
-  ignorePatterns: ['.eslintrc.cjs', 'tsup.config.ts', 'env-shim.ts'],
+  ignorePatterns: ['tsup.config.ts', 'env-shim.ts'],
   parserOptions: {
-    project: 'tsconfig.json',
+    project: './tsconfig.json',
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
@@ -14,4 +17,14 @@ module.exports = {
     'sort-keys-fix/sort-keys-fix': 'off',
     'typescript-sort-keys/interface': 'off',
   },
+  overrides: [
+    {
+      // Parse this file itself with espree instead of TypeScript parser.
+      files: ['.eslintrc.cjs'],
+      parser: 'espree',
+      parserOptions: {
+        ecmaVersion: 2020,
+      },
+    },
+  ],
 };
