@@ -17,19 +17,20 @@ import {
   Condition,
   MintProofV2,
   Mode,
+  TENSOR_WHITELIST_ERROR__FAILED_MERKLE_PROOF_VERIFICATION,
+  TENSOR_WHITELIST_ERROR__NOT_MERKLE_ROOT,
   fetchMintProofV2,
   findMintProofV2Pda,
   getInitUpdateMintProofV2InstructionAsync,
   intoAddress,
 } from '../src';
 import {
+  MAX_PROOF_LENGTH,
   createMintProofThrows,
   createWhitelist,
   upsertMintProof,
 } from './_common';
 import { generateTreeOfSize } from './_merkle';
-
-const MAX_PROOF_LENGTH = 28;
 
 test('it can create and update mint proof v2', async (t) => {
   const client = createDefaultSolanaClient();
@@ -41,7 +42,12 @@ test('it can create and update mint proof v2', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    owner: nftOwner,
+    authority: nftOwner,
+  });
 
   // Setup a merkle tree with our mint as a leaf
   const {
@@ -78,12 +84,12 @@ test('it can create and update mint proof v2', async (t) => {
   }));
 
   // Mint a second NFT
-  const { mint: mint2 } = await createDefaultNft(
+  const { mint: mint2 } = await createDefaultNft({
     client,
-    nftOwner,
-    nftOwner,
-    nftOwner
-  );
+    payer: nftOwner,
+    owner: nftOwner,
+    authority: nftOwner,
+  });
 
   // Setup a new merkle tree with both mints as leaves.
   const {
@@ -135,7 +141,12 @@ test('it cannot override the stored payer', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    owner: nftOwner,
+    authority: nftOwner,
+  });
 
   // Setup a merkle tree with our mint as a leaf
   const {
@@ -202,7 +213,12 @@ test('invalid proof fails', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    owner: nftOwner,
+    authority: nftOwner,
+  });
 
   // Setup a merkle tree with our mint as a leaf
   const { root } = await generateTreeOfSize(10, [mint]);
@@ -230,7 +246,7 @@ test('invalid proof fails', async (t) => {
       Uint8Array.from({ length: 32 }, () => Math.floor(Math.random() * 256)),
     ],
     t,
-    code: 6008n, // FailedMerkleProofVerification
+    code: TENSOR_WHITELIST_ERROR__FAILED_MERKLE_PROOF_VERIFICATION,
   });
 });
 
@@ -244,7 +260,12 @@ test('too long proof fails', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    owner: nftOwner,
+    authority: nftOwner,
+  });
 
   // Setup a merkle tree with our mint as a leaf
   const { root } = await generateTreeOfSize(10, [mint]);
@@ -305,7 +326,12 @@ test('invalid condition fails', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    owner: nftOwner,
+    authority: nftOwner,
+  });
 
   // Setup a merkle tree with our mint as a leaf∏
   const {
@@ -333,6 +359,6 @@ test('invalid condition fails', async (t) => {
     whitelist,
     proof: p.proof, // real proof
     t,
-    code: 6011n, // NotMerkleRoot
+    code: TENSOR_WHITELIST_ERROR__NOT_MERKLE_ROOT, // condition is not merkle root type
   });
 });

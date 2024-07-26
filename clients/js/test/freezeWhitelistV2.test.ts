@@ -1,9 +1,5 @@
-import {
-  SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  appendTransactionMessageInstruction,
-  isSolanaError,
-  pipe,
-} from '@solana/web3.js';
+import { ANCHOR_ERROR__CONSTRAINT_HAS_ONE } from '@coral-xyz/anchor-errors';
+import { appendTransactionMessageInstruction, pipe } from '@solana/web3.js';
 import {
   createDefaultSolanaClient,
   createDefaultTransaction,
@@ -14,13 +10,14 @@ import test from 'ava';
 import {
   Mode,
   State,
+  TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN,
   fetchWhitelistV2,
   getFreezeWhitelistV2Instruction,
   getUnfreezeWhitelistV2Instruction,
   getUpdateWhitelistV2Instruction,
   operation,
 } from '../src';
-import { createWhitelist } from './_common';
+import { createWhitelist, expectCustomError } from './_common';
 
 test('it can freeze and unfreeze a whitelist v2', async (t) => {
   const client = createDefaultSolanaClient();
@@ -96,6 +93,8 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
   const client = createDefaultSolanaClient();
   const updateAuthority = await generateKeyPairSignerWithSol(client);
   const voc = (await generateKeyPairSignerWithSol(client)).address;
+
+  // Funded to pay for the freeze transactions.
   const freezeAuthority = await generateKeyPairSignerWithSol(client);
 
   // Create a whitelist with a freeze authority set.
@@ -159,14 +158,87 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  const error = await t.throwsAsync<Error & { data: { logs: string[] } }>(
-    promise
+  await expectCustomError(
+    t,
+    promise,
+    TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN
+  );
+});
+
+test('update authority cannot freeze and unfreeze a whitelist v2', async (t) => {
+  const client = createDefaultSolanaClient();
+
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const freezeAuthority = await generateKeyPairSignerWithSol(client);
+
+  // Create a whitelist with a freeze authority set.
+  const { whitelist, uuid, conditions } = await createWhitelist({
+    client,
+    updateAuthority,
+    freezeAuthority: freezeAuthority.address,
+  });
+
+  // It was created correctly, and is unfrozen.
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      uuid,
+      conditions,
+      state: State.Unfrozen,
+    },
+  });
+
+  // Freeze
+  let freezeWhitelistIx = getFreezeWhitelistV2Instruction({
+    freezeAuthority: updateAuthority, // Should not be able to freeze
+    whitelist,
+  });
+
+  let promise = pipe(
+    await createDefaultTransaction(client, updateAuthority),
+    (tx) => appendTransactionMessageInstruction(freezeWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
   );
 
-  if (isSolanaError(error.cause, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
-    t.assert(error.cause.context.code === 6016);
-  } else {
-    // Expected a custom error, but didn't get one.
-    t.assert(false);
-  }
+  // Has-one constraint checks that signer is the freeze authority.
+  await expectCustomError(t, promise, ANCHOR_ERROR__CONSTRAINT_HAS_ONE);
+
+  // Freeze
+  freezeWhitelistIx = getFreezeWhitelistV2Instruction({
+    freezeAuthority,
+    whitelist,
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, freezeAuthority),
+    (tx) => appendTransactionMessageInstruction(freezeWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      uuid,
+      // Is now frozen
+      state: State.Frozen,
+      conditions,
+    },
+  });
+
+  // Fail to Unfreeze
+  const unfreezeWhitelistIx = getUnfreezeWhitelistV2Instruction({
+    freezeAuthority: updateAuthority,
+    whitelist,
+  });
+
+  promise = pipe(
+    await createDefaultTransaction(client, updateAuthority),
+    (tx) => appendTransactionMessageInstruction(unfreezeWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  // Has-one constraint checks that signer is the freeze authority.
+  await expectCustomError(t, promise, ANCHOR_ERROR__CONSTRAINT_HAS_ONE);
 });
