@@ -101,9 +101,13 @@ export type CloseMintProofV2Input<
   TAccountMintProof extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
+  /** Receives rent if < 100 slots after mint_proof creation. */
   payer: Address<TAccountPayer>;
+  /** Signing account, will receive rent if > 100 slots after mint_proof creation. */
   signer: TransactionSigner<TAccountSigner>;
+  /** The mint proof account to close. */
   mintProof: Address<TAccountMintProof>;
+  /** The Solana system program account. */
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
@@ -174,9 +178,13 @@ export type ParsedCloseMintProofV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
+    /** Receives rent if < 100 slots after mint_proof creation. */
     payer: TAccountMetas[0];
+    /** Signing account, will receive rent if > 100 slots after mint_proof creation. */
     signer: TAccountMetas[1];
+    /** The mint proof account to close. */
     mintProof: TAccountMetas[2];
+    /** The Solana system program account. */
     systemProgram: TAccountMetas[3];
   };
   data: CloseMintProofV2InstructionData;

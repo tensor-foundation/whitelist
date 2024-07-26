@@ -6,7 +6,7 @@ mod whitelist;
 pub use authority::*;
 pub use full_merkle_proof::*;
 pub use mint_proof::*;
-use tensor_toolbox::assert_decode_metadata;
+use tensor_toolbox::token_metadata::assert_decode_metadata;
 pub use whitelist::*;
 
 // V2

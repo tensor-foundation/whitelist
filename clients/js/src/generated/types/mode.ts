@@ -15,6 +15,7 @@ import {
   getEnumEncoder,
 } from '@solana/web3.js';
 
+/** Mode enum for whitelist conditions. */
 export enum Mode {
   MerkleTree,
   VOC,

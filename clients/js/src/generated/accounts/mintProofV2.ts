@@ -44,16 +44,24 @@ import { MintProofV2Seeds, findMintProofV2Pda } from '../pdas';
 
 export type MintProofV2 = {
   discriminator: ReadonlyUint8Array;
+  /** Length of proof without padding. */
   proofLen: number;
+  /** Proof that the mint is part of the Merkle tree. */
   proof: Array<ReadonlyUint8Array>;
+  /** Slot the proof was created. */
   creationSlot: bigint;
+  /** The account that paid for creation of the proof. */
   payer: Address;
 };
 
 export type MintProofV2Args = {
+  /** Length of proof without padding. */
   proofLen: number;
+  /** Proof that the mint is part of the Merkle tree. */
   proof: Array<ReadonlyUint8Array>;
+  /** Slot the proof was created. */
   creationSlot: number | bigint;
+  /** The account that paid for creation of the proof. */
   payer: Address;
 };
 

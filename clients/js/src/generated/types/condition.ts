@@ -19,6 +19,18 @@ import {
 } from '@solana/web3.js';
 import { Mode, ModeArgs, getModeDecoder, getModeEncoder } from '.';
 
+/**
+ * Defines a whitelist condition that items are checked against.
+ * Conditions are made up of a mode and a value.
+ * The mode determines what kind of value is present to be validated against.
+ * The value is the data used to validate against the whitelist.
+ *
+ * Current modes:
+ * - MerkleTree: The value is the root node of a Merkle tree.
+ * - VOC: The value is the Metaplex "verified-on-chain"/Metaplex Certified Collection address.
+ * - FVC: The value is the first verified creator address of the Metaplex creators metadata.
+ */
+
 export type Condition = { mode: Mode; value: Address };
 
 export type ConditionArgs = { mode: ModeArgs; value: Address };

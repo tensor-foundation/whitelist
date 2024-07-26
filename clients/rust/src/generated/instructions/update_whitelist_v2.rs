@@ -12,14 +12,15 @@ use borsh::BorshSerialize;
 
 /// Accounts.
 pub struct UpdateWhitelistV2 {
+    /// Rent payer if reallocating the WhitelistV2 account to include more conditions.
     pub payer: solana_program::pubkey::Pubkey,
-
+    /// The current update authority.
     pub update_authority: solana_program::pubkey::Pubkey,
 
     pub new_update_authority: Option<solana_program::pubkey::Pubkey>,
-
+    /// The WhitelistV2 account to update.
     pub whitelist: solana_program::pubkey::Pubkey,
-
+    /// The Solana system program.
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
@@ -129,11 +130,13 @@ impl UpdateWhitelistV2Builder {
     pub fn new() -> Self {
         Self::default()
     }
+    /// Rent payer if reallocating the WhitelistV2 account to include more conditions.
     #[inline(always)]
     pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
         self.payer = Some(payer);
         self
     }
+    /// The current update authority.
     #[inline(always)]
     pub fn update_authority(
         &mut self,
@@ -151,12 +154,14 @@ impl UpdateWhitelistV2Builder {
         self.new_update_authority = new_update_authority;
         self
     }
+    /// The WhitelistV2 account to update.
     #[inline(always)]
     pub fn whitelist(&mut self, whitelist: solana_program::pubkey::Pubkey) -> &mut Self {
         self.whitelist = Some(whitelist);
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
+    /// The Solana system program.
     #[inline(always)]
     pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
@@ -216,14 +221,15 @@ impl UpdateWhitelistV2Builder {
 
 /// `update_whitelist_v2` CPI accounts.
 pub struct UpdateWhitelistV2CpiAccounts<'a, 'b> {
+    /// Rent payer if reallocating the WhitelistV2 account to include more conditions.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The current update authority.
     pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-
+    /// The WhitelistV2 account to update.
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The Solana system program.
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
@@ -231,15 +237,15 @@ pub struct UpdateWhitelistV2CpiAccounts<'a, 'b> {
 pub struct UpdateWhitelistV2Cpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// Rent payer if reallocating the WhitelistV2 account to include more conditions.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The current update authority.
     pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub new_update_authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-
+    /// The WhitelistV2 account to update.
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The Solana system program.
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: UpdateWhitelistV2InstructionArgs,
@@ -390,11 +396,13 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
         });
         Self { instruction }
     }
+    /// Rent payer if reallocating the WhitelistV2 account to include more conditions.
     #[inline(always)]
     pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.payer = Some(payer);
         self
     }
+    /// The current update authority.
     #[inline(always)]
     pub fn update_authority(
         &mut self,
@@ -412,6 +420,7 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
         self.instruction.new_update_authority = new_update_authority;
         self
     }
+    /// The WhitelistV2 account to update.
     #[inline(always)]
     pub fn whitelist(
         &mut self,
@@ -420,6 +429,7 @@ impl<'a, 'b> UpdateWhitelistV2CpiBuilder<'a, 'b> {
         self.instruction.whitelist = Some(whitelist);
         self
     }
+    /// The Solana system program.
     #[inline(always)]
     pub fn system_program(
         &mut self,

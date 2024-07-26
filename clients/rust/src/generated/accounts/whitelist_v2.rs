@@ -11,31 +11,43 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 use solana_program::pubkey::Pubkey;
 
-/// Seeds: ["whitelist", <namespace>, <uuid>]
+/// Whitelist V2 state
+/// Seeds: `["whitelist", <namespace>, <uuid>]`
+///
+/// The state account for Whitelist V2. This account stores all the information
+/// and values of a Whitelist, including the list of conditions to validate an item against.
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct WhitelistV2 {
     pub discriminator: [u8; 8],
+    /// Whitelist version, used to control upgrades.
     pub version: u8,
+    /// Bump seed used to derive the PDA.
     pub bump: u8,
+    /// Owner-chosen identifier for the whitelist.
     pub uuid: [u8; 32],
+    /// Whitelist state--currently either Frozen or Unfrozen.
     pub state: State,
+    /// Authority that can update the whitelist.
     #[cfg_attr(
         feature = "serde",
         serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
     )]
     pub update_authority: Pubkey,
+    /// Namespace for the whitelist to further differentiate it from other whitelists owned by the same authority.
     #[cfg_attr(
         feature = "serde",
         serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
     )]
     pub namespace: Pubkey,
+    /// Authority that can freeze/unfreeze the whitelist.
     #[cfg_attr(
         feature = "serde",
         serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
     )]
     pub freeze_authority: Pubkey,
+    /// Whitelist conditions that must be met to validate against the whitelist.
     pub conditions: Vec<Condition>,
 }
 

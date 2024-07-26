@@ -9,18 +9,26 @@ use crate::{
     Mode, WhitelistV2, MINT_PROOF_V2_SIZE,
 };
 
+/// Permissionlessly initialize or update a mint proof.
+///
+/// Mint Proofs are designed to be created on-the-fly, typically
+/// in the same transaction they are used. They can be permissionlessly
+/// created and closed.
 #[derive(Accounts)]
 pub struct InitUpdateMintProofV2<'info> {
+    /// Rent payer for the mint proof account if it is initialized.
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// The mint account for which the proof is being created.
     pub mint: Box<InterfaceAccount<'info, Mint>>,
 
+    /// The whitelist account that the mint proof must validate against.
     // No constraints checks here because creating the mint proof is permissionless.
     // As long as the mint proof validates against the whitelist, it's valid.
     #[account(
         seeds = [
-            b"whitelist",
+            WhitelistV2::PREFIX,
             &whitelist.namespace.key().as_ref(),
             &whitelist.uuid
         ],
@@ -28,12 +36,12 @@ pub struct InitUpdateMintProofV2<'info> {
     )]
     pub whitelist: Box<Account<'info, WhitelistV2>>,
 
-    // Seed derived from mint + whitelist addresses.
+    /// The mint proof account to initialize or update.
     #[account(
         init_if_needed,
         payer = payer,
         seeds = [
-            b"mint_proof_v2".as_ref(),
+            MintProofV2::PREFIX,
             mint.key().as_ref(),
             whitelist.key().as_ref(),
         ],
@@ -42,9 +50,11 @@ pub struct InitUpdateMintProofV2<'info> {
     )]
     pub mint_proof: Box<Account<'info, MintProofV2>>,
 
+    /// The Solana system program account.
     pub system_program: Program<'info, System>,
 }
 
+/// Initializes or updates a mint proof.
 pub fn process_init_update_mint_proof_v2(
     ctx: Context<InitUpdateMintProofV2>,
     proof: Vec<[u8; 32]>,

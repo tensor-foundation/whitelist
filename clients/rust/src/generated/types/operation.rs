@@ -9,6 +9,9 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 use solana_program::pubkey::Pubkey;
 
+/// Noop -- do nothing
+/// Clear -- clear the value
+/// Set -- set the value to the given pubkey
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Operation {

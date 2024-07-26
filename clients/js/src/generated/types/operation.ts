@@ -26,6 +26,12 @@ import {
   getUnitEncoder,
 } from '@solana/web3.js';
 
+/**
+ * Noop -- do nothing
+ * Clear -- clear the value
+ * Set -- set the value to the given pubkey
+ */
+
 export type Operation =
   | { __kind: 'Noop' }
   | { __kind: 'Clear' }

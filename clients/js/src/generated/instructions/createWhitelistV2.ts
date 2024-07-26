@@ -139,9 +139,13 @@ export type CreateWhitelistV2AsyncInput<
   TAccountWhitelist extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
+  /** The rent payer. */
   payer: TransactionSigner<TAccountPayer>;
+  /** The authority that will be allowed to update the whitelist. */
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
+  /** Namespace keypair used to derive the whitelist PDA. */
   namespace: TransactionSigner<TAccountNamespace>;
+  /** The whitelist PDA. */
   whitelist?: Address<TAccountWhitelist>;
   systemProgram?: Address<TAccountSystemProgram>;
   uuid: CreateWhitelistV2InstructionDataArgs['uuid'];
@@ -235,9 +239,13 @@ export type CreateWhitelistV2Input<
   TAccountWhitelist extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
+  /** The rent payer. */
   payer: TransactionSigner<TAccountPayer>;
+  /** The authority that will be allowed to update the whitelist. */
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
+  /** Namespace keypair used to derive the whitelist PDA. */
   namespace: TransactionSigner<TAccountNamespace>;
+  /** The whitelist PDA. */
   whitelist: Address<TAccountWhitelist>;
   systemProgram?: Address<TAccountSystemProgram>;
   uuid: CreateWhitelistV2InstructionDataArgs['uuid'];
@@ -323,9 +331,13 @@ export type ParsedCreateWhitelistV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
+    /** The rent payer. */
     payer: TAccountMetas[0];
+    /** The authority that will be allowed to update the whitelist. */
     updateAuthority: TAccountMetas[1];
+    /** Namespace keypair used to derive the whitelist PDA. */
     namespace: TAccountMetas[2];
+    /** The whitelist PDA. */
     whitelist: TAccountMetas[3];
     systemProgram: TAccountMetas[4];
   };

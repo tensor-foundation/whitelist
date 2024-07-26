@@ -9,6 +9,7 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 use num_derive::FromPrimitive;
 
+/// Mode enum for whitelist conditions.
 #[derive(
     BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq, PartialOrd, Hash, FromPrimitive,
 )]

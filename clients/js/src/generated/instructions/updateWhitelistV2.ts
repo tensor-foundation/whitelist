@@ -136,10 +136,14 @@ export type UpdateWhitelistV2Input<
   TAccountWhitelist extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
+  /** Rent payer if reallocating the WhitelistV2 account to include more conditions. */
   payer: TransactionSigner<TAccountPayer>;
+  /** The current update authority. */
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
   newUpdateAuthority?: TransactionSigner<TAccountNewUpdateAuthority>;
+  /** The WhitelistV2 account to update. */
   whitelist: Address<TAccountWhitelist>;
+  /** The Solana system program. */
   systemProgram?: Address<TAccountSystemProgram>;
   freezeAuthority: UpdateWhitelistV2InstructionDataArgs['freezeAuthority'];
   conditions: UpdateWhitelistV2InstructionDataArgs['conditions'];
@@ -226,10 +230,14 @@ export type ParsedUpdateWhitelistV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
+    /** Rent payer if reallocating the WhitelistV2 account to include more conditions. */
     payer: TAccountMetas[0];
+    /** The current update authority. */
     updateAuthority: TAccountMetas[1];
     newUpdateAuthority?: TAccountMetas[2] | undefined;
+    /** The WhitelistV2 account to update. */
     whitelist: TAccountMetas[3];
+    /** The Solana system program. */
     systemProgram: TAccountMetas[4];
   };
   data: UpdateWhitelistV2InstructionData;

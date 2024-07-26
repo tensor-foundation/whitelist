@@ -33,10 +33,12 @@ pub mod whitelist_program {
 
     use super::*;
 
+    /// Freeze a whitelist so that an extra signature is required to update it.
     pub fn freeze_whitelist(ctx: Context<FreezeWhitelist>) -> Result<()> {
         instructions::process_freeze_whitelist(ctx)
     }
 
+    /// Initialize or update the whitelist singleton authority.
     pub fn init_update_authority(
         ctx: Context<InitUpdateAuthority>,
         new_cosigner: Option<Pubkey>,
@@ -45,6 +47,7 @@ pub mod whitelist_program {
         instructions::process_init_update_authority(ctx, new_cosigner, new_owner)
     }
 
+    /// Initialize or update a mint proof.
     pub fn init_update_mint_proof(
         ctx: Context<InitUpdateMintProof>,
         proof: Vec<[u8; 32]>,
@@ -52,6 +55,7 @@ pub mod whitelist_program {
         instructions::process_init_update_mint_proof(ctx, proof)
     }
 
+    /// Initialize or update a whitelist.
     pub fn init_update_whitelist(
         ctx: Context<InitUpdateWhitelist>,
         uuid: [u8; 32],
@@ -63,20 +67,24 @@ pub mod whitelist_program {
         instructions::process_init_update_whitelist(ctx, uuid, root_hash, name, voc, fvc)
     }
 
+    /// Reallocate space on the whitelist authority singleton.
     pub fn realloc_authority(ctx: Context<ReallocAuthority>) -> Result<()> {
         instructions::process_realloc_authority(ctx)
     }
 
+    /// Reallocate space on the whitelist.
     pub fn realloc_whitelist(ctx: Context<ReallocWhitelist>) -> Result<()> {
         instructions::process_realloc_whitelist(ctx)
     }
 
+    /// Unfreeze a whitelist so that only one signature is required to update it.
     pub fn unfreeze_whitelist(ctx: Context<UnfreezeWhitelist>) -> Result<()> {
         instructions::process_unfreeze_whitelist(ctx)
     }
 
-    /* ------WhitelistV2------ */
+    /* ------Whitelist V2------ */
 
+    /// Create a new whitelist V2.
     pub fn create_whitelist_v2(
         ctx: Context<CreateWhitelistV2>,
         args: CreateWhitelistV2Args,
@@ -84,6 +92,7 @@ pub mod whitelist_program {
         process_create_whitelist_v2(ctx, args)
     }
 
+    /// Update a whitelist V2.
     pub fn update_whitelist_v2(
         ctx: Context<UpdateWhitelistV2>,
         args: UpdateWhitelistV2Args,
@@ -91,6 +100,7 @@ pub mod whitelist_program {
         process_update_whitelist_v2(ctx, args)
     }
 
+    /// Initialize or update a mint proof V2.
     pub fn init_update_mint_proof_v2(
         ctx: Context<InitUpdateMintProofV2>,
         proof: Vec<[u8; 32]>,
@@ -98,14 +108,17 @@ pub mod whitelist_program {
         process_init_update_mint_proof_v2(ctx, proof)
     }
 
+    /// Close a mint proof V2.
     pub fn close_mint_proof_v2(ctx: Context<CloseMintProofV2>) -> Result<()> {
         process_close_mint_proof_v2(ctx)
     }
 
+    /// Freeze a whitelist V2.
     pub fn freeze_whitelist_v2(ctx: Context<FreezeWhitelistV2>) -> Result<()> {
         process_freeze_whitelist_v2(ctx)
     }
 
+    /// Unfreeze a whitelist V2.
     pub fn unfreeze_whitelist_v2(ctx: Context<UnfreezeWhitelistV2>) -> Result<()> {
         process_unfreeze_whitelist_v2(ctx)
     }

@@ -15,6 +15,7 @@ import {
   getEnumEncoder,
 } from '@solana/web3.js';
 
+/** White list state enum. Currently only supports Frozen and Unfrozen. */
 export enum State {
   Unfrozen,
   Frozen,
