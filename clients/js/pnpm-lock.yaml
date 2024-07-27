@@ -31,17 +31,14 @@ importers:
         specifier: 2.0.0-preview.3
         version: 2.0.0-preview.3
       '@tensor-foundation/mpl-token-metadata':
-        specifier: 0.1.2
-        version: 0.1.2(fastestsmallesttextencoderdecoder@1.0.22)(ws@8.18.0)
+        specifier: ^0.1.0
+        version: 0.1.0(fastestsmallesttextencoderdecoder@1.0.22)(ws@8.18.0)
       '@tensor-foundation/test-helpers':
-        specifier: 0.1.0
+        specifier: ^0.1.0
         version: 0.1.0(fastestsmallesttextencoderdecoder@1.0.22)(ws@8.18.0)
       '@types/node':
-        specifier: 20.12.7
-        version: 20.12.7
-      '@types/uuid':
-        specifier: ^9.0.8
-        version: 9.0.8
+        specifier: ^20.14.12
+        version: 20.14.12
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.0.0
         version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)
@@ -552,11 +549,11 @@ packages:
   '@solana/webcrypto-ed25519-polyfill@2.0.0-preview.3':
     resolution: {integrity: sha512-MaV4swf8QJr+H7BVr9hJiZxn/nWedvCMSJB53GtHse5/EC+STdBMzfELICKXiQtycWC5V4vC9LKTOHIjx2zXhg==}
 
-  '@tensor-foundation/mpl-token-metadata@0.1.2':
-    resolution: {integrity: sha512-OGjHNvIesR389MnsO3vZmL/U//gyJmG8Sdd/sUtYqUpxKB7Gw8EAyhQotye/4Q/IEfjG2I5s9e+dT/BlckTf6A==, tarball: https://npm.pkg.github.com/download/@tensor-foundation/mpl-token-metadata/0.1.2/25884b82dddb934d15c38ac256aec67c8863ad1e}
+  '@tensor-foundation/mpl-token-metadata@0.1.0':
+    resolution: {integrity: sha512-4XIwodNqCGP3KItpeop9iDL3fqql90pyPYBl5iLFGm4AUjiIxy8KD1fFIU7XbeYyNyrj6CpNyyREeKLMJSo0Ag==}
 
   '@tensor-foundation/test-helpers@0.1.0':
-    resolution: {integrity: sha512-ogQiP2gOGjeXLeWntxMfBLGwogP2yaTQ4hEOThMIlhH15tc7+s2taR9WRv70Q8PC50HWv0asU5pLIEjFzdUdEg==, tarball: https://npm.pkg.github.com/download/@tensor-foundation/test-helpers/0.1.0/b05625d2a3c4b38526f519e34c6de0f467172c49}
+    resolution: {integrity: sha512-FSb3ZS0TMAlCclx+T44+0wDe9KChgaoNkPo/Tl7faiTA5fpZq3N3rgx1YIBgA5fWncMbtdauX4fUbKNdRXBSLA==}
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
@@ -564,14 +561,11 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@20.12.7':
-    resolution: {integrity: sha512-wq0cICSkRLVaf3UGLMGItu/PtdY7oaXaI/RVU+xliKVOtRna3PRY57ZDfztpDL0n11vfymMUnXv8QwYCO7L1wg==}
+  '@types/node@20.14.12':
+    resolution: {integrity: sha512-r7wNXakLeSsGT0H1AU863vS2wa5wBOK4bWMjZz2wj+8nBx+m5PeIn0k8AloSLpRuiwdRQZwarZqHE4FNArPuJQ==}
 
   '@types/semver@7.5.8':
     resolution: {integrity: sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==}
-
-  '@types/uuid@9.0.8':
-    resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==}
 
   '@typescript-eslint/eslint-plugin@6.21.0':
     resolution: {integrity: sha512-oy9+hTPCUFpngkEZUSzbf9MxI65wbKFoQYsgPdILTfbUldp5ovUuphZVe4i30emU9M/kP+T64Di0mxl7dSw3MA==}
@@ -2605,7 +2599,7 @@ snapshots:
     dependencies:
       '@noble/ed25519': 2.1.0
 
-  '@tensor-foundation/mpl-token-metadata@0.1.2(fastestsmallesttextencoderdecoder@1.0.22)(ws@8.18.0)':
+  '@tensor-foundation/mpl-token-metadata@0.1.0(fastestsmallesttextencoderdecoder@1.0.22)(ws@8.18.0)':
     dependencies:
       '@solana/web3.js': 2.0.0-preview.3(fastestsmallesttextencoderdecoder@1.0.22)(ws@8.18.0)
       '@tensor-foundation/test-helpers': 0.1.0(fastestsmallesttextencoderdecoder@1.0.22)(ws@8.18.0)
@@ -2627,13 +2621,11 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@20.12.7':
+  '@types/node@20.14.12':
     dependencies:
       undici-types: 5.26.5
 
   '@types/semver@7.5.8': {}
-
-  '@types/uuid@9.0.8': {}
 
   '@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)':
     dependencies:

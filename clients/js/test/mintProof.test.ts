@@ -89,8 +89,8 @@ test('it can create and update mint proof v2', async (t) => {
   const { mint: mint2 } = await createDefaultNft({
     client,
     payer: nftOwner,
-    owner: nftOwner,
     authority: nftOwner,
+    owner: nftOwner,
   });
 
   // Setup a new merkle tree with both mints as leaves.
@@ -146,8 +146,8 @@ test('it cannot override the stored payer', async (t) => {
   const { mint } = await createDefaultNft({
     client,
     payer: nftOwner,
-    owner: nftOwner,
     authority: nftOwner,
+    owner: nftOwner,
   });
 
   // Setup a merkle tree with our mint as a leaf
@@ -218,8 +218,8 @@ test('invalid proof fails', async (t) => {
   const { mint } = await createDefaultNft({
     client,
     payer: nftOwner,
-    owner: nftOwner,
     authority: nftOwner,
+    owner: nftOwner,
   });
 
   // Setup a merkle tree with our mint as a leaf
@@ -265,8 +265,8 @@ test('too long proof fails', async (t) => {
   const { mint } = await createDefaultNft({
     client,
     payer: nftOwner,
-    owner: nftOwner,
     authority: nftOwner,
+    owner: nftOwner,
   });
 
   // Setup a merkle tree with our mint as a leaf
@@ -331,8 +331,8 @@ test('invalid condition fails', async (t) => {
   const { mint } = await createDefaultNft({
     client,
     payer: nftOwner,
-    owner: nftOwner,
     authority: nftOwner,
+    owner: nftOwner,
   });
 
   // Setup a merkle tree with our mint as a leaf∏
