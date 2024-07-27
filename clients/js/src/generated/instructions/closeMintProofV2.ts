@@ -7,20 +7,6 @@
  */
 
 import {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  IAccountMeta,
-  IAccountSignerMeta,
-  IInstruction,
-  IInstructionWithAccounts,
-  IInstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
@@ -29,9 +15,23 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type IAccountMeta,
+  type IAccountSignerMeta,
+  type IInstruction,
+  type IInstructionWithAccounts,
+  type IInstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from '@solana/web3.js';
 import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
-import { ResolvedAccount, getAccountMetaFactory } from '../shared';
+import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
 
 export type CloseMintProofV2Instruction<
   TProgram extends string = typeof TENSOR_WHITELIST_PROGRAM_ADDRESS,
@@ -101,9 +101,13 @@ export type CloseMintProofV2Input<
   TAccountMintProof extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
+  /** Receives rent if < 100 slots after mint_proof creation. */
   payer: Address<TAccountPayer>;
+  /** Signing account, will receive rent if > 100 slots after mint_proof creation. */
   signer: TransactionSigner<TAccountSigner>;
+  /** The mint proof account to close. */
   mintProof: Address<TAccountMintProof>;
+  /** The Solana system program account. */
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
@@ -174,9 +178,13 @@ export type ParsedCloseMintProofV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
+    /** Receives rent if < 100 slots after mint_proof creation. */
     payer: TAccountMetas[0];
+    /** Signing account, will receive rent if > 100 slots after mint_proof creation. */
     signer: TAccountMetas[1];
+    /** The mint proof account to close. */
     mintProof: TAccountMetas[2];
+    /** The Solana system program account. */
     systemProgram: TAccountMetas[3];
   };
   data: CloseMintProofV2InstructionData;

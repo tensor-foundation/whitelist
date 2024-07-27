@@ -9,15 +9,30 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 use solana_program::pubkey::Pubkey;
 
+/// MintProof V2 state
 /// Seeds: ["mint_proof_v2", mint, whitelist]
+///
+/// The state account for MintProofV2 that stores the proof
+/// that a particular mint is part of a Merkle tree. The account
+/// is derived from the mint and the whitelist to tie them together uniquely.
+///
+/// Mint proofs are designed to be created on-the-fly when needed, typically in the same
+/// transaction. Creating and closing them is permissionless, but the creation slot is used
+/// to determine if the original payer receives the rent back or if the current caller does.
+/// There is a 100 slot delay after which the current caller receives the rent back to incentivize
+/// cleaning up old accounts.
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MintProofV2 {
     pub discriminator: [u8; 8],
+    /// Length of proof without padding.
     pub proof_len: u8,
+    /// Proof that the mint is part of the Merkle tree.
     pub proof: [[u8; 32]; 28],
+    /// Slot the proof was created.
     pub creation_slot: u64,
+    /// The account that paid for creation of the proof.
     #[cfg_attr(
         feature = "serde",
         serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
@@ -80,4 +95,29 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for MintProofV2
         let mut data: &[u8] = &(*account_info.data).borrow();
         Self::deserialize(&mut data)
     }
+}
+
+#[cfg(feature = "anchor")]
+impl anchor_lang::AccountDeserialize for MintProofV2 {
+    fn try_deserialize_unchecked(buf: &mut &[u8]) -> anchor_lang::Result<Self> {
+        Ok(Self::deserialize(buf)?)
+    }
+}
+
+#[cfg(feature = "anchor")]
+impl anchor_lang::AccountSerialize for MintProofV2 {}
+
+#[cfg(feature = "anchor")]
+impl anchor_lang::Owner for MintProofV2 {
+    fn owner() -> Pubkey {
+        crate::TENSOR_WHITELIST_ID
+    }
+}
+
+#[cfg(feature = "anchor-idl-build")]
+impl anchor_lang::IdlBuild for MintProofV2 {}
+
+#[cfg(feature = "anchor-idl-build")]
+impl anchor_lang::Discriminator for MintProofV2 {
+    const DISCRIMINATOR: [u8; 8] = [0; 8];
 }

@@ -7,17 +7,6 @@
  */
 
 import {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
@@ -37,39 +26,66 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from '@solana/web3.js';
 import { WhitelistV2Seeds, findWhitelistV2Pda } from '../pdas';
 import {
-  Condition,
-  ConditionArgs,
-  State,
-  StateArgs,
   getConditionDecoder,
   getConditionEncoder,
   getStateDecoder,
   getStateEncoder,
+  type Condition,
+  type ConditionArgs,
+  type State,
+  type StateArgs,
 } from '../types';
 
 export type WhitelistV2 = {
   discriminator: ReadonlyUint8Array;
+  /** Whitelist version, used to control upgrades. */
   version: number;
+  /** Bump seed used to derive the PDA. */
   bump: number;
+  /** Owner-chosen identifier for the whitelist. */
   uuid: ReadonlyUint8Array;
+  /** Whitelist state--currently either Frozen or Unfrozen. */
   state: State;
+  /** Authority that can update the whitelist. */
   updateAuthority: Address;
+  /** Namespace for the whitelist to further differentiate it from other whitelists owned by the same authority. */
   namespace: Address;
+  /** Authority that can freeze/unfreeze the whitelist. */
   freezeAuthority: Address;
+  /** Whitelist conditions that must be met to validate against the whitelist. */
   conditions: Array<Condition>;
 };
 
 export type WhitelistV2Args = {
+  /** Whitelist version, used to control upgrades. */
   version: number;
+  /** Bump seed used to derive the PDA. */
   bump: number;
+  /** Owner-chosen identifier for the whitelist. */
   uuid: ReadonlyUint8Array;
+  /** Whitelist state--currently either Frozen or Unfrozen. */
   state: StateArgs;
+  /** Authority that can update the whitelist. */
   updateAuthority: Address;
+  /** Namespace for the whitelist to further differentiate it from other whitelists owned by the same authority. */
   namespace: Address;
+  /** Authority that can freeze/unfreeze the whitelist. */
   freezeAuthority: Address;
+  /** Whitelist conditions that must be met to validate against the whitelist. */
   conditions: Array<ConditionArgs>;
 };
 

@@ -1,13 +1,19 @@
 use crate::{error::ErrorCode, state::WhitelistV2, Condition, VEC_LENGTH};
 use anchor_lang::prelude::*;
 
+/// Update whitelist v2 args.
+///
+/// Operation is a tri-state enum that allows leaving the authority unchanged, clearing it, or setting it to a new pubkey.
+/// Conditions can't be cleared to be empty, so None is the equivalent of a no-op.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct UpdateWhitelistV2Args {
     freeze_authority: Operation,
     conditions: Option<Vec<Condition>>,
 }
 
-// Allows for the update authority to be set to a new pubkey, or cleared.
+/// Noop -- do nothing
+/// Clear -- clear the value
+/// Set -- set the value to the given pubkey
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub enum Operation {
     Noop,
@@ -37,18 +43,22 @@ impl Operation {
     }
 }
 
+/// Update various fields on the WhitelistV2 account.
 #[derive(Accounts)]
 #[instruction(args: UpdateWhitelistV2Args)]
 pub struct UpdateWhitelistV2<'info> {
+    /// Rent payer if reallocating the WhitelistV2 account to include more conditions.
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    /// The current update authority.
     #[account(mut)]
     pub update_authority: Signer<'info>,
 
-    // New update authority must be a signer, if present, to prevent mistakes.
+    // New update authority, which must be a signer, if present, to prevent mistakes.
     pub new_update_authority: Option<Signer<'info>>,
 
+    /// The WhitelistV2 account to update.
     #[account(
         mut,
         // Realloc to new length; if no conditions are passed in, use the existing length--which should be no-op.
@@ -61,24 +71,26 @@ pub struct UpdateWhitelistV2<'info> {
     )]
     pub whitelist: Account<'info, WhitelistV2>,
 
+    /// The Solana system program.
     pub system_program: Program<'info, System>,
 }
 
+/// Update the WhitelistV2 account.
 pub fn process_update_whitelist_v2(
     ctx: Context<UpdateWhitelistV2>,
     args: UpdateWhitelistV2Args,
 ) -> Result<()> {
     let whitelist = &mut ctx.accounts.whitelist;
 
+    // Check if the whitelist is frozen; cannot update if it is.
+    if whitelist.is_frozen() {
+        return Err(ErrorCode::WhitelistIsFrozen.into());
+    }
+
     // None means no update to conditions so nothing to validate.
     if let Some(mut conditions) = args.conditions {
         WhitelistV2::validate_conditions(&mut conditions)?;
         whitelist.conditions = conditions;
-    }
-
-    // Check if the whitelist is frozen; cannot update if it is.
-    if whitelist.is_frozen() {
-        return Err(ErrorCode::WhitelistIsFrozen.into());
     }
 
     // Update the freeze authority. If the Operation is None, then there's nothing to do.

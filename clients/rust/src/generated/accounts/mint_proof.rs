@@ -69,3 +69,28 @@ impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for MintProof {
         Self::deserialize(&mut data)
     }
 }
+
+#[cfg(feature = "anchor")]
+impl anchor_lang::AccountDeserialize for MintProof {
+    fn try_deserialize_unchecked(buf: &mut &[u8]) -> anchor_lang::Result<Self> {
+        Ok(Self::deserialize(buf)?)
+    }
+}
+
+#[cfg(feature = "anchor")]
+impl anchor_lang::AccountSerialize for MintProof {}
+
+#[cfg(feature = "anchor")]
+impl anchor_lang::Owner for MintProof {
+    fn owner() -> Pubkey {
+        crate::TENSOR_WHITELIST_ID
+    }
+}
+
+#[cfg(feature = "anchor-idl-build")]
+impl anchor_lang::IdlBuild for MintProof {}
+
+#[cfg(feature = "anchor-idl-build")]
+impl anchor_lang::Discriminator for MintProof {
+    const DISCRIMINATOR: [u8; 8] = [0; 8];
+}

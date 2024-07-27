@@ -1,32 +1,34 @@
-import { ExecutionContext } from 'ava';
-import { v4 } from 'uuid';
 import {
   Address,
-  address,
   KeyPairSigner,
-  generateKeyPairSigner,
-  none,
   SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
-  isSolanaError,
-  pipe,
+  address,
   appendTransactionMessageInstruction,
+  generateKeyPairSigner,
+  isSolanaError,
+  none,
+  pipe,
 } from '@solana/web3.js';
 import {
   Client,
   createDefaultTransaction,
   signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
+import { ExecutionContext } from 'ava';
+import { v4 } from 'uuid';
 import {
   Condition,
   Mode,
   Operation,
   findMintProofV2Pda,
   findWhitelistV2Pda,
-  getInitUpdateMintProofV2InstructionAsync,
   getCreateWhitelistV2Instruction,
+  getInitUpdateMintProofV2InstructionAsync,
   getUpdateWhitelistV2Instruction,
   operation,
 } from '../src/index.js';
+
+export const MAX_PROOF_LENGTH = 28;
 
 export const DEFAULT_PUBKEY: Address = address(
   '11111111111111111111111111111111'
@@ -129,18 +131,7 @@ export async function createWhitelistThrows({
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  const error = await t.throwsAsync<Error & { data: { logs: string[] } }>(
-    promise
-  );
-
-  if (isSolanaError(error.cause, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
-    t.assert(
-      error.cause.context.code === code,
-      `expected error code ${code}, received ${error.cause.context.code}`
-    );
-  } else {
-    t.fail("expected a custom error, but didn't get one");
-  }
+  await expectCustomError(t, promise, code);
 }
 
 export interface UpdateWhitelistParams {
@@ -209,18 +200,7 @@ export async function updateWhitelistThrows({
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  const error = await t.throwsAsync<Error & { data: { logs: string[] } }>(
-    promise
-  );
-
-  if (isSolanaError(error.cause, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
-    t.assert(
-      error.cause.context.code === code,
-      `expected error code ${code}, received ${error.cause.context.code}`
-    );
-  } else {
-    t.fail("expected a custom error, but didn't get one");
-  }
+  await expectCustomError(t, promise, code);
 }
 
 export async function getAccountDataLength(
@@ -253,7 +233,7 @@ export interface initUpdateMintProofV2Params {
 export interface initUpdateMintProofV2ThrowsParams
   extends initUpdateMintProofV2Params {
   t: ExecutionContext;
-  code: BigInt;
+  code: BigInt | number;
 }
 
 export interface initUpdateMintProofV2Returns {
@@ -308,19 +288,31 @@ export async function createMintProofThrows({
   const promise = pipe(
     await createDefaultTransaction(client, payer),
     (tx) => appendTransactionMessageInstruction(createMintProofIx, tx),
-    (tx) => signAndSendTransaction(client, tx, { skipPreflight: true })
+    (tx) => signAndSendTransaction(client, tx)
   );
 
+  await expectCustomError(t, promise, code);
+}
+
+export const expectCustomError = async (
+  t: ExecutionContext,
+  promise: Promise<unknown>,
+  code: BigInt | number
+) => {
   const error = await t.throwsAsync<Error & { data: { logs: string[] } }>(
     promise
   );
 
-  if (isSolanaError(error, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
+  if (typeof code === 'bigint') {
+    code = Number(code);
+  }
+
+  if (isSolanaError(error.cause, SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM)) {
     t.assert(
-      BigInt(error.context.code) === code,
-      `expected error code ${code}, received ${error.context.code}`
+      error.cause.context.code === code,
+      `expected error code ${code}, received ${error.cause.context.code}`
     );
   } else {
-    t.fail('expected a custom error, but received: ' + error);
+    t.fail("expected a custom error, but didn't get one");
   }
-}
+};

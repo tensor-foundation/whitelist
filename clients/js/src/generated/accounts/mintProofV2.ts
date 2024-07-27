@@ -7,17 +7,6 @@
  */
 
 import {
-  Account,
-  Address,
-  Codec,
-  Decoder,
-  EncodedAccount,
-  Encoder,
-  FetchAccountConfig,
-  FetchAccountsConfig,
-  MaybeAccount,
-  MaybeEncodedAccount,
-  ReadonlyUint8Array,
   assertAccountExists,
   assertAccountsExist,
   combineCodec,
@@ -39,21 +28,40 @@ import {
   getU8Decoder,
   getU8Encoder,
   transformEncoder,
+  type Account,
+  type Address,
+  type Codec,
+  type Decoder,
+  type EncodedAccount,
+  type Encoder,
+  type FetchAccountConfig,
+  type FetchAccountsConfig,
+  type MaybeAccount,
+  type MaybeEncodedAccount,
+  type ReadonlyUint8Array,
 } from '@solana/web3.js';
 import { MintProofV2Seeds, findMintProofV2Pda } from '../pdas';
 
 export type MintProofV2 = {
   discriminator: ReadonlyUint8Array;
+  /** Length of proof without padding. */
   proofLen: number;
+  /** Proof that the mint is part of the Merkle tree. */
   proof: Array<ReadonlyUint8Array>;
+  /** Slot the proof was created. */
   creationSlot: bigint;
+  /** The account that paid for creation of the proof. */
   payer: Address;
 };
 
 export type MintProofV2Args = {
+  /** Length of proof without padding. */
   proofLen: number;
+  /** Proof that the mint is part of the Merkle tree. */
   proof: Array<ReadonlyUint8Array>;
+  /** Slot the proof was created. */
   creationSlot: number | bigint;
+  /** The account that paid for creation of the proof. */
   payer: Address;
 };
 

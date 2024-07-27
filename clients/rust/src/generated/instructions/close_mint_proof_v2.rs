@@ -10,12 +10,13 @@ use borsh::BorshSerialize;
 
 /// Accounts.
 pub struct CloseMintProofV2 {
+    /// Receives rent if < 100 slots after mint_proof creation.
     pub payer: solana_program::pubkey::Pubkey,
-
+    /// Signing account, will receive rent if > 100 slots after mint_proof creation.
     pub signer: solana_program::pubkey::Pubkey,
-
+    /// The mint proof account to close.
     pub mint_proof: solana_program::pubkey::Pubkey,
-
+    /// The Solana system program account.
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
@@ -95,22 +96,26 @@ impl CloseMintProofV2Builder {
     pub fn new() -> Self {
         Self::default()
     }
+    /// Receives rent if < 100 slots after mint_proof creation.
     #[inline(always)]
     pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
         self.payer = Some(payer);
         self
     }
+    /// Signing account, will receive rent if > 100 slots after mint_proof creation.
     #[inline(always)]
     pub fn signer(&mut self, signer: solana_program::pubkey::Pubkey) -> &mut Self {
         self.signer = Some(signer);
         self
     }
+    /// The mint proof account to close.
     #[inline(always)]
     pub fn mint_proof(&mut self, mint_proof: solana_program::pubkey::Pubkey) -> &mut Self {
         self.mint_proof = Some(mint_proof);
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
+    /// The Solana system program account.
     #[inline(always)]
     pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
@@ -151,12 +156,13 @@ impl CloseMintProofV2Builder {
 
 /// `close_mint_proof_v2` CPI accounts.
 pub struct CloseMintProofV2CpiAccounts<'a, 'b> {
+    /// Receives rent if < 100 slots after mint_proof creation.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// Signing account, will receive rent if > 100 slots after mint_proof creation.
     pub signer: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The mint proof account to close.
     pub mint_proof: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The Solana system program account.
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
@@ -164,13 +170,13 @@ pub struct CloseMintProofV2CpiAccounts<'a, 'b> {
 pub struct CloseMintProofV2Cpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// Receives rent if < 100 slots after mint_proof creation.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// Signing account, will receive rent if > 100 slots after mint_proof creation.
     pub signer: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The mint proof account to close.
     pub mint_proof: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The Solana system program account.
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
@@ -294,11 +300,13 @@ impl<'a, 'b> CloseMintProofV2CpiBuilder<'a, 'b> {
         });
         Self { instruction }
     }
+    /// Receives rent if < 100 slots after mint_proof creation.
     #[inline(always)]
     pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.payer = Some(payer);
         self
     }
+    /// Signing account, will receive rent if > 100 slots after mint_proof creation.
     #[inline(always)]
     pub fn signer(
         &mut self,
@@ -307,6 +315,7 @@ impl<'a, 'b> CloseMintProofV2CpiBuilder<'a, 'b> {
         self.instruction.signer = Some(signer);
         self
     }
+    /// The mint proof account to close.
     #[inline(always)]
     pub fn mint_proof(
         &mut self,
@@ -315,6 +324,7 @@ impl<'a, 'b> CloseMintProofV2CpiBuilder<'a, 'b> {
         self.instruction.mint_proof = Some(mint_proof);
         self
     }
+    /// The Solana system program account.
     #[inline(always)]
     pub fn system_program(
         &mut self,

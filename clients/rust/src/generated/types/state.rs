@@ -9,8 +9,18 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 use num_derive::FromPrimitive;
 
+/// White list state enum. Currently only supports Frozen and Unfrozen.
 #[derive(
-    BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq, PartialOrd, Hash, FromPrimitive,
+    BorshSerialize,
+    BorshDeserialize,
+    Clone,
+    Debug,
+    Eq,
+    PartialEq,
+    Copy,
+    PartialOrd,
+    Hash,
+    FromPrimitive,
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum State {

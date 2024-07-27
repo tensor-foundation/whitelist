@@ -7,23 +7,6 @@
  */
 
 import {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  IAccountMeta,
-  IAccountSignerMeta,
-  IInstruction,
-  IInstructionWithAccounts,
-  IInstructionWithData,
-  Option,
-  OptionOrNullable,
-  ReadonlyAccount,
-  ReadonlySignerAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
@@ -38,15 +21,36 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type IAccountMeta,
+  type IAccountSignerMeta,
+  type IInstruction,
+  type IInstructionWithAccounts,
+  type IInstructionWithData,
+  type Option,
+  type OptionOrNullable,
+  type ReadonlyAccount,
+  type ReadonlySignerAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from '@solana/web3.js';
 import { findWhitelistPda } from '../pdas';
 import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
-import { ResolvedAccount, expectSome, getAccountMetaFactory } from '../shared';
 import {
-  Condition,
-  ConditionArgs,
+  expectSome,
+  getAccountMetaFactory,
+  type ResolvedAccount,
+} from '../shared';
+import {
   getConditionDecoder,
   getConditionEncoder,
+  type Condition,
+  type ConditionArgs,
 } from '../types';
 
 export type CreateWhitelistV2Instruction<
@@ -139,9 +143,13 @@ export type CreateWhitelistV2AsyncInput<
   TAccountWhitelist extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
+  /** The rent payer. */
   payer: TransactionSigner<TAccountPayer>;
+  /** The authority that will be allowed to update the whitelist. */
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
+  /** Namespace keypair used to derive the whitelist PDA. */
   namespace: TransactionSigner<TAccountNamespace>;
+  /** The whitelist PDA. */
   whitelist?: Address<TAccountWhitelist>;
   systemProgram?: Address<TAccountSystemProgram>;
   uuid: CreateWhitelistV2InstructionDataArgs['uuid'];
@@ -235,9 +243,13 @@ export type CreateWhitelistV2Input<
   TAccountWhitelist extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
+  /** The rent payer. */
   payer: TransactionSigner<TAccountPayer>;
+  /** The authority that will be allowed to update the whitelist. */
   updateAuthority: TransactionSigner<TAccountUpdateAuthority>;
+  /** Namespace keypair used to derive the whitelist PDA. */
   namespace: TransactionSigner<TAccountNamespace>;
+  /** The whitelist PDA. */
   whitelist: Address<TAccountWhitelist>;
   systemProgram?: Address<TAccountSystemProgram>;
   uuid: CreateWhitelistV2InstructionDataArgs['uuid'];
@@ -323,9 +335,13 @@ export type ParsedCreateWhitelistV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
+    /** The rent payer. */
     payer: TAccountMetas[0];
+    /** The authority that will be allowed to update the whitelist. */
     updateAuthority: TAccountMetas[1];
+    /** Namespace keypair used to derive the whitelist PDA. */
     namespace: TAccountMetas[2];
+    /** The whitelist PDA. */
     whitelist: TAccountMetas[3];
     systemProgram: TAccountMetas[4];
   };

@@ -12,12 +12,13 @@ use solana_program::pubkey::Pubkey;
 
 /// Accounts.
 pub struct CreateWhitelistV2 {
+    /// The rent payer.
     pub payer: solana_program::pubkey::Pubkey,
-
+    /// The authority that will be allowed to update the whitelist.
     pub update_authority: solana_program::pubkey::Pubkey,
-
+    /// Namespace keypair used to derive the whitelist PDA.
     pub namespace: solana_program::pubkey::Pubkey,
-
+    /// The whitelist PDA.
     pub whitelist: solana_program::pubkey::Pubkey,
 
     pub system_program: solana_program::pubkey::Pubkey,
@@ -124,11 +125,13 @@ impl CreateWhitelistV2Builder {
     pub fn new() -> Self {
         Self::default()
     }
+    /// The rent payer.
     #[inline(always)]
     pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
         self.payer = Some(payer);
         self
     }
+    /// The authority that will be allowed to update the whitelist.
     #[inline(always)]
     pub fn update_authority(
         &mut self,
@@ -137,11 +140,13 @@ impl CreateWhitelistV2Builder {
         self.update_authority = Some(update_authority);
         self
     }
+    /// Namespace keypair used to derive the whitelist PDA.
     #[inline(always)]
     pub fn namespace(&mut self, namespace: solana_program::pubkey::Pubkey) -> &mut Self {
         self.namespace = Some(namespace);
         self
     }
+    /// The whitelist PDA.
     #[inline(always)]
     pub fn whitelist(&mut self, whitelist: solana_program::pubkey::Pubkey) -> &mut Self {
         self.whitelist = Some(whitelist);
@@ -210,12 +215,13 @@ impl CreateWhitelistV2Builder {
 
 /// `create_whitelist_v2` CPI accounts.
 pub struct CreateWhitelistV2CpiAccounts<'a, 'b> {
+    /// The rent payer.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The authority that will be allowed to update the whitelist.
     pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// Namespace keypair used to derive the whitelist PDA.
     pub namespace: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The whitelist PDA.
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
@@ -225,13 +231,13 @@ pub struct CreateWhitelistV2CpiAccounts<'a, 'b> {
 pub struct CreateWhitelistV2Cpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The rent payer.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The authority that will be allowed to update the whitelist.
     pub update_authority: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// Namespace keypair used to derive the whitelist PDA.
     pub namespace: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The whitelist PDA.
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
 
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
@@ -376,11 +382,13 @@ impl<'a, 'b> CreateWhitelistV2CpiBuilder<'a, 'b> {
         });
         Self { instruction }
     }
+    /// The rent payer.
     #[inline(always)]
     pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.payer = Some(payer);
         self
     }
+    /// The authority that will be allowed to update the whitelist.
     #[inline(always)]
     pub fn update_authority(
         &mut self,
@@ -389,6 +397,7 @@ impl<'a, 'b> CreateWhitelistV2CpiBuilder<'a, 'b> {
         self.instruction.update_authority = Some(update_authority);
         self
     }
+    /// Namespace keypair used to derive the whitelist PDA.
     #[inline(always)]
     pub fn namespace(
         &mut self,
@@ -397,6 +406,7 @@ impl<'a, 'b> CreateWhitelistV2CpiBuilder<'a, 'b> {
         self.instruction.namespace = Some(namespace);
         self
     }
+    /// The whitelist PDA.
     #[inline(always)]
     pub fn whitelist(
         &mut self,

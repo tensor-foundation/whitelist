@@ -1,4 +1,3 @@
-import test from 'ava';
 import {
   appendTransactionMessageInstruction,
   generateKeyPairSigner,
@@ -11,6 +10,7 @@ import {
   generateKeyPairSignerWithSol,
   signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
+import test from 'ava';
 import {
   Condition,
   Mode,
@@ -187,7 +187,7 @@ test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
       (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
       (tx) => signAndSendTransaction(client, tx)
     );
-    t.fail('Too many merkle proofs');
+    t.fail('Should have thrown an error.');
   } catch (error) {
     t.like(error, {
       cause: {

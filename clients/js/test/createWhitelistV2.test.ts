@@ -110,11 +110,17 @@ test('it throws when creating a whitelist v2 with an empty conditions list', asy
 
 test('it can create a whitelist v2 funded by a separate payer', async (t) => {
   const client = createDefaultSolanaClient();
+
+  // Payer has funds.
   const payer = await generateKeyPairSignerWithSol(client);
+
   // No funds, so can't pay.
   const updateAuthority = await generateKeyPairSigner();
-  const freezeAuthority = (await generateKeyPairSigner()).address;
+
+  // Also no funds.
   const namespace = await generateKeyPairSigner();
+
+  const freezeAuthority = (await generateKeyPairSigner()).address;
   const voc = (await generateKeyPairSigner()).address;
 
   const conditions = [
@@ -191,6 +197,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
     namespace,
   });
 
+  // Merkle should be moved to the first index.
   let expectedConditions = [
     { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.FVC, value: updateAuthority.address },
@@ -225,6 +232,7 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
     namespace,
   }));
 
+  // Merkle should be moved to the first index.
   expectedConditions = [
     { mode: Mode.MerkleTree, value: merkleProof1 },
     { mode: Mode.FVC, value: updateAuthority.address },

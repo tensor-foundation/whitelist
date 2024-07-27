@@ -7,20 +7,6 @@
  */
 
 import {
-  Address,
-  Codec,
-  Decoder,
-  Encoder,
-  IAccountMeta,
-  IAccountSignerMeta,
-  IInstruction,
-  IInstructionWithAccounts,
-  IInstructionWithData,
-  ReadonlyAccount,
-  ReadonlyUint8Array,
-  TransactionSigner,
-  WritableAccount,
-  WritableSignerAccount,
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
@@ -31,13 +17,27 @@ import {
   getStructDecoder,
   getStructEncoder,
   transformEncoder,
+  type Address,
+  type Codec,
+  type Decoder,
+  type Encoder,
+  type IAccountMeta,
+  type IAccountSignerMeta,
+  type IInstruction,
+  type IInstructionWithAccounts,
+  type IInstructionWithData,
+  type ReadonlyAccount,
+  type ReadonlyUint8Array,
+  type TransactionSigner,
+  type WritableAccount,
+  type WritableSignerAccount,
 } from '@solana/web3.js';
 import { findMintProofPda } from '../pdas';
 import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
 import {
-  ResolvedAccount,
   expectAddress,
   getAccountMetaFactory,
+  type ResolvedAccount,
 } from '../shared';
 
 export type InitUpdateMintProofV2Instruction<
@@ -120,10 +120,15 @@ export type InitUpdateMintProofV2AsyncInput<
   TAccountMintProof extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
+  /** Rent payer for the mint proof account if it is initialized. */
   payer: TransactionSigner<TAccountPayer>;
+  /** The mint account for which the proof is being created. */
   mint: Address<TAccountMint>;
+  /** The whitelist account that the mint proof must validate against. */
   whitelist: Address<TAccountWhitelist>;
+  /** The mint proof account to initialize or update. */
   mintProof?: Address<TAccountMintProof>;
+  /** The Solana system program account. */
   systemProgram?: Address<TAccountSystemProgram>;
   proof: InitUpdateMintProofV2InstructionDataArgs['proof'];
 };
@@ -215,10 +220,15 @@ export type InitUpdateMintProofV2Input<
   TAccountMintProof extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
+  /** Rent payer for the mint proof account if it is initialized. */
   payer: TransactionSigner<TAccountPayer>;
+  /** The mint account for which the proof is being created. */
   mint: Address<TAccountMint>;
+  /** The whitelist account that the mint proof must validate against. */
   whitelist: Address<TAccountWhitelist>;
+  /** The mint proof account to initialize or update. */
   mintProof: Address<TAccountMintProof>;
+  /** The Solana system program account. */
   systemProgram?: Address<TAccountSystemProgram>;
   proof: InitUpdateMintProofV2InstructionDataArgs['proof'];
 };
@@ -301,10 +311,15 @@ export type ParsedInitUpdateMintProofV2Instruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
+    /** Rent payer for the mint proof account if it is initialized. */
     payer: TAccountMetas[0];
+    /** The mint account for which the proof is being created. */
     mint: TAccountMetas[1];
+    /** The whitelist account that the mint proof must validate against. */
     whitelist: TAccountMetas[2];
+    /** The mint proof account to initialize or update. */
     mintProof: TAccountMetas[3];
+    /** The Solana system program account. */
     systemProgram: TAccountMetas[4];
   };
   data: InitUpdateMintProofV2InstructionData;

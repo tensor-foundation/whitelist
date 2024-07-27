@@ -37,19 +37,20 @@
   "author": "Tensor Protocol Foundation <maintainers@tensor.foundation>",
   "license": "Apache-2.0",
   "dependencies": {
+    "@coral-xyz/anchor-errors": "^0.30.1",
     "@solana/web3.js": "2.0.0-preview.3"
   },
   "devDependencies": {
     "@ava/typescript": "^4.1.0",
     "@noble/hashes": "^1.4.0",
+    "@solana/errors": "2.0.0-preview.3",
     "@solana/eslint-config-solana": "^3.0.0",
     "@solana/webcrypto-ed25519-polyfill": "2.0.0-preview.3",
     "@tensor-foundation/mpl-token-metadata": "^0.1.0",
     "@tensor-foundation/test-helpers": "^0.1.0",
+    "@types/node": "^20.14.12",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "@types/uuid": "^9.0.8",
-    "@types/node": "^20.12.7",
     "ava": "^6.1.2",
     "eslint": "^8.57.0",
     "merkletreejs": "^0.3.11",
@@ -63,7 +64,9 @@
     "ws": "^8.14.0"
   },
   "ava": {
-    "nodeArguments": ["--no-warnings"],
+    "nodeArguments": [
+      "--no-warnings"
+    ],
     "require": [
       "@solana/webcrypto-ed25519-polyfill"
     ],
