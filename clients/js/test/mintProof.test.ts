@@ -41,7 +41,12 @@ test('it can create and update mint proof v2', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    authority: nftOwner,
+    owner: nftOwner,
+  });
 
   // Setup a merkle tree with our mint as a leaf
   const {
@@ -78,12 +83,12 @@ test('it can create and update mint proof v2', async (t) => {
   }));
 
   // Mint a second NFT
-  const { mint: mint2 } = await createDefaultNft(
+  const { mint: mint2 } = await createDefaultNft({
     client,
-    nftOwner,
-    nftOwner,
-    nftOwner
-  );
+    payer: nftOwner,
+    authority: nftOwner,
+    owner: nftOwner,
+  });
 
   // Setup a new merkle tree with both mints as leaves.
   const {
@@ -135,7 +140,12 @@ test('it cannot override the stored payer', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    authority: nftOwner,
+    owner: nftOwner,
+  });
 
   // Setup a merkle tree with our mint as a leaf
   const {
@@ -202,7 +212,12 @@ test('invalid proof fails', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    authority: nftOwner,
+    owner: nftOwner,
+  });
 
   // Setup a merkle tree with our mint as a leaf
   const { root } = await generateTreeOfSize(10, [mint]);
@@ -244,7 +259,12 @@ test('too long proof fails', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    authority: nftOwner,
+    owner: nftOwner,
+  });
 
   // Setup a merkle tree with our mint as a leaf
   const { root } = await generateTreeOfSize(10, [mint]);
@@ -305,7 +325,12 @@ test('invalid condition fails', async (t) => {
   const nftOwner = await generateKeyPairSignerWithSol(client);
 
   // Mint NFT
-  const { mint } = await createDefaultNft(client, nftOwner, nftOwner, nftOwner);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    authority: nftOwner,
+    owner: nftOwner,
+  });
 
   // Setup a merkle tree with our mint as a leaf∏
   const {
