@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use vipers::throw_err;
+use tensor_vipers::throw_err;
 
 use crate::{
     error::ErrorCode,

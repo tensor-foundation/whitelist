@@ -17,7 +17,7 @@ pub use mint_proof_v2::*;
 pub use whitelist_v2::*;
 
 use anchor_lang::{prelude::*, solana_program::keccak, AccountDeserialize};
-use vipers::throw_err;
+use tensor_vipers::throw_err;
 
 use crate::error::ErrorCode;
 
