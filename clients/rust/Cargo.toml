@@ -1,15 +1,21 @@
 [package]
 name = "tensor-whitelist"
-version = "0.0.0"
+description = "Client crate for the Tensor Foundation whitelist program."
+repository = "https://github.com/tensor-foundation/whitelist"
+homepage = "https://github.com/tensor-foundation/whitelist"
+version = "0.1.0"
 edition = "2021"
 readme = "README.md"
 license-file = "../../LICENSE"
 
 [features]
+anchor = ["anchor-lang"]
+anchor-idl-build = ["anchor-lang/idl-build"]
 test-sbf = []
 serde = ["dep:serde", "dep:serde_with"]
 
 [dependencies]
+anchor-lang = { version = "0.29.0", optional = true }
 borsh = "^0.10"
 num-derive = "^0.3"
 num-traits = "^0.2"
@@ -24,6 +30,4 @@ mpl-token-metadata = "4.1.2"
 solana-program-test = ">1.14, < 1.18"
 solana-sdk = "< 1.18"
 spl-merkle-tree-reference = "0.1.0"
-tensor-toolbox = { version = "0.0.2", git = "ssh://git@github.com/tensor-foundation/toolbox.git", rev = "1e84508", features = [
-    "cnft",
-] }
+tensor-toolbox = { version = "0.1.0", features = ["cnft"] }

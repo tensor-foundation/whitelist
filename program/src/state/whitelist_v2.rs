@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use mpl_token_metadata::types::{Collection, Creator};
 use tensor_toolbox::validate_proof;
-use vipers::throw_err;
+use tensor_vipers::throw_err;
 
 use crate::{error::ErrorCode, state::FullMerkleProof};
 
