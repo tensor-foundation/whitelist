@@ -9,6 +9,8 @@ readme = "README.md"
 license-file = "../../LICENSE"
 
 [features]
+anchor = []
+anchor-idl-build = []
 test-sbf = []
 serde = ["dep:serde", "dep:serde_with"]
 
