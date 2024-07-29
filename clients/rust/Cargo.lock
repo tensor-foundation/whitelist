@@ -237,6 +237,7 @@ dependencies = [
  "anchor-derive-accounts",
  "anchor-derive-serde",
  "anchor-derive-space",
+ "anchor-syn",
  "arrayref",
  "base64 0.13.1",
  "bincode",
@@ -5216,6 +5217,7 @@ dependencies = [
 name = "tensor-whitelist"
 version = "0.1.0"
 dependencies = [
+ "anchor-lang",
  "assert_matches",
  "borsh 0.10.3",
  "mpl-token-metadata",
