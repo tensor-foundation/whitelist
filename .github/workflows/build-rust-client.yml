@@ -66,6 +66,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rust-client-builds
+          working-directory: clients/rust
           # First wildcard ensures exported paths are consistently under the clients folder.
           path: ./targe*/release/*whitelist*
           if-no-files-found: error
