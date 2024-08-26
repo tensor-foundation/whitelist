@@ -23,7 +23,7 @@ pub struct InitUpdateMintProof<'info> {
         init_if_needed,
         payer = user,
         seeds = [
-            b"mint_proof".as_ref(),
+            MintProof::PREFIX,
             mint.key().as_ref(),
             whitelist.key().as_ref(),
         ],
