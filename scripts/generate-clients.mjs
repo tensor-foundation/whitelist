@@ -95,12 +95,12 @@ kinobi.update(
     {
       account: "mintProof",
       ignoreIfOptional: true,
-      defaultValue: k.pdaValueNode("mintProof"),
+      defaultValue: k.pdaValueNode("mintProofV2"),
     },
     {
       account: "whitelist",
       ignoreIfOptional: true,
-      defaultValue: k.pdaValueNode("whitelist"),
+      defaultValue: k.pdaValueNode("whitelistV2"),
     },
     {
       account: "whitelistAuthority",
@@ -115,6 +115,31 @@ kinobi.update(
     "[definedTypeNode]whitelistType",
     "[definedTypeNode]mintProofType",
   ]),
+);
+
+// Override whitelist default resolvers to V1 for V1 ixs
+kinobi.update(
+  k.updateInstructionsVisitor({
+    initUpdateWhitelist: {
+      accounts: {
+        whitelist: {
+          defaultValue: k.pdaValueNode("whitelist", [
+            k.pdaSeedValueNode("uuid", k.argumentValueNode("uuid")),
+          ]),
+        },
+      },
+    },
+    initUpdateMintProof: {
+      accounts: {
+        mintProof: {
+          defaultValue: k.pdaValueNode("mintProof", [
+            k.pdaSeedValueNode("mint", k.accountValueNode("mint")),
+            k.pdaSeedValueNode("whitelist", k.accountValueNode("whitelist")),
+          ]),
+        },
+      },
+    },
+  }),
 );
 
 // Debug print the tree.
