@@ -117,7 +117,7 @@ kinobi.update(
   ]),
 );
 
-// Override whitelist default resolvers to V1 for V1 ixs
+// Override whitelist default resolvers to V1 for V1 ixs.
 kinobi.update(
   k.updateInstructionsVisitor({
     initUpdateWhitelist: {
