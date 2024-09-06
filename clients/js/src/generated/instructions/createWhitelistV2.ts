@@ -39,9 +39,10 @@ import {
   type WritableAccount,
   type WritableSignerAccount,
 } from '@solana/web3.js';
-import { findWhitelistPda } from '../pdas';
+import { findWhitelistV2Pda } from '../pdas';
 import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
 import {
+  expectAddress,
   expectSome,
   getAccountMetaFactory,
   type ResolvedAccount,
@@ -202,7 +203,8 @@ export async function getCreateWhitelistV2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.whitelist.value) {
-    accounts.whitelist.value = await findWhitelistPda({
+    accounts.whitelist.value = await findWhitelistV2Pda({
+      namespace: expectAddress(accounts.namespace.value),
       uuid: expectSome(args.uuid),
     });
   }

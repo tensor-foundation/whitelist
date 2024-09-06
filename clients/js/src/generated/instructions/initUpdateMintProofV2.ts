@@ -32,7 +32,7 @@ import {
   type WritableAccount,
   type WritableSignerAccount,
 } from '@solana/web3.js';
-import { findMintProofPda } from '../pdas';
+import { findMintProofV2Pda } from '../pdas';
 import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
 import {
   expectAddress,
@@ -178,7 +178,7 @@ export async function getInitUpdateMintProofV2InstructionAsync<
 
   // Resolve default values.
   if (!accounts.mintProof.value) {
-    accounts.mintProof.value = await findMintProofPda({
+    accounts.mintProof.value = await findMintProofV2Pda({
       mint: expectAddress(accounts.mint.value),
       whitelist: expectAddress(accounts.whitelist.value),
     });
