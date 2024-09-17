@@ -5,6 +5,7 @@ import {
   isSolanaError,
   pipe,
 } from '@solana/web3.js';
+import { createDefaultAsset } from '@tensor-foundation/mpl-core';
 import { createDefaultNft } from '@tensor-foundation/mpl-token-metadata';
 import {
   createDefaultSolanaClient,
@@ -47,7 +48,7 @@ test('it can create and update mint proof v2', async (t) => {
   const { mint } = await createDefaultNft({
     client,
     payer: nftOwner,
-    owner: nftOwner,
+    owner: nftOwner.address,
     authority: nftOwner,
   });
 
@@ -90,7 +91,7 @@ test('it can create and update mint proof v2', async (t) => {
     client,
     payer: nftOwner,
     authority: nftOwner,
-    owner: nftOwner,
+    owner: nftOwner.address,
   });
 
   // Setup a new merkle tree with both mints as leaves.
@@ -133,6 +134,106 @@ test('it can create and update mint proof v2', async (t) => {
   }));
 });
 
+test.only('it can create and update mint proof v2 for a non-mint NFT', async (t) => {
+  // Mint proofs can be create asset-based NFTs without Mint accounts.
+  const client = createDefaultSolanaClient();
+
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const freezeAuthority = (await generateKeyPairSigner()).address;
+  const namespace = await generateKeyPairSigner();
+
+  const nftOwner = await generateKeyPairSignerWithSol(client);
+
+  // Mint Core asset
+  const asset = await createDefaultAsset({
+    client,
+    payer: nftOwner,
+    owner: nftOwner.address,
+    authority: nftOwner,
+  });
+
+  // Setup a merkle tree with our asset as a leaf
+  const {
+    root,
+    proofs: [p],
+  } = await generateTreeOfSize(10, [asset.address]);
+
+  const conditions: Condition[] = [
+    { mode: Mode.MerkleTree, value: intoAddress(root) },
+  ];
+
+  const { whitelist } = await createWhitelist({
+    client,
+    updateAuthority,
+    freezeAuthority,
+    conditions,
+    namespace,
+  });
+
+  const { mintProof } = await upsertMintProof({
+    client,
+    payer: nftOwner,
+    mint: asset.address,
+    whitelist,
+    proof: p.proof,
+  });
+
+  t.like(await fetchMintProofV2(client.rpc, mintProof), <MintProofV2>(<unknown>{
+    address: mintProof,
+    data: {
+      proof: p.proof,
+      payer: nftOwner.address,
+    },
+  }));
+
+  // Mint a second asset
+  const asset2 = await createDefaultAsset({
+    client,
+    payer: nftOwner,
+    owner: nftOwner.address,
+    authority: nftOwner,
+  });
+
+  // Setup a new merkle tree with both mints as leaves.
+  const {
+    root: root2,
+    proofs: [p2],
+  } = await generateTreeOfSize(10, [asset.address, asset2.address]);
+
+  const conditions2: Condition[] = [
+    { mode: Mode.MerkleTree, value: intoAddress(root2) },
+  ];
+
+  // Create a new whitelist with both mints.
+  const { whitelist: whitelist2 } = await createWhitelist({
+    client,
+    updateAuthority,
+    freezeAuthority,
+    conditions: conditions2,
+    namespace,
+  });
+
+  // Update the mint proof with the new proof.
+  const { mintProof: mintProof2 } = await upsertMintProof({
+    client,
+    payer: nftOwner,
+    mint: asset.address,
+    whitelist: whitelist2,
+    proof: p2.proof,
+  });
+
+  // Check it was updated.
+  t.like(await fetchMintProofV2(client.rpc, mintProof2), <MintProofV2>(<
+    unknown
+  >{
+    address: mintProof2,
+    data: {
+      proof: p2.proof,
+      payer: nftOwner.address,
+    },
+  }));
+});
+
 test('it cannot override the stored payer', async (t) => {
   const client = createDefaultSolanaClient();
 
@@ -147,7 +248,7 @@ test('it cannot override the stored payer', async (t) => {
     client,
     payer: nftOwner,
     authority: nftOwner,
-    owner: nftOwner,
+    owner: nftOwner.address,
   });
 
   // Setup a merkle tree with our mint as a leaf
@@ -219,7 +320,7 @@ test('invalid proof fails', async (t) => {
     client,
     payer: nftOwner,
     authority: nftOwner,
-    owner: nftOwner,
+    owner: nftOwner.address,
   });
 
   // Setup a merkle tree with our mint as a leaf
@@ -266,7 +367,7 @@ test('too long proof fails', async (t) => {
     client,
     payer: nftOwner,
     authority: nftOwner,
-    owner: nftOwner,
+    owner: nftOwner.address,
   });
 
   // Setup a merkle tree with our mint as a leaf
@@ -332,7 +433,7 @@ test('invalid condition fails', async (t) => {
     client,
     payer: nftOwner,
     authority: nftOwner,
-    owner: nftOwner,
+    owner: nftOwner.address,
   });
 
   // Setup a merkle tree with our mint as a leaf∏
@@ -380,7 +481,7 @@ test('it can permissionlessly close a mint proof v2', async (t) => {
   const { mint } = await createDefaultNft({
     client,
     payer: nftOwner,
-    owner: nftOwner,
+    owner: nftOwner.address,
     authority: nftOwner,
   });
 

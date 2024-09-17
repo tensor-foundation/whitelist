@@ -122,7 +122,7 @@ export type InitUpdateMintProofV2AsyncInput<
 > = {
   /** Rent payer for the mint proof account if it is initialized. */
   payer: TransactionSigner<TAccountPayer>;
-  /** The mint account for which the proof is being created. */
+  /** The mint or asset account for which the proof is being created. */
   mint: Address<TAccountMint>;
   /** The whitelist account that the mint proof must validate against. */
   whitelist: Address<TAccountWhitelist>;
@@ -222,7 +222,7 @@ export type InitUpdateMintProofV2Input<
 > = {
   /** Rent payer for the mint proof account if it is initialized. */
   payer: TransactionSigner<TAccountPayer>;
-  /** The mint account for which the proof is being created. */
+  /** The mint or asset account for which the proof is being created. */
   mint: Address<TAccountMint>;
   /** The whitelist account that the mint proof must validate against. */
   whitelist: Address<TAccountWhitelist>;
@@ -313,7 +313,7 @@ export type ParsedInitUpdateMintProofV2Instruction<
   accounts: {
     /** Rent payer for the mint proof account if it is initialized. */
     payer: TAccountMetas[0];
-    /** The mint account for which the proof is being created. */
+    /** The mint or asset account for which the proof is being created. */
     mint: TAccountMetas[1];
     /** The whitelist account that the mint proof must validate against. */
     whitelist: TAccountMetas[2];

@@ -12,7 +12,7 @@ use borsh::BorshSerialize;
 pub struct InitUpdateMintProofV2 {
     /// Rent payer for the mint proof account if it is initialized.
     pub payer: solana_program::pubkey::Pubkey,
-    /// The mint account for which the proof is being created.
+    /// The mint or asset account for which the proof is being created.
     pub mint: solana_program::pubkey::Pubkey,
     /// The whitelist account that the mint proof must validate against.
     pub whitelist: solana_program::pubkey::Pubkey,
@@ -124,7 +124,7 @@ impl InitUpdateMintProofV2Builder {
         self.payer = Some(payer);
         self
     }
-    /// The mint account for which the proof is being created.
+    /// The mint or asset account for which the proof is being created.
     #[inline(always)]
     pub fn mint(&mut self, mint: solana_program::pubkey::Pubkey) -> &mut Self {
         self.mint = Some(mint);
@@ -195,7 +195,7 @@ impl InitUpdateMintProofV2Builder {
 pub struct InitUpdateMintProofV2CpiAccounts<'a, 'b> {
     /// Rent payer for the mint proof account if it is initialized.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The mint account for which the proof is being created.
+    /// The mint or asset account for which the proof is being created.
     pub mint: &'b solana_program::account_info::AccountInfo<'a>,
     /// The whitelist account that the mint proof must validate against.
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
@@ -211,7 +211,7 @@ pub struct InitUpdateMintProofV2Cpi<'a, 'b> {
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
     /// Rent payer for the mint proof account if it is initialized.
     pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The mint account for which the proof is being created.
+    /// The mint or asset account for which the proof is being created.
     pub mint: &'b solana_program::account_info::AccountInfo<'a>,
     /// The whitelist account that the mint proof must validate against.
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
@@ -364,7 +364,7 @@ impl<'a, 'b> InitUpdateMintProofV2CpiBuilder<'a, 'b> {
         self.instruction.payer = Some(payer);
         self
     }
-    /// The mint account for which the proof is being created.
+    /// The mint or asset account for which the proof is being created.
     #[inline(always)]
     pub fn mint(&mut self, mint: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.mint = Some(mint);

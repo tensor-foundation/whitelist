@@ -488,7 +488,7 @@
           "isMut": false,
           "isSigner": false,
           "docs": [
-            "The mint account for which the proof is being created."
+            "The mint or asset account for which the proof is being created."
           ]
         },
         {
