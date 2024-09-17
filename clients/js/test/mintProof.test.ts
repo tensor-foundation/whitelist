@@ -114,7 +114,7 @@ test('it can create and update mint proof v2', async (t) => {
   });
 
   // Update the mint proof with the new proof.
-  const { mintProof: mintProof2 } = await upsertMintProof({
+  await upsertMintProof({
     client,
     payer: nftOwner,
     mint,
@@ -123,10 +123,8 @@ test('it can create and update mint proof v2', async (t) => {
   });
 
   // Check it was updated.
-  t.like(await fetchMintProofV2(client.rpc, mintProof2), <MintProofV2>(<
-    unknown
-  >{
-    address: mintProof2,
+  t.like(await fetchMintProofV2(client.rpc, mintProof), <MintProofV2>(<unknown>{
+    address: mintProof,
     data: {
       proof: p2.proof,
       payer: nftOwner.address,
@@ -213,7 +211,7 @@ test('it can create and update mint proof v2 for a non-mint NFT', async (t) => {
   });
 
   // Update the mint proof with the new proof.
-  const { mintProof: mintProof2 } = await upsertMintProof({
+  await upsertMintProof({
     client,
     payer: nftOwner,
     mint: asset.address,
@@ -222,10 +220,8 @@ test('it can create and update mint proof v2 for a non-mint NFT', async (t) => {
   });
 
   // Check it was updated.
-  t.like(await fetchMintProofV2(client.rpc, mintProof2), <MintProofV2>(<
-    unknown
-  >{
-    address: mintProof2,
+  t.like(await fetchMintProofV2(client.rpc, mintProof), <MintProofV2>(<unknown>{
+    address: mintProof,
     data: {
       proof: p2.proof,
       payer: nftOwner.address,
