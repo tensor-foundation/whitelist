@@ -31,6 +31,7 @@ import {
   MAX_PROOF_LENGTH,
   createMintProofThrows,
   createWhitelist,
+  updateWhitelist,
   upsertMintProof,
 } from './_common';
 import { generateTreeOfSize } from './_merkle';
@@ -104,13 +105,12 @@ test('it can create and update mint proof v2', async (t) => {
     { mode: Mode.MerkleTree, value: intoAddress(root2) },
   ];
 
-  // Create a new whitelist with both mints.
-  const { whitelist: whitelist2 } = await createWhitelist({
+  // Update the whitelist with the new conditions.
+  await updateWhitelist({
     client,
     updateAuthority,
-    freezeAuthority,
-    conditions: conditions2,
-    namespace,
+    newConditions: conditions2,
+    whitelist,
   });
 
   // Update the mint proof with the new proof.
@@ -118,7 +118,7 @@ test('it can create and update mint proof v2', async (t) => {
     client,
     payer: nftOwner,
     mint,
-    whitelist: whitelist2,
+    whitelist,
     proof: p2.proof,
   });
 
@@ -204,13 +204,12 @@ test('it can create and update mint proof v2 for a non-mint NFT', async (t) => {
     { mode: Mode.MerkleTree, value: intoAddress(root2) },
   ];
 
-  // Create a new whitelist with both mints.
-  const { whitelist: whitelist2 } = await createWhitelist({
+  // Update the whitelist with the new conditions.
+  await updateWhitelist({
     client,
     updateAuthority,
-    freezeAuthority,
-    conditions: conditions2,
-    namespace,
+    newConditions: conditions2,
+    whitelist,
   });
 
   // Update the mint proof with the new proof.
@@ -218,7 +217,7 @@ test('it can create and update mint proof v2 for a non-mint NFT', async (t) => {
     client,
     payer: nftOwner,
     mint: asset.address,
-    whitelist: whitelist2,
+    whitelist,
     proof: p2.proof,
   });
 
