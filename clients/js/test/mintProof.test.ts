@@ -134,7 +134,7 @@ test('it can create and update mint proof v2', async (t) => {
   }));
 });
 
-test.only('it can create and update mint proof v2 for a non-mint NFT', async (t) => {
+test('it can create and update mint proof v2 for a non-mint NFT', async (t) => {
   // Mint proofs can be create asset-based NFTs without Mint accounts.
   const client = createDefaultSolanaClient();
 
