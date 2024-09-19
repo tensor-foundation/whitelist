@@ -29,7 +29,7 @@ This new Whitelist program is currently deployed to devnet, and will be deployed
 
 | Devnet | Mainnet |
 | ------ | ------- |
-| v0.1.0 | -       |
+| v0.1.1 | -       |
 
 ## Getting started
 
