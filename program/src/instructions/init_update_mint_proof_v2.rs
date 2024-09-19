@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token_interface::Mint;
 use tensor_toolbox::validate_proof;
 use tensor_vipers::{throw_err, unwrap_int};
 
@@ -20,8 +19,9 @@ pub struct InitUpdateMintProofV2<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    /// The mint account for which the proof is being created.
-    pub mint: Box<InterfaceAccount<'info, Mint>>,
+    /// The mint or asset account for which the proof is being created.
+    /// CHECK: validation happens in the handler.
+    pub mint: UncheckedAccount<'info>,
 
     /// The whitelist account that the mint proof must validate against.
     // No constraints checks here because creating the mint proof is permissionless.
