@@ -89,7 +89,7 @@ pub fn process_update_whitelist_v2(
 
     // None means no update to conditions so nothing to validate.
     if let Some(mut conditions) = args.conditions {
-        WhitelistV2::validate_conditions(&mut conditions);
+        WhitelistV2::validate_conditions(&mut conditions)?;
         whitelist.conditions = conditions;
     }
 
