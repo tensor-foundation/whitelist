@@ -12,7 +12,7 @@ pub struct ReallocAuthority<'info> {
         has_one = cosigner,
         realloc = AUTHORITY_SIZE,
         realloc::payer = cosigner,
-        realloc::zero = false
+        realloc::zero = true
     )]
     pub whitelist_authority: Box<Account<'info, Authority>>,
 

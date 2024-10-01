@@ -2,7 +2,7 @@ use crate::{state::WhitelistV2, Condition, State, CURRENT_WHITELIST_V2_VERSION, 
 use anchor_lang::prelude::*;
 
 /// Arguments for creating a Whitelist V2 account.
-/// Optional freeze authority defaulst to the system program pubkey if not provided.
+/// Optional freeze authority defaults to the system program pubkey if not provided.
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct CreateWhitelistV2Args {
     uuid: [u8; 32],

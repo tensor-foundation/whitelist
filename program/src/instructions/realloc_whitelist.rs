@@ -14,7 +14,7 @@ pub struct ReallocWhitelist<'info> {
         bump = whitelist.bump,
         realloc = WHITELIST_SIZE,
         realloc::payer = cosigner,
-        realloc::zero = false
+        realloc::zero = true
     )]
     pub whitelist: Box<Account<'info, Whitelist>>,
 

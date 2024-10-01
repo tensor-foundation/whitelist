@@ -72,7 +72,7 @@ impl WhitelistV2 {
     /// This function ensures that the merkle proof is the first condition by swapping it to the front
     /// if necessary.
     ///
-    /// Whitelists are expected to be created once, editing seldom, and validated many times and having
+    /// Whitelists are expected to be created once, edited seldom, and validated many times, so having
     /// the merkle proof first makes it easier to validate the proof.
     ///
     /// The number of conditions is limited to `WHITELIST_V2_CONDITIONS_LENGTH` to control compute usage.

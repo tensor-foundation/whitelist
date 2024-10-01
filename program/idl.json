@@ -899,7 +899,7 @@
       "name": "CreateWhitelistV2Args",
       "docs": [
         "Arguments for creating a Whitelist V2 account.",
-        "Optional freeze authority defaulst to the system program pubkey if not provided."
+        "Optional freeze authority defaults to the system program pubkey if not provided."
       ],
       "type": {
         "kind": "struct",
