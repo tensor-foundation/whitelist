@@ -6,6 +6,7 @@
 //!
 
 pub(crate) mod r#close_mint_proof_v2;
+pub(crate) mod r#close_whitelist_v2;
 pub(crate) mod r#create_whitelist_v2;
 pub(crate) mod r#freeze_whitelist;
 pub(crate) mod r#freeze_whitelist_v2;
@@ -20,6 +21,7 @@ pub(crate) mod r#unfreeze_whitelist_v2;
 pub(crate) mod r#update_whitelist_v2;
 
 pub use self::r#close_mint_proof_v2::*;
+pub use self::r#close_whitelist_v2::*;
 pub use self::r#create_whitelist_v2::*;
 pub use self::r#freeze_whitelist::*;
 pub use self::r#freeze_whitelist_v2::*;

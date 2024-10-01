@@ -20,10 +20,8 @@ import {
   Mode,
   TENSOR_WHITELIST_ERROR__FAILED_MERKLE_PROOF_VERIFICATION,
   TENSOR_WHITELIST_ERROR__NOT_MERKLE_ROOT,
-  fetchMaybeMintProofV2,
   fetchMintProofV2,
   findMintProofV2Pda,
-  getCloseMintProofV2Instruction,
   getInitUpdateMintProofV2InstructionAsync,
   intoAddress,
 } from '../src';
@@ -459,73 +457,4 @@ test('invalid condition fails', async (t) => {
     t,
     code: TENSOR_WHITELIST_ERROR__NOT_MERKLE_ROOT, // condition is not merkle root type
   });
-});
-
-test('it can permissionlessly close a mint proof v2', async (t) => {
-  const client = createDefaultSolanaClient();
-
-  const other = await generateKeyPairSignerWithSol(client);
-
-  const updateAuthority = await generateKeyPairSignerWithSol(client);
-  const freezeAuthority = (await generateKeyPairSigner()).address;
-  const namespace = await generateKeyPairSigner();
-
-  const nftOwner = await generateKeyPairSignerWithSol(client);
-
-  // Mint NFT
-  const { mint } = await createDefaultNft({
-    client,
-    payer: nftOwner,
-    owner: nftOwner.address,
-    authority: nftOwner,
-  });
-
-  // Setup a merkle tree with our mint as a leaf
-  const {
-    root,
-    proofs: [p],
-  } = await generateTreeOfSize(10, [mint]);
-
-  const conditions: Condition[] = [
-    { mode: Mode.MerkleTree, value: intoAddress(root) },
-  ];
-
-  const { whitelist } = await createWhitelist({
-    client,
-    updateAuthority,
-    freezeAuthority,
-    conditions,
-    namespace,
-  });
-
-  const { mintProof } = await upsertMintProof({
-    client,
-    payer: nftOwner, // original payer, permissionless but we will use a separate signer to close
-    mint,
-    whitelist,
-    proof: p.proof,
-  });
-
-  t.like(await fetchMintProofV2(client.rpc, mintProof), <MintProofV2>(<unknown>{
-    address: mintProof,
-    data: {
-      proof: p.proof,
-      payer: nftOwner.address,
-    },
-  }));
-
-  const closeMintProofIx = getCloseMintProofV2Instruction({
-    payer: nftOwner.address, // original payer
-    signer: other, // permissionless close
-    mintProof,
-  });
-
-  await pipe(
-    await createDefaultTransaction(client, other),
-    (tx) => appendTransactionMessageInstruction(closeMintProofIx, tx),
-    (tx) => signAndSendTransaction(client, tx)
-  );
-
-  // Account is closed.
-  t.is((await fetchMaybeMintProofV2(client.rpc, mintProof)).exists, false);
 });

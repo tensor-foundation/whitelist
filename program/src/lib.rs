@@ -92,6 +92,11 @@ pub mod whitelist_program {
         process_create_whitelist_v2(ctx, args)
     }
 
+    /// Close a whitelist V2.
+    pub fn close_whitelist_v2(ctx: Context<CloseWhitelistV2>) -> Result<()> {
+        process_close_whitelist_v2(ctx)
+    }
+
     /// Update a whitelist V2.
     pub fn update_whitelist_v2(
         ctx: Context<UpdateWhitelistV2>,
