@@ -55,7 +55,7 @@ pub fn process_create_whitelist_v2(
     ctx: Context<CreateWhitelistV2>,
     mut args: CreateWhitelistV2Args,
 ) -> Result<()> {
-    WhitelistV2::validate_conditions(&mut args.conditions)?;
+    WhitelistV2::validate_conditions(&mut args.conditions);
 
     let whitelist = &mut ctx.accounts.whitelist;
 
