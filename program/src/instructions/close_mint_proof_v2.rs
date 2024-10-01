@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::state::MintProofV2;
+use crate::{error::ErrorCode, state::MintProofV2};
 
 #[constant]
 pub const SLOT_DELAY: u64 = 100;
@@ -39,6 +39,11 @@ pub fn process_close_mint_proof_v2(ctx: Context<CloseMintProofV2>) -> Result<()>
 
     // Close the mint proof account.
     if clock.slot < mint_proof.creation_slot + SLOT_DELAY {
+        // Only the original payer can close the mint proof account before the delay, to prevent DOS attacks.
+        require!(
+            ctx.accounts.signer.key == ctx.accounts.payer.key,
+            ErrorCode::InvalidAuthority
+        );
         mint_proof.close(ctx.accounts.payer.to_account_info())?;
     } else {
         mint_proof.close(ctx.accounts.signer.to_account_info())?;

@@ -31,3 +31,6 @@ anchor-spl = { version = "0.29.0", features = ["default"] }
 mpl-token-metadata = "4.0.0"
 tensor-toolbox = { version = "0.2.1", features = ["cnft"] }
 tensor-vipers = { version = "1.0.0" }
+
+[lints.rust]
+unused_must_use = "deny"
