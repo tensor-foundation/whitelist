@@ -50,7 +50,7 @@ test('it can close a whitelist v2', async (t) => {
     namespace,
   });
 
-  // Then a whitelist authority was created with the correct data.
+  // Then a whitelist was created with the correct data.
   t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
@@ -99,7 +99,6 @@ test('cannot close a frozen whitelist v2', async (t) => {
     freezeAuthority: updateAuthority.address,
   });
 
-  // Then a whitelist authority was created with the correct data.
   t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
@@ -143,6 +142,7 @@ test('cannot close a frozen whitelist v2', async (t) => {
     (tx) => signAndSendTransaction(client, tx)
   );
 
+  // The whitelist cannot be closed and fails with the correct error.
   await expectCustomError(
     t,
     promise,
