@@ -33,4 +33,4 @@ tensor-toolbox = { version = "0.2.1", features = ["cnft"] }
 tensor-vipers = { version = "1.0.0" }
 
 [lints.rust]
-unused_must_use = "warn"
+unused_must_use = "deny"
