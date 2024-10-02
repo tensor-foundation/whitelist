@@ -216,16 +216,18 @@ test('update authority cannot freeze and unfreeze a whitelist v2', async (t) => 
     (tx) => signAndSendTransaction(client, tx)
   );
 
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
-    address: whitelist,
-    data: {
-      updateAuthority: updateAuthority.address,
-      uuid,
-      // Is now frozen
-      state: State.Frozen,
-      conditions,
-    },
-  });
+  const checkState = async () =>
+    t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+      address: whitelist,
+      data: {
+        updateAuthority: updateAuthority.address,
+        uuid,
+        // Is now frozen
+        state: State.Frozen,
+        conditions,
+      },
+    });
+  await checkState();
 
   // Fail to Unfreeze
   const unfreezeWhitelistIx = getUnfreezeWhitelistV2Instruction({
@@ -241,4 +243,6 @@ test('update authority cannot freeze and unfreeze a whitelist v2', async (t) => 
 
   // Has-one constraint checks that signer is the freeze authority.
   await expectCustomError(t, promise, ANCHOR_ERROR__CONSTRAINT_HAS_ONE);
+
+  await checkState();
 });
