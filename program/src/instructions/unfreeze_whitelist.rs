@@ -20,6 +20,7 @@ pub struct UnfreezeWhitelist<'info> {
     )]
     pub whitelist_authority: Box<Account<'info, Authority>>,
 
+    // TODO: surprised not ALSO cosigner?
     /// unfreezing requires owner
     #[account(mut)]
     pub owner: Signer<'info>,

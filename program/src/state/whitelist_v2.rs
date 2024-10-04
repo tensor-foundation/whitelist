@@ -96,6 +96,7 @@ impl WhitelistV2 {
             throw_err!(ErrorCode::TooManyMerkleProofs);
         }
 
+        // TODO: I assume this mutates conditions in place? tbh I'm not familiar with this rust pattern, but if tests pass then fine
         // Ensure the merkle proof is the first item in the vector, if it exists.
         if let Some(index) = conditions
             .iter()

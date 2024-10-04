@@ -6,6 +6,7 @@ use anchor_lang::prelude::*;
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct CreateWhitelistV2Args {
     uuid: [u8; 32],
+    // TODO: personally found it weird that updated_authority is a signer but freeze_authority is not
     freeze_authority: Option<Pubkey>,
     conditions: Vec<Condition>,
 }
@@ -29,6 +30,7 @@ pub struct CreateWhitelistV2<'info> {
     pub update_authority: Signer<'info>,
 
     /// Namespace keypair used to derive the whitelist PDA.
+    /// Hm I guess we need this because we want to be able to quickly fing whitelists belonging to one user, and has to sign off since otherwise how do you know someone else didnt add it
     pub namespace: Signer<'info>,
 
     /// The whitelist PDA.

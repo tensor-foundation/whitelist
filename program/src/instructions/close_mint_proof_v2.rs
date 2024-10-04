@@ -24,6 +24,7 @@ pub struct CloseMintProofV2<'info> {
     pub signer: Signer<'info>,
 
     /// The mint proof account to close.
+    /// TODO: missing seeds?
     #[account(mut)]
     pub mint_proof: Box<Account<'info, MintProofV2>>,
 

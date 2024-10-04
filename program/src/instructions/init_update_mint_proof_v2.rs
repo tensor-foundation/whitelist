@@ -19,6 +19,7 @@ pub struct InitUpdateMintProofV2<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
+    // TODO: does it tho? where? I dont think we ever check if this is a Mint account
     /// The mint or asset account for which the proof is being created.
     /// CHECK: validation happens in the handler.
     pub mint: UncheckedAccount<'info>,
@@ -91,6 +92,7 @@ pub fn process_init_update_mint_proof_v2(
 
     mint_proof.proof[0..proof.len()].copy_from_slice(proof.as_slice());
 
+    // TODO: hmmm we dont allow updating the payer, but we do allow the creation slot?
     let clock = Clock::get()?;
     mint_proof.creation_slot = clock.slot;
 

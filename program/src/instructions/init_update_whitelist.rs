@@ -11,6 +11,7 @@ use crate::{
 #[instruction(uuid: [u8; 32])]
 pub struct InitUpdateWhitelist<'info> {
     #[account(
+        // re-entrancy not possible because single authority / cosigner
         init_if_needed,
         payer = cosigner,
         seeds = [&uuid],

@@ -7,6 +7,7 @@ use crate::{state::WhitelistV2, State};
 pub struct FreezeWhitelistV2<'info> {
     pub freeze_authority: Signer<'info>,
 
+    // TODO: missing seeds?
     #[account(
         mut,
         has_one = freeze_authority,

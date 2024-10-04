@@ -58,6 +58,7 @@ pub struct UpdateWhitelistV2<'info> {
     // New update authority, which must be a signer, if present, to prevent mistakes.
     pub new_update_authority: Option<Signer<'info>>,
 
+    // TODO: missing seeds?
     /// The WhitelistV2 account to update.
     #[account(
         mut,
