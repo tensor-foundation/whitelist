@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.2.0",
   "name": "whitelist_program",
   "constants": [
     {
@@ -414,6 +414,44 @@
           }
         }
       ]
+    },
+    {
+      "name": "closeWhitelistV2",
+      "docs": [
+        "Close a whitelist V2."
+      ],
+      "accounts": [
+        {
+          "name": "rentDestination",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The rent payer."
+          ]
+        },
+        {
+          "name": "updateAuthority",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The authority that will be allowed to update the whitelist."
+          ]
+        },
+        {
+          "name": "whitelist",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The whitelist PDA."
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
       "name": "updateWhitelistV2",
@@ -899,7 +937,7 @@
       "name": "CreateWhitelistV2Args",
       "docs": [
         "Arguments for creating a Whitelist V2 account.",
-        "Optional freeze authority defaulst to the system program pubkey if not provided."
+        "Optional freeze authority defaults to the system program pubkey if not provided."
       ],
       "type": {
         "kind": "struct",

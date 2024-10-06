@@ -7,6 +7,7 @@
  */
 
 export * from './closeMintProofV2';
+export * from './closeWhitelistV2';
 export * from './createWhitelistV2';
 export * from './freezeWhitelist';
 export * from './freezeWhitelistV2';

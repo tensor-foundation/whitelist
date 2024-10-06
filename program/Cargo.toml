@@ -1,6 +1,6 @@
 [package]
 name = "whitelist-program"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 readme = "./README.md"
 license-file = "../LICENSE"
@@ -28,6 +28,9 @@ testing = []
 [dependencies]
 anchor-lang = { version = "0.29.0", features = ["init-if-needed"] }
 anchor-spl = { version = "0.29.0", features = ["default"] }
-mpl-token-metadata = "4.0.0"
-tensor-toolbox = { version = "0.2.1", features = ["cnft"] }
-tensor-vipers = { version = "1.0.0" }
+mpl-token-metadata = "4.1.2"
+tensor-toolbox = { version = "0.4.0", features = ["cnft"] }
+tensor-vipers = { version = "1.0.1" }
+
+[lints.rust]
+unused_must_use = "deny"

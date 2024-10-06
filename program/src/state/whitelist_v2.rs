@@ -72,7 +72,7 @@ impl WhitelistV2 {
     /// This function ensures that the merkle proof is the first condition by swapping it to the front
     /// if necessary.
     ///
-    /// Whitelists are expected to be created once, editing seldom, and validated many times and having
+    /// Whitelists are expected to be created once, edited seldom, and validated many times, so having
     /// the merkle proof first makes it easier to validate the proof.
     ///
     /// The number of conditions is limited to `WHITELIST_V2_CONDITIONS_LENGTH` to control compute usage.
@@ -119,6 +119,7 @@ impl WhitelistV2 {
         proof: &Option<FullMerkleProof>,
     ) -> Result<()> {
         // If any pass, then the whitelist is valid.
+        // Empty iterators return false.
         let pass = self
             .conditions
             .iter()
@@ -130,7 +131,7 @@ impl WhitelistV2 {
                 .conditions
                 .iter()
                 .find_map(|condition| condition.validate(collection, creators, proof).err())
-                .unwrap();
+                .unwrap_or_else(|| ErrorCode::EmptyConditions.into());
 
             return Err(err);
         }
@@ -219,5 +220,187 @@ impl Condition {
             }
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn whitelist_verify_fails_on_empty_conditions() {
+        let whitelist = WhitelistV2::default();
+        assert!(whitelist.conditions.is_empty());
+
+        let err = whitelist.verify(&None, &None, &None).unwrap_err();
+
+        match err {
+            Error::AnchorError(anchor_error) => {
+                assert_eq!(
+                    anchor_error.error_msg.to_string(),
+                    ErrorCode::EmptyConditions.to_string()
+                );
+            }
+            Error::ProgramError(_) => {
+                panic!("Expected AnchorError, got ProgramError");
+            }
+        }
+    }
+
+    #[test]
+    fn whitelist_verify_fails_on_empty_creators() {
+        let creator = Pubkey::new_unique();
+        let creators = vec![];
+
+        let whitelist = WhitelistV2 {
+            conditions: vec![Condition {
+                mode: Mode::FVC,
+                value: creator,
+            }],
+            ..Default::default()
+        };
+
+        let err = whitelist.verify(&None, &Some(creators), &None).unwrap_err();
+
+        match err {
+            Error::AnchorError(anchor_error) => {
+                assert_eq!(
+                    anchor_error.error_msg.to_string(),
+                    ErrorCode::FailedFvcVerification.to_string()
+                );
+            }
+            Error::ProgramError(_) => {
+                panic!("Expected AnchorError, got ProgramError");
+            }
+        }
+    }
+
+    #[test]
+    fn whitelist_verify_fails_on_unverified_creator() {
+        let creator = Pubkey::new_unique();
+        let creators = vec![Creator {
+            address: creator,
+            verified: false,
+            share: 100,
+        }];
+
+        let whitelist = WhitelistV2 {
+            conditions: vec![Condition {
+                mode: Mode::FVC,
+                value: creator,
+            }],
+            ..Default::default()
+        };
+
+        let err = whitelist.verify(&None, &Some(creators), &None).unwrap_err();
+
+        match err {
+            Error::AnchorError(anchor_error) => {
+                assert_eq!(
+                    anchor_error.error_msg.to_string(),
+                    ErrorCode::FailedFvcVerification.to_string()
+                );
+            }
+            Error::ProgramError(_) => {
+                panic!("Expected AnchorError, got ProgramError");
+            }
+        }
+    }
+
+    // whiteslist verify fails on empty collection
+    #[test]
+    fn whitelist_verify_fails_on_empty_collection() {
+        let collection = Collection {
+            verified: true,
+            key: Pubkey::new_unique(),
+        };
+
+        // Set the condition to VOC.
+        let whitelist = WhitelistV2 {
+            conditions: vec![Condition {
+                mode: Mode::VOC,
+                value: collection.key,
+            }],
+            ..Default::default()
+        };
+
+        // No collection provided
+        let err = whitelist.verify(&None, &None, &None).unwrap_err();
+
+        match err {
+            Error::AnchorError(anchor_error) => {
+                assert_eq!(
+                    anchor_error.error_msg.to_string(),
+                    ErrorCode::FailedVocVerification.to_string()
+                );
+            }
+            Error::ProgramError(_) => {
+                panic!("Expected AnchorError, got ProgramError");
+            }
+        }
+    }
+
+    #[test]
+    fn whitelist_verify_fails_on_unverified_collection() {
+        let collection = Collection {
+            verified: false,
+            key: Pubkey::new_unique(),
+        };
+
+        let whitelist = WhitelistV2 {
+            conditions: vec![Condition {
+                mode: Mode::VOC,
+                value: collection.key,
+            }],
+            ..Default::default()
+        };
+
+        let err = whitelist
+            .verify(&Some(collection), &None, &None)
+            .unwrap_err();
+
+        match err {
+            Error::AnchorError(anchor_error) => {
+                assert_eq!(
+                    anchor_error.error_msg.to_string(),
+                    ErrorCode::FailedVocVerification.to_string()
+                );
+            }
+            Error::ProgramError(_) => {
+                panic!("Expected AnchorError, got ProgramError");
+            }
+        }
+    }
+
+    #[test]
+    fn whitelist_verify_fails_on_invalid_voc() {
+        let collection = Collection {
+            verified: true,
+            key: Pubkey::new_unique(),
+        };
+
+        let whitelist = WhitelistV2 {
+            conditions: vec![Condition {
+                mode: Mode::VOC,
+                value: Pubkey::new_unique(), // Invalid VOC
+            }],
+            ..Default::default()
+        };
+
+        let err = whitelist
+            .verify(&Some(collection), &None, &None)
+            .unwrap_err();
+
+        match err {
+            Error::AnchorError(anchor_error) => {
+                assert_eq!(
+                    anchor_error.error_msg.to_string(),
+                    ErrorCode::FailedVocVerification.to_string()
+                );
+            }
+            Error::ProgramError(_) => {
+                panic!("Expected AnchorError, got ProgramError");
+            }
+        }
     }
 }
