@@ -1,21 +1,21 @@
 import { ANCHOR_ERROR__CONSTRAINT_HAS_ONE } from '@coral-xyz/anchor-errors';
 import { appendTransactionMessageInstruction, pipe } from '@solana/web3.js';
 import {
-    createDefaultSolanaClient,
-    createDefaultTransaction,
-    generateKeyPairSignerWithSol,
-    signAndSendTransaction,
+  createDefaultSolanaClient,
+  createDefaultTransaction,
+  generateKeyPairSignerWithSol,
+  signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
 import test from 'ava';
 import {
-    Mode,
-    State,
-    TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN,
-    fetchWhitelistV2,
-    getFreezeWhitelistV2Instruction,
-    getUnfreezeWhitelistV2Instruction,
-    getUpdateWhitelistV2Instruction,
-    operation,
+  Mode,
+  State,
+  TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN,
+  fetchWhitelistV2,
+  getFreezeWhitelistV2Instruction,
+  getUnfreezeWhitelistV2Instruction,
+  getUpdateWhitelistV2Instruction,
+  operation,
 } from '../src';
 import { createWhitelist, expectCustomError } from './_common';
 

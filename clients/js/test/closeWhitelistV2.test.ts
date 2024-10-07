@@ -1,33 +1,33 @@
 import {
-    appendTransactionMessageInstruction,
-    generateKeyPairSigner,
-    pipe,
+  appendTransactionMessageInstruction,
+  generateKeyPairSigner,
+  pipe,
 } from '@solana/web3.js';
 import {
-    createDefaultSolanaClient,
-    createDefaultTransaction,
-    generateKeyPairSignerWithSol,
-    getBalance,
-    signAndSendTransaction,
+  createDefaultSolanaClient,
+  createDefaultTransaction,
+  generateKeyPairSignerWithSol,
+  getBalance,
+  signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
 import test from 'ava';
 import {
-    Condition,
-    fetchMaybeWhitelistV2,
-    fetchWhitelistV2,
-    getCloseWhitelistV2Instruction,
-    getFreezeWhitelistV2Instruction,
-    Mode,
-    State,
-    TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY,
-    TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN,
+  Condition,
+  fetchMaybeWhitelistV2,
+  fetchWhitelistV2,
+  getCloseWhitelistV2Instruction,
+  getFreezeWhitelistV2Instruction,
+  Mode,
+  State,
+  TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY,
+  TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN,
 } from '../src';
 import {
-    createWhitelist,
-    expectCustomError,
-    RUST_VEC_SIZE,
-    WHITELIST_V2_BASE_SIZE,
-    WHITELIST_V2_CONDITION_SIZE,
+  createWhitelist,
+  expectCustomError,
+  RUST_VEC_SIZE,
+  WHITELIST_V2_BASE_SIZE,
+  WHITELIST_V2_CONDITION_SIZE,
 } from './_common';
 
 test('it can close a whitelist v2', async (t) => {
@@ -242,7 +242,7 @@ test('cannot close another whitelist v2 with a valid update authority', async (t
     TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY
   );
 
-   promise = pipe(
+  promise = pipe(
     await createDefaultTransaction(client, updateAuthorityA),
     (tx) => appendTransactionMessageInstruction(closeWhitelistBIx, tx),
     (tx) => signAndSendTransaction(client, tx)
