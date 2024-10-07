@@ -1,21 +1,21 @@
 import { ANCHOR_ERROR__CONSTRAINT_HAS_ONE } from '@coral-xyz/anchor-errors';
 import { appendTransactionMessageInstruction, pipe } from '@solana/web3.js';
 import {
-  createDefaultSolanaClient,
-  createDefaultTransaction,
-  generateKeyPairSignerWithSol,
-  signAndSendTransaction,
+    createDefaultSolanaClient,
+    createDefaultTransaction,
+    generateKeyPairSignerWithSol,
+    signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
 import test from 'ava';
 import {
-  Mode,
-  State,
-  TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN,
-  fetchWhitelistV2,
-  getFreezeWhitelistV2Instruction,
-  getUnfreezeWhitelistV2Instruction,
-  getUpdateWhitelistV2Instruction,
-  operation,
+    Mode,
+    State,
+    TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN,
+    fetchWhitelistV2,
+    getFreezeWhitelistV2Instruction,
+    getUnfreezeWhitelistV2Instruction,
+    getUpdateWhitelistV2Instruction,
+    operation,
 } from '../src';
 import { createWhitelist, expectCustomError } from './_common';
 
@@ -36,6 +36,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
       uuid,
       conditions,
       state: State.Unfrozen,
@@ -58,6 +59,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
       uuid,
       // Is frozen
       state: State.Frozen,
@@ -81,6 +83,7 @@ test('it can freeze and unfreeze a whitelist v2', async (t) => {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
       uuid,
       // Is unfrozen
       state: State.Unfrozen,
@@ -109,6 +112,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
       uuid,
       conditions,
       state: State.Unfrozen,
@@ -131,6 +135,7 @@ test('a frozen whitelist v2 cannot be updated', async (t) => {
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
       uuid,
       // Is frozen
       state: State.Frozen,
@@ -183,6 +188,7 @@ test('update authority cannot freeze and unfreeze a whitelist v2', async (t) => 
     address: whitelist,
     data: {
       updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
       uuid,
       conditions,
       state: State.Unfrozen,
@@ -221,6 +227,7 @@ test('update authority cannot freeze and unfreeze a whitelist v2', async (t) => 
       address: whitelist,
       data: {
         updateAuthority: updateAuthority.address,
+        freezeAuthority: freezeAuthority.address,
         uuid,
         // Is now frozen
         state: State.Frozen,
@@ -245,4 +252,164 @@ test('update authority cannot freeze and unfreeze a whitelist v2', async (t) => 
   await expectCustomError(t, promise, ANCHOR_ERROR__CONSTRAINT_HAS_ONE);
 
   await checkState();
+});
+
+test('freezing is idempotent', async (t) => {
+  const client = createDefaultSolanaClient();
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const freezeAuthority = await generateKeyPairSignerWithSol(client);
+
+  // Create a whitelist with a freeze authority set.
+  const { whitelist, uuid, conditions } = await createWhitelist({
+    client,
+    updateAuthority,
+    freezeAuthority: freezeAuthority.address,
+  });
+
+  // It was created correctly, and is unfrozen.
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
+      uuid,
+      conditions,
+      state: State.Unfrozen,
+    },
+  });
+
+  // Freeze
+  const freezeWhitelistIx = getFreezeWhitelistV2Instruction({
+    freezeAuthority,
+    whitelist,
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, freezeAuthority),
+    (tx) => appendTransactionMessageInstruction(freezeWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
+      uuid,
+      // Is frozen
+      state: State.Frozen,
+      conditions,
+    },
+  });
+
+  // Freeze again
+  await pipe(
+    await createDefaultTransaction(client, freezeAuthority),
+    (tx) => appendTransactionMessageInstruction(freezeWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
+      uuid,
+      // Still frozen
+      state: State.Frozen,
+      conditions,
+    },
+  });
+});
+
+test('unfreezing is idempotent', async (t) => {
+  const client = createDefaultSolanaClient();
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const freezeAuthority = await generateKeyPairSignerWithSol(client);
+
+  // Create a whitelist with a freeze authority set.
+  const { whitelist, uuid, conditions } = await createWhitelist({
+    client,
+    updateAuthority,
+    freezeAuthority: freezeAuthority.address,
+  });
+
+  // It was created correctly, and is unfrozen.
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
+      uuid,
+      conditions,
+      state: State.Unfrozen,
+    },
+  });
+
+  // Freeze
+  const freezeWhitelistIx = getFreezeWhitelistV2Instruction({
+    freezeAuthority,
+    whitelist,
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, freezeAuthority),
+    (tx) => appendTransactionMessageInstruction(freezeWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
+      uuid,
+      // Is frozen
+      state: State.Frozen,
+      conditions,
+    },
+  });
+
+  // Unfreeze
+  const unfreezeWhitelistIx = getUnfreezeWhitelistV2Instruction({
+    freezeAuthority,
+    whitelist,
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, freezeAuthority),
+    (tx) => appendTransactionMessageInstruction(unfreezeWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
+      uuid,
+      // Is unfrozen
+      state: State.Unfrozen,
+      conditions,
+    },
+  });
+
+  // Unfreeze again
+  await pipe(
+    await createDefaultTransaction(client, freezeAuthority),
+    (tx) => appendTransactionMessageInstruction(unfreezeWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      freezeAuthority: freezeAuthority.address,
+      uuid,
+      // Still unfrozen
+      state: State.Unfrozen,
+      conditions,
+    },
+  });
 });

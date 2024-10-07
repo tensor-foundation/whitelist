@@ -1,33 +1,33 @@
 import {
-  appendTransactionMessageInstruction,
-  generateKeyPairSigner,
-  pipe,
+    appendTransactionMessageInstruction,
+    generateKeyPairSigner,
+    pipe,
 } from '@solana/web3.js';
 import {
-  createDefaultSolanaClient,
-  createDefaultTransaction,
-  generateKeyPairSignerWithSol,
-  getBalance,
-  signAndSendTransaction,
+    createDefaultSolanaClient,
+    createDefaultTransaction,
+    generateKeyPairSignerWithSol,
+    getBalance,
+    signAndSendTransaction,
 } from '@tensor-foundation/test-helpers';
 import test from 'ava';
 import {
-  Condition,
-  Mode,
-  State,
-  TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY,
-  TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN,
-  fetchMaybeWhitelistV2,
-  fetchWhitelistV2,
-  getCloseWhitelistV2Instruction,
-  getFreezeWhitelistV2Instruction,
+    Condition,
+    fetchMaybeWhitelistV2,
+    fetchWhitelistV2,
+    getCloseWhitelistV2Instruction,
+    getFreezeWhitelistV2Instruction,
+    Mode,
+    State,
+    TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY,
+    TENSOR_WHITELIST_ERROR__WHITELIST_IS_FROZEN,
 } from '../src';
 import {
-  createWhitelist,
-  expectCustomError,
-  RUST_VEC_SIZE,
-  WHITELIST_V2_BASE_SIZE,
-  WHITELIST_V2_CONDITION_SIZE,
+    createWhitelist,
+    expectCustomError,
+    RUST_VEC_SIZE,
+    WHITELIST_V2_BASE_SIZE,
+    WHITELIST_V2_CONDITION_SIZE,
 } from './_common';
 
 test('it can close a whitelist v2', async (t) => {
@@ -178,6 +178,73 @@ test('cannot close a whitelist v2 with an invalid update authority', async (t) =
   const promise = pipe(
     await createDefaultTransaction(client, updateAuthority),
     (tx) => appendTransactionMessageInstruction(closeWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  await expectCustomError(
+    t,
+    promise,
+    TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY
+  );
+});
+
+test('cannot close another whitelist v2 with a valid update authority', async (t) => {
+  const client = createDefaultSolanaClient();
+  const updateAuthorityA = await generateKeyPairSignerWithSol(client);
+  const updateAuthorityB = await generateKeyPairSignerWithSol(client);
+  const namespaceA = await generateKeyPairSigner();
+  const namespaceB = await generateKeyPairSigner();
+
+  const conditionsA: Condition[] = [
+    { mode: Mode.FVC, value: updateAuthorityA.address },
+  ];
+  const conditionsB: Condition[] = [
+    { mode: Mode.FVC, value: updateAuthorityA.address },
+  ];
+
+  const { whitelist: whitelistA } = await createWhitelist({
+    client,
+    updateAuthority: updateAuthorityA,
+    conditions: conditionsA,
+    namespace: namespaceA,
+    freezeAuthority: updateAuthorityA.address,
+  });
+
+  const { whitelist: whitelistB } = await createWhitelist({
+    client,
+    updateAuthority: updateAuthorityB,
+    conditions: conditionsB,
+    namespace: namespaceB,
+    freezeAuthority: updateAuthorityB.address,
+  });
+
+  const closeWhitelistAIx = getCloseWhitelistV2Instruction({
+    updateAuthority: updateAuthorityB,
+    whitelist: whitelistA,
+    rentDestination: updateAuthorityA.address,
+  });
+
+  const closeWhitelistBIx = getCloseWhitelistV2Instruction({
+    updateAuthority: updateAuthorityA,
+    whitelist: whitelistB,
+    rentDestination: updateAuthorityB.address,
+  });
+
+  let promise = pipe(
+    await createDefaultTransaction(client, updateAuthorityA),
+    (tx) => appendTransactionMessageInstruction(closeWhitelistAIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  await expectCustomError(
+    t,
+    promise,
+    TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY
+  );
+
+   promise = pipe(
+    await createDefaultTransaction(client, updateAuthorityA),
+    (tx) => appendTransactionMessageInstruction(closeWhitelistBIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
 
