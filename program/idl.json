@@ -403,7 +403,10 @@
         {
           "name": "systemProgram",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "The Solana system program."
+          ]
         }
       ],
       "args": [

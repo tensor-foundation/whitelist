@@ -15,15 +15,23 @@ import test from 'ava';
 import {
   Condition,
   Mode,
+  State,
+  TENSOR_WHITELIST_ERROR__EMPTY_CONDITIONS,
+  TENSOR_WHITELIST_ERROR__TOO_MANY_MERKLE_PROOFS,
   fetchWhitelistV2,
   findWhitelistV2Pda,
   getCreateWhitelistV2Instruction,
 } from '../src';
 import {
+  CURRENT_WHITELIST_VERSION,
   DEFAULT_PUBKEY,
+  RUST_VEC_SIZE,
+  WHITELIST_V2_BASE_SIZE,
+  WHITELIST_V2_CONDITION_SIZE,
   createWhitelist,
   createWhitelistThrows,
   generateUuid,
+  getAccountDataLength,
 } from './_common';
 
 const MAX_CONDITIONS = 24;
@@ -52,13 +60,25 @@ test('it can create a whitelist v2', async (t) => {
   t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
     data: {
+      version: CURRENT_WHITELIST_VERSION,
       updateAuthority: updateAuthority.address,
       namespace: namespace.address,
       freezeAuthority,
       uuid,
       conditions,
+      state: State.Unfrozen,
     },
   });
+
+  // Data is the right length.
+  const dataLength = await getAccountDataLength(client, whitelist);
+
+  t.assert(
+    dataLength ===
+      WHITELIST_V2_BASE_SIZE +
+        RUST_VEC_SIZE +
+        WHITELIST_V2_CONDITION_SIZE * conditions.length
+  );
 });
 
 test('creating a whitelist v2 with no freeze authority defaults to system pubkey', async (t) => {
@@ -103,50 +123,7 @@ test('it throws when creating a whitelist v2 with an empty conditions list', asy
     updateAuthority,
     conditions,
     t,
-    // 6014 -- Emptyconditions
-    code: 6014,
-  });
-});
-
-test('it can create a whitelist v2 funded by a separate payer', async (t) => {
-  const client = createDefaultSolanaClient();
-
-  // Payer has funds.
-  const payer = await generateKeyPairSignerWithSol(client);
-
-  // No funds, so can't pay.
-  const updateAuthority = await generateKeyPairSigner();
-
-  // Also no funds.
-  const namespace = await generateKeyPairSigner();
-
-  const freezeAuthority = (await generateKeyPairSigner()).address;
-  const voc = (await generateKeyPairSigner()).address;
-
-  const conditions = [
-    { mode: Mode.FVC, value: updateAuthority.address },
-    { mode: Mode.VOC, value: voc },
-  ];
-
-  const { whitelist, uuid } = await createWhitelist({
-    client,
-    payer,
-    updateAuthority,
-    freezeAuthority,
-    conditions,
-    namespace,
-  });
-
-  // Then a whitelist authority was created with the correct data.
-  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
-    address: whitelist,
-    data: {
-      updateAuthority: updateAuthority.address,
-      namespace: namespace.address,
-      freezeAuthority,
-      uuid,
-      conditions,
-    },
+    code: TENSOR_WHITELIST_ERROR__EMPTY_CONDITIONS,
   });
 });
 
@@ -171,8 +148,7 @@ test('it cannot create a whitelist v2 with more than one merkle proof', async (t
     conditions,
     namespace,
     t,
-    // 6015 -- TooManyMerkleProofs
-    code: 6015,
+    code: TENSOR_WHITELIST_ERROR__TOO_MANY_MERKLE_PROOFS,
   });
 });
 
@@ -357,4 +333,46 @@ test('it throws when trying to create a whitelist v2 more than max length', asyn
   if (isSolanaError(error, SOLANA_ERROR__JSON_RPC__INVALID_PARAMS)) {
     t.regex(error.context.__serverMessage, / too large: 1652 bytes/);
   }
+});
+
+test('it can create a whitelist v2 funded by a separate payer', async (t) => {
+  const client = createDefaultSolanaClient();
+
+  // Payer has funds.
+  const payer = await generateKeyPairSignerWithSol(client);
+
+  // No funds, so can't pay.
+  const updateAuthority = await generateKeyPairSigner();
+
+  // Also no funds.
+  const namespace = await generateKeyPairSigner();
+
+  const freezeAuthority = (await generateKeyPairSigner()).address;
+  const voc = (await generateKeyPairSigner()).address;
+
+  const conditions = [
+    { mode: Mode.FVC, value: updateAuthority.address },
+    { mode: Mode.VOC, value: voc },
+  ];
+
+  const { whitelist, uuid } = await createWhitelist({
+    client,
+    payer,
+    updateAuthority,
+    freezeAuthority,
+    conditions,
+    namespace,
+  });
+
+  // Then a whitelist authority was created with the correct data.
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      namespace: namespace.address,
+      freezeAuthority,
+      uuid,
+      conditions,
+    },
+  });
 });

@@ -28,11 +28,13 @@ import {
 
 test('it can update a whitelist v2, reallocing to be larger', async (t) => {
   const client = createDefaultSolanaClient();
+  const payer = await generateKeyPairSignerWithSol(client);
   const updateAuthority = await generateKeyPairSignerWithSol(client);
   const voc = (await generateKeyPairSigner()).address;
 
   // Default conditions size is one item
   const { whitelist, uuid, conditions } = await createWhitelist({
+    payer,
     client,
     updateAuthority,
   });
@@ -59,15 +61,19 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
   ];
 
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
-    payer: updateAuthority,
+    payer,
     updateAuthority,
     whitelist,
     conditions: newConditions,
     freezeAuthority: operation('Noop'),
   });
 
+  const beginningPayerBalance = (
+    await client.rpc.getBalance(payer.address).send()
+  ).value;
+
   await pipe(
-    await createDefaultTransaction(client, updateAuthority),
+    await createDefaultTransaction(client, payer),
     (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
@@ -81,13 +87,19 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
     },
   });
 
+  // Check that the account size has increased
   const newAccountSize = await getAccountDataLength(client, whitelist);
-
   t.true(newAccountSize > originalAccountSize);
+
+  // Check that payer balance has decreased
+  const endingPayerBalance = (await client.rpc.getBalance(payer.address).send())
+    .value;
+  t.true(endingPayerBalance < beginningPayerBalance);
 });
 
 test('it can update a whitelist v2 reallocing to be smaller', async (t) => {
   const client = createDefaultSolanaClient();
+  const payer = await generateKeyPairSignerWithSol(client);
   const updateAuthority = await generateKeyPairSignerWithSol(client);
   const voc = (await generateKeyPairSigner()).address;
 
@@ -102,6 +114,7 @@ test('it can update a whitelist v2 reallocing to be smaller', async (t) => {
 
   const { whitelist, uuid } = await createWhitelist({
     client,
+    payer,
     updateAuthority,
     conditions,
   });
@@ -121,20 +134,22 @@ test('it can update a whitelist v2 reallocing to be smaller', async (t) => {
   const newConditions: Condition[] = [{ mode: Mode.VOC, value: voc }];
 
   const updateWhitelistIx = getUpdateWhitelistV2Instruction({
-    payer: updateAuthority,
+    payer,
     updateAuthority,
     whitelist,
     conditions: newConditions,
     freezeAuthority: operation('Noop'),
   });
 
+  const beginningPayerBalance = (
+    await client.rpc.getBalance(payer.address).send()
+  ).value;
+
   await pipe(
     await createDefaultTransaction(client, updateAuthority),
     (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
     (tx) => signAndSendTransaction(client, tx)
   );
-
-  const newAccountSize = await getAccountDataLength(client, whitelist);
 
   t.like(await fetchWhitelistV2(client.rpc, whitelist), {
     address: whitelist,
@@ -145,7 +160,14 @@ test('it can update a whitelist v2 reallocing to be smaller', async (t) => {
     },
   });
 
+  // Check that the account size has dedcreased
+  const newAccountSize = await getAccountDataLength(client, whitelist);
   t.true(newAccountSize < originalAccountSize);
+
+  // Check that payer balance has increased
+  const endingPayerBalance = (await client.rpc.getBalance(payer.address).send())
+    .value;
+  t.true(endingPayerBalance > beginningPayerBalance);
 });
 
 test('it cannot edit a whitelist v2 with the wrong authority', async (t) => {
@@ -399,6 +421,51 @@ test('it moves the merkle proof to the first index for a whitelist v2', async (t
       updateAuthority: updateAuthority.address,
       // No rotation needed, should be the same.
       conditions: newConditions,
+    },
+  });
+});
+
+test('noop leaves conditions unchanged', async (t) => {
+  const client = createDefaultSolanaClient();
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+
+  const conditions = [{ mode: Mode.FVC, value: updateAuthority.address }];
+
+  const { whitelist, uuid } = await createWhitelist({
+    client,
+    updateAuthority,
+    conditions,
+  });
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      uuid,
+      conditions,
+    },
+  });
+
+  const updateWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer: updateAuthority,
+    updateAuthority,
+    whitelist,
+    conditions: null,
+    freezeAuthority: operation('Noop'),
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, updateAuthority),
+    (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      // No change.
+      conditions,
     },
   });
 });

@@ -30,6 +30,8 @@ import {
 
 export const MAX_PROOF_LENGTH = 28;
 
+export const CURRENT_WHITELIST_VERSION = 1;
+
 export const WHITELIST_V2_BASE_SIZE = 139;
 export const WHITELIST_V2_CONDITION_SIZE = 33;
 export const RUST_VEC_SIZE = 4;

@@ -281,6 +281,7 @@ test('it cannot override the stored payer', async (t) => {
   // Try to update the payer.
   const newPayer = await generateKeyPairSignerWithSol(client);
 
+  // This succeeds...
   await upsertMintProof({
     client,
     payer: newPayer,
@@ -289,7 +290,7 @@ test('it cannot override the stored payer', async (t) => {
     proof: p.proof,
   });
 
-  // Payer should be the original payer.
+  // ...but the payer should be the original payer.
   t.like(await fetchMintProofV2(client.rpc, mintProof), <MintProofV2>(<unknown>{
     address: mintProof,
     data: {
@@ -429,7 +430,7 @@ test('invalid condition fails', async (t) => {
     owner: nftOwner.address,
   });
 
-  // Setup a merkle tree with our mint as a leaf∏
+  // Setup a merkle tree with our mint as a leaf
   const {
     root,
     proofs: [p],

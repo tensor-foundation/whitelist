@@ -20,7 +20,7 @@ pub struct CreateWhitelistV2 {
     pub namespace: solana_program::pubkey::Pubkey,
     /// The whitelist PDA.
     pub whitelist: solana_program::pubkey::Pubkey,
-
+    /// The Solana system program.
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
@@ -153,6 +153,7 @@ impl CreateWhitelistV2Builder {
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
+    /// The Solana system program.
     #[inline(always)]
     pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
@@ -223,7 +224,7 @@ pub struct CreateWhitelistV2CpiAccounts<'a, 'b> {
     pub namespace: &'b solana_program::account_info::AccountInfo<'a>,
     /// The whitelist PDA.
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The Solana system program.
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
@@ -239,7 +240,7 @@ pub struct CreateWhitelistV2Cpi<'a, 'b> {
     pub namespace: &'b solana_program::account_info::AccountInfo<'a>,
     /// The whitelist PDA.
     pub whitelist: &'b solana_program::account_info::AccountInfo<'a>,
-
+    /// The Solana system program.
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
     pub __args: CreateWhitelistV2InstructionArgs,
@@ -415,6 +416,7 @@ impl<'a, 'b> CreateWhitelistV2CpiBuilder<'a, 'b> {
         self.instruction.whitelist = Some(whitelist);
         self
     }
+    /// The Solana system program.
     #[inline(always)]
     pub fn system_program(
         &mut self,

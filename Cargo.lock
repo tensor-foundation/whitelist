@@ -2090,6 +2090,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "spl-merkle-tree-reference"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "28437c617c7f0db6b7229a489239f3ea6160499542d9367fbca2fc5ec7744abb"
+dependencies = [
+ "solana-program",
+ "thiserror",
+]
+
+[[package]]
 name = "spl-noop"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2585,6 +2595,8 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "mpl-token-metadata",
+ "solana-sdk",
+ "spl-merkle-tree-reference",
  "tensor-toolbox",
  "tensor-vipers",
 ]

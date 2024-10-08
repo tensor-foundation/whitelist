@@ -47,6 +47,7 @@ pub struct CreateWhitelistV2<'info> {
     )]
     pub whitelist: Account<'info, WhitelistV2>,
 
+    /// The Solana system program.
     pub system_program: Program<'info, System>,
 }
 

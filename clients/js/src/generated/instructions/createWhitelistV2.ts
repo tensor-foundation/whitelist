@@ -152,6 +152,7 @@ export type CreateWhitelistV2AsyncInput<
   namespace: TransactionSigner<TAccountNamespace>;
   /** The whitelist PDA. */
   whitelist?: Address<TAccountWhitelist>;
+  /** The Solana system program. */
   systemProgram?: Address<TAccountSystemProgram>;
   uuid: CreateWhitelistV2InstructionDataArgs['uuid'];
   freezeAuthority: CreateWhitelistV2InstructionDataArgs['freezeAuthority'];
@@ -253,6 +254,7 @@ export type CreateWhitelistV2Input<
   namespace: TransactionSigner<TAccountNamespace>;
   /** The whitelist PDA. */
   whitelist: Address<TAccountWhitelist>;
+  /** The Solana system program. */
   systemProgram?: Address<TAccountSystemProgram>;
   uuid: CreateWhitelistV2InstructionDataArgs['uuid'];
   freezeAuthority: CreateWhitelistV2InstructionDataArgs['freezeAuthority'];
@@ -345,6 +347,7 @@ export type ParsedCreateWhitelistV2Instruction<
     namespace: TAccountMetas[2];
     /** The whitelist PDA. */
     whitelist: TAccountMetas[3];
+    /** The Solana system program. */
     systemProgram: TAccountMetas[4];
   };
   data: CreateWhitelistV2InstructionData;
