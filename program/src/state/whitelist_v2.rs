@@ -227,6 +227,11 @@ impl Condition {
 mod test {
     use super::*;
 
+    use std::collections::HashMap;
+
+    use solana_sdk::{keccak::hash, pubkey::Pubkey};
+    use spl_merkle_tree_reference::MerkleTree;
+
     #[test]
     fn whitelist_verify_fails_on_empty_conditions() {
         let whitelist = WhitelistV2::default();
@@ -402,5 +407,129 @@ mod test {
                 panic!("Expected AnchorError, got ProgramError");
             }
         }
+    }
+
+    #[test]
+    fn multiple_condition_or_succeeds() {
+        let item = Pubkey::new_unique();
+        let tree = create_merkle_tree_of_size(2, vec![item]);
+
+        let proof = tree.proofs.get(&item).unwrap();
+
+        let creator = Pubkey::new_unique();
+        let creators = vec![Creator {
+            address: creator,
+            verified: true,
+            share: 100,
+        }];
+
+        let collection = Collection {
+            verified: true,
+            key: Pubkey::new_unique(),
+        };
+
+        let collection2 = Collection {
+            verified: true,
+            key: Pubkey::new_unique(),
+        };
+
+        let whitelist = WhitelistV2 {
+            conditions: vec![
+                Condition {
+                    mode: Mode::MerkleTree,
+                    value: tree.root,
+                },
+                Condition {
+                    mode: Mode::VOC,
+                    value: collection.key,
+                },
+                Condition {
+                    mode: Mode::VOC,
+                    value: collection2.key,
+                },
+                Condition {
+                    mode: Mode::FVC,
+                    value: creator,
+                },
+            ],
+            ..Default::default()
+        };
+
+        // Any one of these conditions should pass.
+        whitelist
+            .verify(&Some(collection.clone()), &None, &None)
+            .unwrap();
+        whitelist
+            .verify(&Some(collection2.clone()), &None, &None)
+            .unwrap();
+        whitelist
+            .verify(&None, &Some(creators.clone()), &None)
+            .unwrap();
+        whitelist
+            .verify(&None, &None, &Some(proof.clone()))
+            .unwrap();
+
+        // Combining multiple conditions should pass.
+        whitelist
+            .verify(
+                &Some(collection),
+                &Some(creators.clone()),
+                &Some(proof.clone()),
+            )
+            .unwrap();
+        whitelist
+            .verify(&Some(collection2), &Some(creators), &Some(proof.clone()))
+            .unwrap();
+    }
+
+    struct TestMerkleTree {
+        root: Pubkey,
+        proofs: HashMap<Pubkey, FullMerkleProof>,
+    }
+
+    fn create_merkle_tree_of_size(size: usize, target_items: Vec<Pubkey>) -> TestMerkleTree {
+        // Ensure we don't exceed the specified size
+        assert!(
+            target_items.len() <= size,
+            "Too many target items for the specified tree size"
+        );
+
+        // Create leaves for all items (target and filler)
+        let target_leaves: Vec<[u8; 32]> = target_items
+            .iter()
+            .map(|item| hash(item.as_ref()).to_bytes())
+            .collect();
+
+        let mut leaves: Vec<[u8; 32]> = Vec::new();
+
+        leaves.extend(target_leaves);
+
+        // Fill the remaining leaves to reach the desired size
+        while leaves.len() < size {
+            leaves.push(hash(&Pubkey::default().to_bytes()).to_bytes());
+        }
+
+        leaves.sort();
+
+        // Create the Merkle tree
+        let tree = MerkleTree::new(&leaves);
+        let root = Pubkey::new_from_array(tree.get_root());
+
+        // Generate proofs for target items and store them in a HashMap
+        let proofs: HashMap<Pubkey, FullMerkleProof> = target_items
+            .iter()
+            .map(|item| {
+                let leaf = hash(item.as_ref()).to_bytes();
+                // Consistently compute the index
+                let index = leaves
+                    .iter()
+                    .position(|x| x == &leaf)
+                    .expect("Leaf not found in leaves vector");
+                let proof = tree.get_proof_of_leaf(index);
+                (*item, FullMerkleProof { proof, leaf })
+            })
+            .collect();
+
+        TestMerkleTree { root, proofs }
     }
 }
