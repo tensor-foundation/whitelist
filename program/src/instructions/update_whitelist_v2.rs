@@ -52,7 +52,6 @@ pub struct UpdateWhitelistV2<'info> {
     pub payer: Signer<'info>,
 
     /// The current update authority.
-    #[account(mut)]
     pub update_authority: Signer<'info>,
 
     // New update authority, which must be a signer, if present, to prevent mistakes.

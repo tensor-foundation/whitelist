@@ -41,7 +41,7 @@ impl CreateWhitelistV2 {
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.payer, true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             self.update_authority,
             true,
         ));
@@ -104,7 +104,7 @@ pub struct CreateWhitelistV2InstructionArgs {
 /// ### Accounts:
 ///
 ///   0. `[writable, signer]` payer
-///   1. `[writable, signer]` update_authority
+///   1. `[signer]` update_authority
 ///   2. `[signer]` namespace
 ///   3. `[writable]` whitelist
 ///   4. `[optional]` system_program (default to `11111111111111111111111111111111`)
@@ -300,7 +300,7 @@ impl<'a, 'b> CreateWhitelistV2Cpi<'a, 'b> {
             *self.payer.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             *self.update_authority.key,
             true,
         ));
@@ -358,7 +358,7 @@ impl<'a, 'b> CreateWhitelistV2Cpi<'a, 'b> {
 /// ### Accounts:
 ///
 ///   0. `[writable, signer]` payer
-///   1. `[writable, signer]` update_authority
+///   1. `[signer]` update_authority
 ///   2. `[signer]` namespace
 ///   3. `[writable]` whitelist
 ///   4. `[]` system_program
