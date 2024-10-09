@@ -40,6 +40,8 @@ export const DEFAULT_PUBKEY: Address = address(
   '11111111111111111111111111111111'
 );
 
+export const TRANSACTION_FEE = 5000n;
+
 export const uuidToUint8Array = (uuid: string) => {
   const encoder = new TextEncoder();
   // replace any '-' to handle uuids

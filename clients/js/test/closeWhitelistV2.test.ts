@@ -26,6 +26,7 @@ import {
   createWhitelist,
   expectCustomError,
   RUST_VEC_SIZE,
+  TRANSACTION_FEE,
   WHITELIST_V2_BASE_SIZE,
   WHITELIST_V2_CONDITION_SIZE,
 } from './_common';
@@ -62,6 +63,15 @@ test('it can close a whitelist v2', async (t) => {
     },
   });
 
+  const whitelistV2Size =
+    WHITELIST_V2_BASE_SIZE +
+    RUST_VEC_SIZE +
+    conditions.length * WHITELIST_V2_CONDITION_SIZE;
+  const whitelistV2Rent = await client.rpc
+    .getMinimumBalanceForRentExemption(BigInt(whitelistV2Size))
+    .send();
+  const startingBalance = await getBalance(client, updateAuthority.address);
+
   // When the whitelist is closed.
   const closeWhitelistIx = getCloseWhitelistV2Instruction({
     updateAuthority,
@@ -78,6 +88,16 @@ test('it can close a whitelist v2', async (t) => {
   // Then the whitelist is not on-chain.
   const maybeAccount = await fetchMaybeWhitelistV2(client.rpc, whitelist);
   t.assert(!maybeAccount.exists);
+
+  // Then the rent destination receives the rent.
+  const rentDestinationBalance = await getBalance(
+    client,
+    updateAuthority.address
+  );
+  t.assert(
+    rentDestinationBalance ==
+      whitelistV2Rent + startingBalance - TRANSACTION_FEE
+  );
 });
 
 test('cannot close a frozen whitelist v2', async (t) => {

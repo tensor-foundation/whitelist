@@ -63,9 +63,9 @@ pub fn process_create_whitelist_v2(
     whitelist.bump = ctx.bumps.whitelist;
     whitelist.uuid = args.uuid;
     whitelist.state = State::Unfrozen;
+
     whitelist.update_authority = ctx.accounts.update_authority.key();
     whitelist.namespace = ctx.accounts.namespace.key();
-
     whitelist.freeze_authority = args.freeze_authority.unwrap_or_default();
 
     whitelist.conditions = args.conditions;

@@ -33,6 +33,10 @@ import {
   upsertMintProof,
 } from './_common';
 import { generateTreeOfSize } from './_merkle';
+import {
+  ANCHOR_ERROR__ACCOUNT_DISCRIMINATOR_MISMATCH,
+  ANCHOR_ERROR__ACCOUNT_NOT_INITIALIZED,
+} from '@coral-xyz/anchor-errors';
 
 test('it can create and update mint proof v2', async (t) => {
   const client = createDefaultSolanaClient();
@@ -131,7 +135,7 @@ test('it can create and update mint proof v2', async (t) => {
 });
 
 test('it can create and update mint proof v2 for a non-mint NFT', async (t) => {
-  // Mint proofs can be create asset-based NFTs without Mint accounts.
+  // Mint proofs can be created for asset-based NFTs without Mint accounts.
   const client = createDefaultSolanaClient();
 
   const updateAuthority = await generateKeyPairSignerWithSol(client);
@@ -437,9 +441,7 @@ test('invalid condition fails', async (t) => {
   } = await generateTreeOfSize(10, [mint]);
 
   // Use the real root, but FVC instead of MerkleTree.
-  const conditions: Condition[] = [
-    { mode: Mode.FVC, value: intoAddress(root) },
-  ];
+  let conditions: Condition[] = [{ mode: Mode.FVC, value: intoAddress(root) }];
 
   const { whitelist } = await createWhitelist({
     client,
@@ -457,5 +459,90 @@ test('invalid condition fails', async (t) => {
     proof: p.proof, // real proof
     t,
     code: TENSOR_WHITELIST_ERROR__NOT_MERKLE_ROOT, // condition is not merkle root type
+  });
+
+  // For good measure, let's try a VOC condition.
+  conditions = [{ mode: Mode.VOC, value: intoAddress(root) }];
+
+  await updateWhitelist({
+    client,
+    updateAuthority,
+    newConditions: conditions,
+    whitelist,
+  });
+
+  await createMintProofThrows({
+    client,
+    payer: nftOwner,
+    mint,
+    whitelist,
+    proof: p.proof, // real proof
+    t,
+    code: TENSOR_WHITELIST_ERROR__NOT_MERKLE_ROOT, // condition is not merkle root type
+  });
+});
+
+test('invalid whitelist fails', async (t) => {
+  const client = createDefaultSolanaClient();
+
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const freezeAuthority = (await generateKeyPairSigner()).address;
+  const namespace = await generateKeyPairSigner();
+
+  const nftOwner = await generateKeyPairSignerWithSol(client);
+
+  // Mint NFT
+  const { mint } = await createDefaultNft({
+    client,
+    payer: nftOwner,
+    authority: nftOwner,
+    owner: nftOwner.address,
+  });
+
+  // Setup a merkle tree with our mint as a leaf
+  const {
+    root,
+    proofs: [p],
+  } = await generateTreeOfSize(10, [mint]);
+
+  const conditions: Condition[] = [
+    { mode: Mode.MerkleTree, value: intoAddress(root) },
+  ];
+
+  const { whitelist } = await createWhitelist({
+    client,
+    updateAuthority,
+    freezeAuthority,
+    conditions,
+    namespace,
+  });
+
+  // Succeeds
+  const { mintProof } = await upsertMintProof({
+    client,
+    payer: nftOwner,
+    mint,
+    whitelist,
+    proof: p.proof,
+  });
+
+  await createMintProofThrows({
+    client,
+    payer: nftOwner,
+    mint,
+    whitelist: mintProof, // Wrong account type
+    proof: p.proof,
+    t,
+    code: ANCHOR_ERROR__ACCOUNT_DISCRIMINATOR_MISMATCH,
+  });
+
+  await createMintProofThrows({
+    client,
+    payer: nftOwner,
+    mint,
+    whitelist: (await generateKeyPairSigner()).address, // Not initialized
+    proof: p.proof,
+    t,
+    code: ANCHOR_ERROR__ACCOUNT_NOT_INITIALIZED,
   });
 });

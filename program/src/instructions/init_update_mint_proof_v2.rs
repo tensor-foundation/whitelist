@@ -26,14 +26,6 @@ pub struct InitUpdateMintProofV2<'info> {
     /// The whitelist account that the mint proof must validate against.
     // No constraints checks here because creating the mint proof is permissionless.
     // As long as the mint proof validates against the whitelist, it's valid.
-    #[account(
-        seeds = [
-            WhitelistV2::PREFIX,
-            &whitelist.namespace.key().as_ref(),
-            &whitelist.uuid
-        ],
-        bump = whitelist.bump,
-    )]
     pub whitelist: Box<Account<'info, WhitelistV2>>,
 
     /// The mint proof account to initialize or update.
@@ -78,7 +70,7 @@ pub fn process_init_update_mint_proof_v2(
             ErrorCode::FailedMerkleProofVerification,
         );
     } else {
-        throw_err!(ErrorCode::InvalidWhitelistIndex);
+        throw_err!(ErrorCode::EmptyConditions);
     }
 
     // Upsert proof into the MintProof account.

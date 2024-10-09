@@ -212,6 +212,7 @@ pub fn assert_decode_whitelist_v2(whitelist_info: &AccountInfo) -> Result<Whitel
     Ok(whitelist)
 }
 
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum WhitelistType {
     V1(Whitelist),
     V2(WhitelistV2),
@@ -221,6 +222,10 @@ pub enum WhitelistType {
 #[inline(never)]
 pub fn assert_decode_whitelist_generic(whitelist_info: &AccountInfo) -> Result<WhitelistType> {
     let data: &[u8] = &whitelist_info.try_borrow_data()?;
+
+    if data.len() < 8 {
+        return Err(ProgramError::InvalidAccountData.into());
+    }
 
     let discriminator: [u8; 8] = data[0..8]
         .try_into()
@@ -349,26 +354,132 @@ mod test {
     use super::*;
     use std::{cell::RefCell, rc::Rc};
 
-    #[test]
-    fn test_assert_decode_whitelist() {
+    macro_rules! taccount {
+        ($key:expr, $lamports:expr, $data:expr) => {
+            AccountInfo {
+                key: $key,
+                is_signer: false,
+                is_writable: false,
+                lamports: Rc::new(RefCell::new($lamports)),
+                data: Rc::new(RefCell::new($data)),
+                owner: &crate::ID,
+                rent_epoch: 0,
+                executable: false,
+            }
+        };
+    }
+
+    struct TestWhitelist {
+        pubkey: Pubkey,
+        whitelist: Whitelist,
+        data: Vec<u8>,
+    }
+
+    struct TestWhitelistV2 {
+        pubkey: Pubkey,
+        whitelist: WhitelistV2,
+        data: Vec<u8>,
+    }
+
+    struct TestMintProof {
+        pubkey: Pubkey,
+        mint_proof: MintProof,
+        data: Vec<u8>,
+    }
+
+    struct TestMintProofV2 {
+        pubkey: Pubkey,
+        mint_proof: MintProofV2,
+        data: Vec<u8>,
+    }
+
+    const WHITELIST_MIN_RENT: u64 = 2_547_360;
+    const WHITELIST_V2_BASE_MIN_RENT: u64 = 2_547_360;
+    const MINT_PROOF_V2_LAMPORTS: u64 = 7_461_120;
+
+    fn setup_whitelist() -> TestWhitelist {
         let whitelist = Whitelist::default();
         let mut data = Vec::with_capacity(WHITELIST_SIZE);
         data.extend(WHITELIST_DISCRIMINATOR);
         data.extend(whitelist.try_to_vec().unwrap());
+        TestWhitelist {
+            pubkey: Pubkey::find_program_address(&[&whitelist.uuid], &crate::ID).0,
+            whitelist,
+            data,
+        }
+    }
 
-        let whitelist_pubkey = Pubkey::find_program_address(&[&whitelist.uuid], &crate::ID).0;
-        let mut whitelist_lamports = 2_547_360;
+    fn setup_whitelist_v2() -> TestWhitelistV2 {
+        let whitelist = WhitelistV2::default();
+        let mut data = Vec::with_capacity(WHITELIST_V2_BASE_SIZE);
+        data.extend(WHITELIST_V2_DISCRIMINATOR);
+        data.extend(whitelist.try_to_vec().unwrap());
+        TestWhitelistV2 {
+            pubkey: Pubkey::find_program_address(
+                &[b"whitelist", whitelist.namespace.as_ref(), &whitelist.uuid],
+                &crate::ID,
+            )
+            .0,
+            whitelist,
+            data,
+        }
+    }
 
-        let account = AccountInfo {
-            key: &whitelist_pubkey,
-            is_signer: false,
-            is_writable: false,
-            lamports: Rc::new(RefCell::new(&mut whitelist_lamports)),
-            data: Rc::new(RefCell::new(data.as_mut_slice())),
-            owner: &crate::ID,
-            rent_epoch: 0,
-            executable: false,
-        };
+    fn setup_mint_proof(mint_pubkey: Pubkey, whitelist_pubkey: Pubkey) -> TestMintProof {
+        let mint_proof = MintProof::default();
+        let mut data = Vec::with_capacity(MINT_PROOF_SIZE);
+        data.extend(MINT_PROOF_DISCRIMINATOR);
+        data.extend(mint_proof.try_to_vec().unwrap());
+        TestMintProof {
+            pubkey: Pubkey::find_program_address(
+                &[
+                    MintProof::PREFIX,
+                    mint_pubkey.key().as_ref(),
+                    whitelist_pubkey.key().as_ref(),
+                ],
+                &crate::ID,
+            )
+            .0,
+            mint_proof,
+            data,
+        }
+    }
+
+    fn setup_mint_proof_v2(mint_pubkey: Pubkey, whitelist_pubkey: Pubkey) -> TestMintProofV2 {
+        let mint_proof = MintProofV2::default();
+        let mut data = Vec::with_capacity(MINT_PROOF_V2_SIZE);
+        data.extend(MINT_PROOF_V2_DISCRIMINATOR);
+        data.extend(mint_proof.try_to_vec().unwrap());
+        TestMintProofV2 {
+            pubkey: Pubkey::find_program_address(
+                &[
+                    MintProofV2::PREFIX,
+                    mint_pubkey.key().as_ref(),
+                    whitelist_pubkey.key().as_ref(),
+                ],
+                &crate::ID,
+            )
+            .0,
+            mint_proof,
+            data,
+        }
+    }
+
+    #[test]
+    fn test_assert_decode_whitelist() {
+        let TestWhitelist {
+            pubkey: whitelist_pubkey,
+            whitelist,
+            mut data,
+        } = setup_whitelist();
+
+        let mut whitelist_lamports = WHITELIST_MIN_RENT;
+
+        let account = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            data.as_mut_slice()
+        );
 
         let decoded_whitelist = assert_decode_whitelist(&account).unwrap();
 
@@ -376,25 +487,80 @@ mod test {
     }
 
     #[test]
+    fn test_assert_decode_whitelist_with_v2_fails() {
+        let TestWhitelistV2 {
+            pubkey: whitelist_pubkey,
+            whitelist: _,
+            mut data,
+        } = setup_whitelist_v2();
+
+        let mut whitelist_lamports = WHITELIST_V2_BASE_MIN_RENT;
+
+        let account = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            data.as_mut_slice()
+        );
+
+        assert_decode_whitelist(&account).unwrap_err();
+    }
+
+    #[test]
+    fn test_assert_decode_whitelist_v2() {
+        let TestWhitelistV2 {
+            pubkey: whitelist_pubkey,
+            whitelist,
+            mut data,
+        } = setup_whitelist_v2();
+
+        let mut whitelist_lamports = WHITELIST_V2_BASE_MIN_RENT;
+
+        let account = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            data.as_mut_slice()
+        );
+
+        let decoded_whitelist = assert_decode_whitelist_v2(&account).unwrap();
+
+        assert_eq!(decoded_whitelist, whitelist);
+    }
+
+    #[test]
+    fn test_assert_decode_whitelist_v2_with_v1_fails() {
+        let TestWhitelist {
+            pubkey: whitelist_pubkey,
+            whitelist: _,
+            mut data,
+        } = setup_whitelist();
+
+        let mut whitelist_lamports = WHITELIST_MIN_RENT;
+
+        let account = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            data.as_mut_slice()
+        );
+
+        assert_decode_whitelist_v2(&account).unwrap_err();
+    }
+
+    #[test]
     fn test_assert_decode_whitelist_generic_on_whitelist() {
-        let whitelist = Whitelist::default();
-        let mut data = Vec::with_capacity(WHITELIST_SIZE);
-        data.extend(WHITELIST_DISCRIMINATOR);
-        data.extend(whitelist.try_to_vec().unwrap());
+        let TestWhitelist {
+            pubkey: whitelist_pubkey,
+            whitelist,
+            mut data,
+        } = setup_whitelist();
 
-        let whitelist_pubkey = Pubkey::find_program_address(&[&whitelist.uuid], &crate::ID).0;
-        let mut whitelist_lamports = 2_547_360;
+        let mut whitelist_lamports = WHITELIST_MIN_RENT;
 
-        let account = AccountInfo {
-            key: &whitelist_pubkey,
-            is_signer: false,
-            is_writable: false,
-            lamports: Rc::new(RefCell::new(&mut whitelist_lamports)),
-            data: Rc::new(RefCell::new(data.as_mut_slice())),
-            owner: &crate::ID,
-            rent_epoch: 0,
-            executable: false,
-        };
+        let account = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            data.as_mut_slice()
+        );
+
         let decoded_whitelist = match assert_decode_whitelist_generic(&account).unwrap() {
             WhitelistType::V1(whitelist) => whitelist,
             WhitelistType::V2(_) => panic!("Expected V1"),
@@ -405,28 +571,20 @@ mod test {
 
     #[test]
     fn test_assert_decode_whitelist_generic_on_whitelist_v2() {
-        let whitelist = WhitelistV2::default();
-        let mut data = vec![];
-        data.extend(WHITELIST_V2_DISCRIMINATOR);
-        data.extend(whitelist.try_to_vec().unwrap());
+        let TestWhitelistV2 {
+            pubkey: whitelist_pubkey,
+            whitelist,
+            mut data,
+        } = setup_whitelist_v2();
 
-        let whitelist_pubkey = Pubkey::find_program_address(
-            &[b"whitelist", whitelist.namespace.as_ref(), &whitelist.uuid],
-            &crate::ID,
-        )
-        .0;
-        let mut whitelist_lamports = 2_547_360;
+        let mut whitelist_lamports = WHITELIST_V2_BASE_MIN_RENT;
 
-        let account = AccountInfo {
-            key: &whitelist_pubkey,
-            is_signer: false,
-            is_writable: false,
-            lamports: Rc::new(RefCell::new(&mut whitelist_lamports)),
-            data: Rc::new(RefCell::new(data.as_mut_slice())),
-            owner: &crate::ID,
-            rent_epoch: 0,
-            executable: false,
-        };
+        let account = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            data.as_mut_slice()
+        );
+
         let decoded_whitelist = match assert_decode_whitelist_generic(&account).unwrap() {
             WhitelistType::V1(_) => panic!("Expected V1"),
             WhitelistType::V2(whitelist) => whitelist,
@@ -436,55 +594,95 @@ mod test {
     }
 
     #[test]
+    fn test_assert_decode_whitelist_generic_invalid_program_owner_fails() {
+        let TestWhitelistV2 {
+            pubkey: whitelist_pubkey,
+            whitelist: _,
+            mut data,
+        } = setup_whitelist_v2();
+
+        let mut whitelist_lamports = WHITELIST_V2_BASE_MIN_RENT;
+        let wrong_owner = Pubkey::default();
+
+        let mut account = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            data.as_mut_slice()
+        );
+        account.owner = &wrong_owner;
+
+        assert_decode_whitelist_generic(&account).unwrap_err();
+
+        let another_wrong_owner = tensor_toolbox::escrow::ID;
+        account.owner = &another_wrong_owner;
+
+        assert_decode_whitelist_generic(&account).unwrap_err();
+    }
+
+    #[test]
+    fn test_assert_decode_whitelist_generic_uninitialized_account_fails() {
+        let TestWhitelistV2 {
+            pubkey: whitelist_pubkey,
+            whitelist: _,
+            mut data,
+        } = setup_whitelist_v2();
+
+        let mut whitelist_lamports = WHITELIST_V2_BASE_MIN_RENT;
+
+        // Data but uninitalized discriminator.
+        data[0..8].copy_from_slice(&[0u8; 8]);
+        let account = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            data.as_mut_slice()
+        );
+        assert_decode_whitelist_generic(&account).unwrap_err();
+
+        // All 0's.
+        data.fill(0);
+        let account = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            data.as_mut_slice()
+        );
+        assert_decode_whitelist_generic(&account).unwrap_err();
+
+        // No data.
+        let account = taccount!(&whitelist_pubkey, &mut whitelist_lamports, &mut []);
+        assert_decode_whitelist_generic(&account).unwrap_err();
+    }
+
+    #[test]
     fn test_assert_decode_mint_proof_generic_on_mint_proof() {
-        let whitelist = WhitelistV2::default();
-        let mint_proof = MintProof::default();
+        let TestWhitelistV2 {
+            pubkey: whitelist_pubkey,
+            whitelist: _,
+            data: mut whitelist_data,
+        } = setup_whitelist_v2();
 
         let mint_pubkey = Pubkey::new_unique();
 
-        let mut whitelist_data = Vec::with_capacity(WHITELIST_SIZE);
-        whitelist_data.extend(WHITELIST_DISCRIMINATOR);
-        whitelist_data.extend(whitelist.try_to_vec().unwrap());
+        let TestMintProof {
+            pubkey: mint_proof_pubkey,
+            mint_proof,
+            data: mut mint_proof_data,
+        } = setup_mint_proof(mint_pubkey, whitelist_pubkey);
 
-        let mut mint_proof_data = Vec::with_capacity(MINT_PROOF_SIZE);
-        mint_proof_data.extend(MINT_PROOF_DISCRIMINATOR);
-        mint_proof_data.extend(mint_proof.try_to_vec().unwrap());
+        let mut whitelist_lamports = WHITELIST_V2_BASE_MIN_RENT;
 
-        let whitelist_pubkey = Pubkey::find_program_address(&[&whitelist.uuid], &crate::ID).0;
-        let mut whitelist_lamports = 2_547_360;
+        let whitelist_info = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            whitelist_data.as_mut_slice()
+        );
 
-        let whitelist_info = AccountInfo {
-            key: &whitelist_pubkey,
-            is_signer: false,
-            is_writable: false,
-            lamports: Rc::new(RefCell::new(&mut whitelist_lamports)),
-            data: Rc::new(RefCell::new(whitelist_data.as_mut_slice())),
-            owner: &crate::ID,
-            rent_epoch: 0,
-            executable: false,
-        };
+        let mut mint_proof_lamports = MINT_PROOF_V2_LAMPORTS;
 
-        let mint_proof_pubkey = Pubkey::find_program_address(
-            &[
-                MintProof::PREFIX,
-                mint_pubkey.key().as_ref(),
-                whitelist_pubkey.key().as_ref(),
-            ],
-            &crate::ID,
-        )
-        .0;
-        let mut mint_proof_lamports = 1_000_000_000;
-
-        let mint_proof_info = AccountInfo {
-            key: &mint_proof_pubkey,
-            is_signer: false,
-            is_writable: false,
-            lamports: Rc::new(RefCell::new(&mut mint_proof_lamports)),
-            data: Rc::new(RefCell::new(mint_proof_data.as_mut_slice())),
-            owner: &crate::ID,
-            rent_epoch: 0,
-            executable: false,
-        };
+        let mint_proof_info = taccount!(
+            &mint_proof_pubkey,
+            &mut mint_proof_lamports,
+            mint_proof_data.as_mut_slice()
+        );
 
         let decoded_mint_proof = match assert_decode_mint_proof_generic(
             &whitelist_info.key(),
@@ -493,7 +691,7 @@ mod test {
         )
         .unwrap()
         {
-            MintProofType::V1(mint_proof) => mint_proof,
+            MintProofType::V1(mp) => mp,
             MintProofType::V2(_) => panic!("Expected V1"),
         };
 
@@ -502,58 +700,35 @@ mod test {
 
     #[test]
     fn test_assert_decode_mint_proof_generic_on_mint_proof_v2() {
-        let whitelist = WhitelistV2::default();
-        let mint_proof = MintProofV2::default();
+        let TestWhitelistV2 {
+            pubkey: whitelist_pubkey,
+            whitelist: _,
+            data: mut whitelist_data,
+        } = setup_whitelist_v2();
 
         let mint_pubkey = Pubkey::new_unique();
 
-        let mut whitelist_data = vec![];
-        whitelist_data.extend(WHITELIST_V2_DISCRIMINATOR);
-        whitelist_data.extend(whitelist.try_to_vec().unwrap());
+        let TestMintProofV2 {
+            pubkey: mint_proof_pubkey,
+            mint_proof,
+            data: mut mint_proof_data,
+        } = setup_mint_proof_v2(mint_pubkey, whitelist_pubkey);
 
-        let mut mint_proof_data = Vec::with_capacity(MINT_PROOF_V2_SIZE);
-        mint_proof_data.extend(MINT_PROOF_V2_DISCRIMINATOR);
-        mint_proof_data.extend(mint_proof.try_to_vec().unwrap());
+        let mut whitelist_lamports = WHITELIST_V2_BASE_MIN_RENT;
 
-        let whitelist_pubkey = Pubkey::find_program_address(
-            &[b"whitelist", whitelist.namespace.as_ref(), &whitelist.uuid],
-            &crate::ID,
-        )
-        .0;
-        let mut whitelist_lamports = 2_547_360;
+        let whitelist_info = taccount!(
+            &whitelist_pubkey,
+            &mut whitelist_lamports,
+            whitelist_data.as_mut_slice()
+        );
 
-        let whitelist_info = AccountInfo {
-            key: &whitelist_pubkey,
-            is_signer: false,
-            is_writable: false,
-            lamports: Rc::new(RefCell::new(&mut whitelist_lamports)),
-            data: Rc::new(RefCell::new(whitelist_data.as_mut_slice())),
-            owner: &crate::ID,
-            rent_epoch: 0,
-            executable: false,
-        };
+        let mut mint_proof_lamports = MINT_PROOF_V2_LAMPORTS;
 
-        let mint_proof_pubkey = Pubkey::find_program_address(
-            &[
-                MintProofV2::PREFIX,
-                mint_pubkey.key().as_ref(),
-                whitelist_pubkey.key().as_ref(),
-            ],
-            &crate::ID,
-        )
-        .0;
-        let mut mint_proof_lamports = 1_000_000_000;
-
-        let mint_proof_info = AccountInfo {
-            key: &mint_proof_pubkey,
-            is_signer: false,
-            is_writable: false,
-            lamports: Rc::new(RefCell::new(&mut mint_proof_lamports)),
-            data: Rc::new(RefCell::new(mint_proof_data.as_mut_slice())),
-            owner: &crate::ID,
-            rent_epoch: 0,
-            executable: false,
-        };
+        let mint_proof_info = taccount!(
+            &mint_proof_pubkey,
+            &mut mint_proof_lamports,
+            mint_proof_data.as_mut_slice()
+        );
 
         let decoded_mint_proof = match assert_decode_mint_proof_generic(
             &whitelist_info.key(),

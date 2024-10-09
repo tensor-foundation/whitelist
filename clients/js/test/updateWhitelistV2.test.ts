@@ -32,7 +32,7 @@ test('it can update a whitelist v2, reallocing to be larger', async (t) => {
   const updateAuthority = await generateKeyPairSignerWithSol(client);
   const voc = (await generateKeyPairSigner()).address;
 
-  // Default conditions size is one item
+  // Default conditions size is one item in createWhitelist helper fn.
   const { whitelist, uuid, conditions } = await createWhitelist({
     payer,
     client,

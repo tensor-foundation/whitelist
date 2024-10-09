@@ -92,7 +92,7 @@ pub fn process_update_whitelist_v2(
         whitelist.conditions = conditions;
     }
 
-    // Update the freeze authority. If the Operation is None, then there's nothing to do.
+    // Update the freeze authority. If the Operation is Noop, then there's nothing to do.
     // Update authority can change the freeze authority if the whitelist is unfrozen,
     // but cannot unfreeze the whitelist itself.
     if let Operation::Set(authority) = args.freeze_authority {

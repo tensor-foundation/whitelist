@@ -497,16 +497,16 @@ mod test {
         // Create leaves for all items (target and filler)
         let target_leaves: Vec<[u8; 32]> = target_items
             .iter()
-            .map(|item| hash(item.as_ref()).to_bytes())
+            .map(|item| hash(item.as_ref()).0)
             .collect();
 
-        let mut leaves: Vec<[u8; 32]> = Vec::new();
+        let mut leaves: Vec<[u8; 32]> = Vec::with_capacity(size);
 
         leaves.extend(target_leaves);
 
         // Fill the remaining leaves to reach the desired size
         while leaves.len() < size {
-            leaves.push(hash(&Pubkey::default().to_bytes()).to_bytes());
+            leaves.push(hash(&Pubkey::default().to_bytes()).0);
         }
 
         leaves.sort();
@@ -519,7 +519,7 @@ mod test {
         let proofs: HashMap<Pubkey, FullMerkleProof> = target_items
             .iter()
             .map(|item| {
-                let leaf = hash(item.as_ref()).to_bytes();
+                let leaf = hash(item.as_ref()).0;
                 // Consistently compute the index
                 let index = leaves
                     .iter()
