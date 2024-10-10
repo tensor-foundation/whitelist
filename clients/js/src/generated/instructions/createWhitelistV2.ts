@@ -73,7 +73,7 @@ export type CreateWhitelistV2Instruction<
             IAccountSignerMeta<TAccountPayer>
         : TAccountPayer,
       TAccountUpdateAuthority extends string
-        ? WritableSignerAccount<TAccountUpdateAuthority> &
+        ? ReadonlySignerAccount<TAccountUpdateAuthority> &
             IAccountSignerMeta<TAccountUpdateAuthority>
         : TAccountUpdateAuthority,
       TAccountNamespace extends string
@@ -189,7 +189,10 @@ export async function getCreateWhitelistV2InstructionAsync<
   // Original accounts.
   const originalAccounts = {
     payer: { value: input.payer ?? null, isWritable: true },
-    updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
+    updateAuthority: {
+      value: input.updateAuthority ?? null,
+      isWritable: false,
+    },
     namespace: { value: input.namespace ?? null, isWritable: false },
     whitelist: { value: input.whitelist ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
@@ -289,7 +292,10 @@ export function getCreateWhitelistV2Instruction<
   // Original accounts.
   const originalAccounts = {
     payer: { value: input.payer ?? null, isWritable: true },
-    updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
+    updateAuthority: {
+      value: input.updateAuthority ?? null,
+      isWritable: false,
+    },
     namespace: { value: input.namespace ?? null, isWritable: false },
     whitelist: { value: input.whitelist ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },

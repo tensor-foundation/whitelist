@@ -34,7 +34,7 @@ impl CloseWhitelistV2 {
             self.rent_destination,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             self.update_authority,
             true,
         ));
@@ -81,7 +81,7 @@ impl Default for CloseWhitelistV2InstructionData {
 /// ### Accounts:
 ///
 ///   0. `[writable]` rent_destination
-///   1. `[writable, signer]` update_authority
+///   1. `[signer]` update_authority
 ///   2. `[writable]` whitelist
 ///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
@@ -237,7 +237,7 @@ impl<'a, 'b> CloseWhitelistV2Cpi<'a, 'b> {
             *self.rent_destination.key,
             false,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             *self.update_authority.key,
             true,
         ));
@@ -286,7 +286,7 @@ impl<'a, 'b> CloseWhitelistV2Cpi<'a, 'b> {
 /// ### Accounts:
 ///
 ///   0. `[writable]` rent_destination
-///   1. `[writable, signer]` update_authority
+///   1. `[signer]` update_authority
 ///   2. `[writable]` whitelist
 ///   3. `[]` system_program
 #[derive(Clone, Debug)]

@@ -13,7 +13,6 @@ pub struct CloseWhitelistV2<'info> {
     pub rent_destination: UncheckedAccount<'info>,
 
     /// The authority that will be allowed to update the whitelist.
-    #[account(mut)]
     pub update_authority: Signer<'info>,
 
     /// The whitelist PDA.

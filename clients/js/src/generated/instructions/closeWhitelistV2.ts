@@ -25,10 +25,10 @@ import {
   type IInstructionWithAccounts,
   type IInstructionWithData,
   type ReadonlyAccount,
+  type ReadonlySignerAccount,
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
-  type WritableSignerAccount,
 } from '@solana/web3.js';
 import { TENSOR_WHITELIST_PROGRAM_ADDRESS } from '../programs';
 import { getAccountMetaFactory, type ResolvedAccount } from '../shared';
@@ -50,7 +50,7 @@ export type CloseWhitelistV2Instruction<
         ? WritableAccount<TAccountRentDestination>
         : TAccountRentDestination,
       TAccountUpdateAuthority extends string
-        ? WritableSignerAccount<TAccountUpdateAuthority> &
+        ? ReadonlySignerAccount<TAccountUpdateAuthority> &
             IAccountSignerMeta<TAccountUpdateAuthority>
         : TAccountUpdateAuthority,
       TAccountWhitelist extends string
@@ -135,7 +135,10 @@ export function getCloseWhitelistV2Instruction<
   // Original accounts.
   const originalAccounts = {
     rentDestination: { value: input.rentDestination ?? null, isWritable: true },
-    updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
+    updateAuthority: {
+      value: input.updateAuthority ?? null,
+      isWritable: false,
+    },
     whitelist: { value: input.whitelist ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };

@@ -69,7 +69,7 @@ export type UpdateWhitelistV2Instruction<
             IAccountSignerMeta<TAccountPayer>
         : TAccountPayer,
       TAccountUpdateAuthority extends string
-        ? WritableSignerAccount<TAccountUpdateAuthority> &
+        ? ReadonlySignerAccount<TAccountUpdateAuthority> &
             IAccountSignerMeta<TAccountUpdateAuthority>
         : TAccountUpdateAuthority,
       TAccountNewUpdateAuthority extends string
@@ -177,7 +177,10 @@ export function getUpdateWhitelistV2Instruction<
   // Original accounts.
   const originalAccounts = {
     payer: { value: input.payer ?? null, isWritable: true },
-    updateAuthority: { value: input.updateAuthority ?? null, isWritable: true },
+    updateAuthority: {
+      value: input.updateAuthority ?? null,
+      isWritable: false,
+    },
     newUpdateAuthority: {
       value: input.newUpdateAuthority ?? null,
       isWritable: false,

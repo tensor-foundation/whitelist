@@ -378,7 +378,7 @@
         },
         {
           "name": "updateAuthority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true,
           "docs": [
             "The authority that will be allowed to update the whitelist."
@@ -434,7 +434,7 @@
         },
         {
           "name": "updateAuthority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true,
           "docs": [
             "The authority that will be allowed to update the whitelist."
@@ -472,7 +472,7 @@
         },
         {
           "name": "updateAuthority",
-          "isMut": true,
+          "isMut": false,
           "isSigner": true,
           "docs": [
             "The current update authority."

@@ -78,7 +78,7 @@ pub fn process_init_update_mint_proof_v2(
             ErrorCode::FailedMerkleProofVerification,
         );
     } else {
-        throw_err!(ErrorCode::InvalidWhitelistIndex);
+        throw_err!(ErrorCode::EmptyConditions);
     }
 
     // Upsert proof into the MintProof account.
