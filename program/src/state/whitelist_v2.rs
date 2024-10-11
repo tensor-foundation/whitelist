@@ -48,6 +48,8 @@ pub struct WhitelistV2 {
     /// Authority that can freeze/unfreeze the whitelist.
     pub freeze_authority: Pubkey,
     /// Whitelist conditions that must be met to validate against the whitelist.
+    // We support up to 24 conditions and dynamically allocate the space for them, so the base size should
+    // have 0 conditions and we manually calculate the necessary space from there.
     #[max_len(0)]
     pub conditions: Vec<Condition>,
 }
