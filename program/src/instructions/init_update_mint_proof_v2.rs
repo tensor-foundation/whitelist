@@ -5,7 +5,7 @@ use tensor_vipers::{throw_err, unwrap_int};
 use crate::{
     error::ErrorCode,
     state::{MintProofV2, MAX_PROOF_LEN},
-    Mode, WhitelistV2, MINT_PROOF_V2_SIZE,
+    Mode, WhitelistV2,
 };
 
 /// Permissionlessly initialize or update a mint proof.
@@ -46,7 +46,7 @@ pub struct InitUpdateMintProofV2<'info> {
             whitelist.key().as_ref(),
         ],
         bump,
-        space = MINT_PROOF_V2_SIZE,
+        space = MintProofV2::SIZE,
     )]
     pub mint_proof: Box<Account<'info, MintProofV2>>,
 

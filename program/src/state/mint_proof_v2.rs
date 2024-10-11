@@ -2,16 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::MAX_PROOF_LEN;
 
-/// MintProof V2 size constant, a separate const so it can be exported into the Anchor IDL.
-// (!) Sync with MAX_PROOF_LEN (can't ref the constant or wont show up in IDL)
-#[constant]
-pub const MINT_PROOF_V2_SIZE: usize =
-      8                     // discriminator
-    + 1                     // proof_len
-    + (32 * 28)             // proof
-    + 8                     // creation_slot
-    + 32                    // authority
-;
+use super::DISCRIMINATOR_SIZE;
 
 /// MintProof V2 state
 /// Seeds: ["mint_proof_v2", mint, whitelist]
@@ -26,7 +17,7 @@ pub const MINT_PROOF_V2_SIZE: usize =
 /// There is a 100 slot delay after which the current caller receives the rent back to incentivize
 /// cleaning up old accounts.
 #[account]
-#[derive(Debug, Default, Eq, PartialEq)]
+#[derive(Debug, Default, InitSpace, Eq, PartialEq)]
 pub struct MintProofV2 {
     /// Length of proof without padding.
     pub proof_len: u8,
@@ -41,4 +32,5 @@ pub struct MintProofV2 {
 impl MintProofV2 {
     /// Prefix used for seeds derivation.
     pub const PREFIX: &'static [u8] = b"mint_proof_v2";
+    pub const SIZE: usize = DISCRIMINATOR_SIZE + Self::INIT_SPACE;
 }

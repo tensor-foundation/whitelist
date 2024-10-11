@@ -24,9 +24,6 @@ use crate::error::ErrorCode;
 // Constant for zero array.
 pub const ZERO_ARRAY: [u8; 32] = [0; 32];
 
-/// Borsh prefix size for a vector.
-pub const VEC_LENGTH: usize = 4;
-
 /// Whitelist Anchor account discriminator.
 const WHITELIST_DISCRIMINATOR: [u8; 8] = [204, 176, 52, 79, 146, 121, 54, 247];
 
@@ -38,6 +35,8 @@ const MINT_PROOF_DISCRIMINATOR: [u8; 8] = [227, 131, 106, 240, 190, 48, 219, 228
 
 /// MintProoV2 Anchor account discriminator.
 const MINT_PROOF_V2_DISCRIMINATOR: [u8; 8] = [22, 197, 150, 178, 249, 225, 183, 75];
+
+const DISCRIMINATOR_SIZE: usize = 8;
 
 #[inline(never)]
 pub fn verify_whitelist(
@@ -447,7 +446,7 @@ mod test {
 
     fn setup_mint_proof_v2(mint_pubkey: Pubkey, whitelist_pubkey: Pubkey) -> TestMintProofV2 {
         let mint_proof = MintProofV2::default();
-        let mut data = Vec::with_capacity(MINT_PROOF_V2_SIZE);
+        let mut data = Vec::with_capacity(MintProofV2::SIZE);
         data.extend(MINT_PROOF_V2_DISCRIMINATOR);
         data.extend(mint_proof.try_to_vec().unwrap());
         TestMintProofV2 {

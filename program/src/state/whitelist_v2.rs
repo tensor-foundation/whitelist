@@ -5,9 +5,10 @@ use tensor_vipers::throw_err;
 
 use crate::{error::ErrorCode, state::FullMerkleProof};
 
+use super::DISCRIMINATOR_SIZE;
+
 /// Whitelist V2 size constant, a separate const so it can be exported into the Anchor IDL.
 #[constant]
-#[allow(clippy::identity_op)]
 pub const WHITELIST_V2_BASE_SIZE: usize =
       8   // discriminator
     + 1   // version
@@ -30,7 +31,7 @@ pub const WHITELIST_V2_CONDITIONS_LENGTH: usize = 24;
 /// The state account for Whitelist V2. This account stores all the information
 /// and values of a Whitelist, including the list of conditions to validate an item against.
 #[account]
-#[derive(Debug, Default, Eq, PartialEq)]
+#[derive(Debug, Default, InitSpace, Eq, PartialEq)]
 pub struct WhitelistV2 {
     /// Whitelist version, used to control upgrades.
     pub version: u8,
@@ -47,16 +48,19 @@ pub struct WhitelistV2 {
     /// Authority that can freeze/unfreeze the whitelist.
     pub freeze_authority: Pubkey,
     /// Whitelist conditions that must be met to validate against the whitelist.
+    #[max_len(0)]
     pub conditions: Vec<Condition>,
 }
 
 impl WhitelistV2 {
     /// Whitelist V2 prefix for seeds.
     pub const PREFIX: &'static [u8] = b"whitelist";
-    /// Whitelist base size without any conditions.
-    pub const BASE_SIZE: usize = WHITELIST_V2_BASE_SIZE;
+
+    /// Whitelist base size without without any conditions, but including the conditions vector length.
+    pub const BASE_SIZE: usize = DISCRIMINATOR_SIZE + Self::INIT_SPACE;
+
     /// Whitelist condition size.
-    pub const CONDITION_SIZE: usize = std::mem::size_of::<u8>() + std::mem::size_of::<Pubkey>();
+    pub const CONDITION_SIZE: usize = 33; // 1 byte mode + 32 bytes pubkey
 
     /// Determine if a whitelist is frozen.
     pub fn is_frozen(&self) -> bool {
@@ -142,7 +146,7 @@ impl WhitelistV2 {
 
 /// White list state enum. Currently only supports Frozen and Unfrozen.
 #[repr(u8)]
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, Eq, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, InitSpace, Eq, PartialEq)]
 pub enum State {
     #[default]
     Unfrozen,
@@ -158,7 +162,7 @@ pub enum State {
 /// - MerkleTree: The value is the root node of a Merkle tree.
 /// - VOC: The value is the Metaplex "verified-on-chain"/Metaplex Certified Collection address.
 /// - FVC: The value is the first verified creator address of the Metaplex creators metadata.
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, Eq, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, InitSpace, Eq, PartialEq)]
 pub struct Condition {
     pub mode: Mode,
     pub value: Pubkey,
@@ -166,7 +170,7 @@ pub struct Condition {
 
 /// Mode enum for whitelist conditions.
 #[repr(u8)]
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, Eq, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, InitSpace, Eq, PartialEq)]
 pub enum Mode {
     #[default]
     MerkleTree,

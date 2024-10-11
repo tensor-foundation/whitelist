@@ -1,4 +1,4 @@
-use crate::{error::ErrorCode, state::WhitelistV2, Condition, VEC_LENGTH};
+use crate::{error::ErrorCode, state::WhitelistV2, Condition};
 use anchor_lang::prelude::*;
 
 /// Update whitelist v2 args.
@@ -63,7 +63,7 @@ pub struct UpdateWhitelistV2<'info> {
         // Realloc to new length; if no conditions are passed in, use the existing length--which should be no-op.
         // args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() just gets us either
         // 1) the length of the passed in conditions, or the length of the current conditions
-        realloc = WhitelistV2::BASE_SIZE + VEC_LENGTH + args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() * WhitelistV2::CONDITION_SIZE,
+        realloc = WhitelistV2::BASE_SIZE + args.conditions.as_ref().unwrap_or(&whitelist.conditions).len() * WhitelistV2::CONDITION_SIZE,
         realloc::zero = true,
         realloc::payer = payer,
         has_one = update_authority @ ErrorCode::InvalidAuthority
