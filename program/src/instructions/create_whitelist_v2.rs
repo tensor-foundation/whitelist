@@ -1,4 +1,4 @@
-use crate::{state::WhitelistV2, Condition, State, CURRENT_WHITELIST_V2_VERSION, VEC_LENGTH};
+use crate::{state::WhitelistV2, Condition, State, CURRENT_WHITELIST_V2_VERSION};
 use anchor_lang::prelude::*;
 
 /// Arguments for creating a Whitelist V2 account.
@@ -35,8 +35,8 @@ pub struct CreateWhitelistV2<'info> {
         init,
         payer = payer,
         // Allocate the account to the actual size we need given the number of conditions.
-        // Borsh represents vectors with a 4 byte size prefix, which is what VEC_LENGTH accounts for.
-        space = WhitelistV2::BASE_SIZE + VEC_LENGTH + args.conditions.len() * WhitelistV2::CONDITION_SIZE,
+        // Vec length is included in the base size.
+        space = WhitelistV2::BASE_SIZE + args.conditions.len() * WhitelistV2::CONDITION_SIZE,
         seeds = [
             WhitelistV2::PREFIX,
             namespace.key().as_ref(),

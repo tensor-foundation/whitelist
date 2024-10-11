@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.2.1",
   "name": "whitelist_program",
   "constants": [
     {
@@ -13,13 +13,6 @@
         "defined": "usize"
       },
       "value": "8 + 1 + (32 * 2) + 64"
-    },
-    {
-      "name": "MINT_PROOF_V2_SIZE",
-      "type": {
-        "defined": "usize"
-      },
-      "value": "8 + 1 + (32 * 28) + 8 + 32"
     },
     {
       "name": "MAX_PROOF_LEN",
