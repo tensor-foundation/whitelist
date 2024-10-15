@@ -8,6 +8,11 @@
   Verify your collection on-chain.
 </p>
 
+## Overview
+
+The Tensor Foundation Whitelist program allows defining and managing a collection of NFTs or other digital assets on-chain. Within the Tensor protocol
+it is used for gatekeeping which NFTs can be deposited or sold in to AMM pools, and which items Marketplace bids are placed against.
+
 ## Program
 
 This project contains the following program:
@@ -29,7 +34,41 @@ This new Whitelist program is currently deployed to devnet, and will be deployed
 
 | Devnet | Mainnet |
 | ------ | ------- |
-| v0.1.1 | -       |
+| v0.2.1 | v0.2.1  |
+
+## Build
+
+### Prerequisites
+
+You need the following tools installed to build the project:
+
+- pnpm v9+
+- rust v1.78.0
+- node v18+
+- solana v1.17.23
+- anchor v0.29.0
+
+### Steps
+
+Install JavaScript dependencies:
+
+```bash
+pnpm install
+```
+
+Build the program and generate the clients:
+
+```bash
+pnpm programs:build
+pnpm generate
+```
+
+Run JS and Rust tests:
+
+```bash
+pnpm clients:js:test
+pnpm clients:rust:test
+```
 
 ## Getting started
 

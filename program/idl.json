@@ -1079,7 +1079,7 @@
     {
       "name": "State",
       "docs": [
-        "White list state enum. Currently only supports Frozen and Unfrozen."
+        "Whitelist state enum. Currently only supports Frozen and Unfrozen."
       ],
       "type": {
         "kind": "enum",
