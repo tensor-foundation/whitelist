@@ -146,7 +146,7 @@ impl WhitelistV2 {
     }
 }
 
-/// White list state enum. Currently only supports Frozen and Unfrozen.
+/// Whitelist state enum. Currently only supports Frozen and Unfrozen.
 #[repr(u8)]
 #[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default, InitSpace, Eq, PartialEq)]
 pub enum State {
