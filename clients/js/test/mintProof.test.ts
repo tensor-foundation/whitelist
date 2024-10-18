@@ -1,4 +1,8 @@
 import {
+  ANCHOR_ERROR__ACCOUNT_DISCRIMINATOR_MISMATCH,
+  ANCHOR_ERROR__ACCOUNT_NOT_INITIALIZED,
+} from '@coral-xyz/anchor-errors';
+import {
   SOLANA_ERROR__JSON_RPC__INVALID_PARAMS,
   appendTransactionMessageInstruction,
   generateKeyPairSigner,
@@ -27,16 +31,14 @@ import {
 } from '../src';
 import {
   MAX_PROOF_LENGTH,
+  MINT_PROOF_V2_SIZE,
   createMintProofThrows,
   createWhitelist,
+  getAccountDataLength,
   updateWhitelist,
   upsertMintProof,
 } from './_common';
 import { generateTreeOfSize } from './_merkle';
-import {
-  ANCHOR_ERROR__ACCOUNT_DISCRIMINATOR_MISMATCH,
-  ANCHOR_ERROR__ACCOUNT_NOT_INITIALIZED,
-} from '@coral-xyz/anchor-errors';
 
 test('it can create and update mint proof v2', async (t) => {
   const client = createDefaultSolanaClient();
@@ -88,6 +90,12 @@ test('it can create and update mint proof v2', async (t) => {
       payer: nftOwner.address,
     },
   }));
+
+  const mintProofV2AccountLength = await getAccountDataLength(
+    client,
+    mintProof
+  );
+  t.assert(mintProofV2AccountLength === MINT_PROOF_V2_SIZE);
 
   // Mint a second NFT
   const { mint: mint2 } = await createDefaultNft({
