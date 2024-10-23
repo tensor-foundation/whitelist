@@ -1,4 +1,5 @@
 import {
+  address,
   appendTransactionMessageInstruction,
   generateKeyPairSigner,
   none,
@@ -466,6 +467,105 @@ test('noop leaves conditions unchanged', async (t) => {
       updateAuthority: updateAuthority.address,
       // No change.
       conditions,
+    },
+  });
+});
+
+test('it can set the freeze authority', async (t) => {
+  const client = createDefaultSolanaClient();
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const freezeAuthority = await generateKeyPairSignerWithSol(client);
+
+  const conditions = [{ mode: Mode.FVC, value: updateAuthority.address }];
+
+  const { whitelist, uuid } = await createWhitelist({
+    client,
+    updateAuthority,
+    conditions,
+  });
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      uuid,
+      conditions,
+    },
+  });
+
+  // set freeze authority
+  const updateWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer: updateAuthority,
+    updateAuthority,
+    whitelist,
+    conditions: null,
+    freezeAuthority: operation('Set', [freezeAuthority.address]),
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, updateAuthority),
+    (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      conditions,
+    },
+  });
+});
+
+test('it can clear the freeze authority', async (t) => {
+  const client = createDefaultSolanaClient();
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const freezeAuthority = await generateKeyPairSignerWithSol(client);
+
+  const conditions = [{ mode: Mode.FVC, value: updateAuthority.address }];
+
+  const { whitelist } = await createWhitelist({
+    client,
+    updateAuthority,
+    conditions,
+  });
+
+  // set freeze authority
+  const updateWhitelistIx = getUpdateWhitelistV2Instruction({
+    payer: updateAuthority,
+    updateAuthority,
+    whitelist,
+    conditions: null,
+    freezeAuthority: operation('Set', [freezeAuthority.address]),
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, updateAuthority),
+    (tx) => appendTransactionMessageInstruction(updateWhitelistIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  // clear freeze authority
+  const updateWhitelistClearIx = getUpdateWhitelistV2Instruction({
+    payer: updateAuthority,
+    updateAuthority,
+    whitelist,
+    conditions: null,
+    freezeAuthority: operation('Clear'),
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, updateAuthority),
+    (tx) => appendTransactionMessageInstruction(updateWhitelistClearIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  t.like(await fetchWhitelistV2(client.rpc, whitelist), {
+    address: whitelist,
+    data: {
+      updateAuthority: updateAuthority.address,
+      conditions,
+      freezeAuthority: address('11111111111111111111111111111111'),
     },
   });
 });
