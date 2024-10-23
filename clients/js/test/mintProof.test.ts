@@ -19,16 +19,22 @@ import {
   MintProofV2,
   Mode,
   TENSOR_WHITELIST_ERROR__FAILED_MERKLE_PROOF_VERIFICATION,
+  TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY,
   TENSOR_WHITELIST_ERROR__NOT_MERKLE_ROOT,
+  fetchMaybeMintProofV2,
   fetchMintProofV2,
   findMintProofV2Pda,
+  getCloseMintProofV2Instruction,
   getInitUpdateMintProofV2InstructionAsync,
   intoAddress,
 } from '../src';
 import {
   MAX_PROOF_LENGTH,
+  SLOT_DELAY,
+  TRANSACTION_FEE,
   createMintProofThrows,
   createWhitelist,
+  expectCustomError,
   updateWhitelist,
   upsertMintProof,
 } from './_common';
@@ -545,4 +551,173 @@ test('invalid whitelist fails', async (t) => {
     t,
     code: ANCHOR_ERROR__ACCOUNT_NOT_INITIALIZED,
   });
+});
+
+test('cannot close the mint proof account before slot delay if not original signer', async (t) => {
+  const client = createDefaultSolanaClient();
+
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const mintProofSigner = await generateKeyPairSignerWithSol(client);
+  const notMintProofSigner = await generateKeyPairSignerWithSol(client);
+
+  const { mint } = await createDefaultNft({
+    client,
+    payer: mintProofSigner,
+    authority: mintProofSigner,
+    owner: mintProofSigner.address,
+  });
+
+  const {
+    root,
+    proofs: [p],
+  } = await generateTreeOfSize(10, [mint]);
+
+  const conditions: Condition[] = [
+    { mode: Mode.MerkleTree, value: intoAddress(root) },
+  ];
+
+  const { whitelist } = await createWhitelist({
+    client,
+    updateAuthority,
+    conditions,
+  });
+
+  const [mintProof] = await findMintProofV2Pda({ mint, whitelist });
+
+  const createMintProofIx = await getInitUpdateMintProofV2InstructionAsync({
+    payer: mintProofSigner,
+    mint,
+    mintProof,
+    whitelist,
+    proof: p.proof,
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, mintProofSigner),
+    (tx) => appendTransactionMessageInstruction(createMintProofIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  const creationSlot = (await fetchMintProofV2(client.rpc, mintProof)).data.creationSlot;
+
+  // If not original signer => Can't close it with own address as payer... 
+  const closeMintProofIxWrongAddress = getCloseMintProofV2Instruction({
+    payer: mintProofSigner.address,
+    mintProof,
+    signer: notMintProofSigner,
+  });
+
+  const promise = pipe(
+    await createDefaultTransaction(client, notMintProofSigner),
+    (tx) => appendTransactionMessageInstruction(closeMintProofIxWrongAddress, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  await expectCustomError(t, promise, TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY);
+
+  // Mint proof is still open and unchanged
+  let mintProofAcc = await fetchMintProofV2(client.rpc, mintProof);
+  t.like(mintProofAcc.data, {
+    proof: p.proof,
+    creationSlot,
+    proofLen: p.proof.length,
+    payer: mintProofSigner.address,
+  });
+
+  // ... and also not with the correct address as payer (DOS attack vector)
+  const closeMintProofIxNotAllowed = getCloseMintProofV2Instruction({
+    payer: mintProofSigner.address,
+    mintProof,
+    signer: notMintProofSigner,
+  });
+
+  const promiseV2 = pipe(
+    await createDefaultTransaction(client, mintProofSigner),
+    (tx) => appendTransactionMessageInstruction(closeMintProofIxNotAllowed, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  await expectCustomError(t, promiseV2, TENSOR_WHITELIST_ERROR__INVALID_AUTHORITY);
+
+  // Mint proof is still open and unchanged
+  mintProofAcc = await fetchMintProofV2(client.rpc, mintProof);
+  t.like(mintProofAcc.data, {
+    proof: p.proof,
+    creationSlot,
+    proofLen: p.proof.length,
+    payer: mintProofSigner.address,
+  });
+
+  // Assert that the test ran WITHIN expected slot delay
+  const currentSlot = await client.rpc.getSlot().send();
+  t.assert(currentSlot - creationSlot < SLOT_DELAY);
+});
+
+test('mint proof can be closed by original signer before slot delay - receives rent back', async (t) => {
+  const client = createDefaultSolanaClient();
+
+  const mintProofSigner = await generateKeyPairSignerWithSol(client); 
+  const updateAuthority = await generateKeyPairSignerWithSol(client);
+  const { mint } = await createDefaultNft({
+    client,
+    payer: mintProofSigner,
+    authority: mintProofSigner,
+    owner: mintProofSigner.address,
+  });
+
+  const {
+    root,
+    proofs: [p],
+  } = await generateTreeOfSize(10, [mint]);
+
+  const conditions: Condition[] = [
+    { mode: Mode.MerkleTree, value: intoAddress(root) },
+  ];
+
+  const { whitelist } = await createWhitelist({
+    client,
+    updateAuthority,
+    conditions,
+  });
+
+  const [mintProof] = await findMintProofV2Pda({ mint, whitelist });
+
+  const beforeFunds = (await client.rpc.getBalance(mintProofSigner.address).send()).value;
+
+  const createMintProofIx = await getInitUpdateMintProofV2InstructionAsync({
+    payer: mintProofSigner,
+    mint,
+    mintProof,
+    whitelist,
+    proof: p.proof,
+  });
+
+  await pipe(
+    await createDefaultTransaction(client, mintProofSigner),
+    (tx) => appendTransactionMessageInstruction(createMintProofIx, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+  const creationSlot = (await fetchMintProofV2(client.rpc, mintProof)).data.creationSlot;
+
+  const closeMintProofIxOriginalSigner = getCloseMintProofV2Instruction({
+    payer: mintProofSigner.address,
+    mintProof,
+    signer: mintProofSigner,
+  }); 
+
+  await pipe(
+    await createDefaultTransaction(client, mintProofSigner),
+    (tx) => appendTransactionMessageInstruction(closeMintProofIxOriginalSigner, tx),
+    (tx) => signAndSendTransaction(client, tx)
+  );
+
+  const afterFunds = (await client.rpc.getBalance(mintProofSigner.address).send()).value;
+
+  // Mint proof is closed now...
+  t.assert((await fetchMaybeMintProofV2(client.rpc, mintProof)).exists === false);
+  // ... the original signer received rent back ...
+  t.assert(afterFunds === beforeFunds - (TRANSACTION_FEE * 2n)); // Creation + Closing tx fees subtracted
+  // ... within the slot delay
+  const currentSlot = await client.rpc.getSlot().send();
+  t.assert(currentSlot - creationSlot < SLOT_DELAY);
 });
