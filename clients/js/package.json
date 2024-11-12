@@ -50,6 +50,7 @@
     "@tensor-foundation/mpl-token-metadata": "^0.4.0",
     "@tensor-foundation/test-helpers": "^0.4.0",
     "@types/node": "^20.14.12",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "ava": "^6.1.2",
@@ -61,7 +62,7 @@
     "typedoc": "^0.25.12",
     "typedoc-plugin-missing-exports": "^2.2.0",
     "typescript": "^5.4.2",
-    "uuid": "^9.0.1",
+    "uuid": "^10.0.0",
     "ws": "^8.14.0"
   },
   "ava": {
