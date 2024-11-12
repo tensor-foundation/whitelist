@@ -1,20 +1,20 @@
 #!/usr/bin/env zx
 import "zx/globals";
-import * as k from "kinobi";
-import { rootNodeFromAnchor } from "@kinobi-so/nodes-from-anchor";
-import { renderVisitor as renderJavaScriptVisitor } from "@kinobi-so/renderers-js";
-import { renderVisitor as renderRustVisitor } from "@kinobi-so/renderers-rust";
+import * as c from "codama";
+import { rootNodeFromAnchor } from "@codama/nodes-from-anchor";
+import { renderVisitor as renderJavaScriptVisitor } from "@codama/renderers-js";
+import { renderVisitor as renderRustVisitor } from "@codama/renderers-rust";
 import { getAllProgramIdls } from "./utils.mjs";
 
-// Instanciate Kinobi.
+// Instanciate codama.
 const [idl, ...additionalIdls] = getAllProgramIdls().map((idl) =>
   rootNodeFromAnchor(require(idl)),
 );
-const kinobi = k.createFromRoot(idl, additionalIdls);
+const codama = c.createFromRoot(idl, additionalIdls);
 
 // Update programs.
-kinobi.update(
-  k.updateProgramsVisitor({
+codama.update(
+  c.updateProgramsVisitor({
     whitelistProgram: {
       name: "tensorWhitelist",
     },
@@ -22,20 +22,20 @@ kinobi.update(
 );
 
 // Update accounts.
-kinobi.update(
-  k.updateAccountsVisitor({
+codama.update(
+  c.updateAccountsVisitor({
     mintProof: {
       size: 28,
       seeds: [
-        k.constantPdaSeedNodeFromString("utf8", "mint_proof"),
-        k.variablePdaSeedNode(
+        c.constantPdaSeedNodeFromString("utf8", "mint_proof"),
+        c.variablePdaSeedNode(
           "mint",
-          k.publicKeyTypeNode(),
+          c.publicKeyTypeNode(),
           "The address of the mint account",
         ),
-        k.variablePdaSeedNode(
+        c.variablePdaSeedNode(
           "whitelist",
-          k.publicKeyTypeNode(),
+          c.publicKeyTypeNode(),
           "The address of the whitelist pda",
         ),
       ],
@@ -43,15 +43,15 @@ kinobi.update(
     mintProofV2: {
       size: 945,
       seeds: [
-        k.constantPdaSeedNodeFromString("utf8", "mint_proof_v2"),
-        k.variablePdaSeedNode(
+        c.constantPdaSeedNodeFromString("utf8", "mint_proof_v2"),
+        c.variablePdaSeedNode(
           "mint",
-          k.publicKeyTypeNode(),
+          c.publicKeyTypeNode(),
           "The address of the mint account",
         ),
-        k.variablePdaSeedNode(
+        c.variablePdaSeedNode(
           "whitelist",
-          k.publicKeyTypeNode(),
+          c.publicKeyTypeNode(),
           "The address of the whitelist pda",
         ),
       ],
@@ -59,9 +59,9 @@ kinobi.update(
     whitelist: {
       size: 238,
       seeds: [
-        k.variablePdaSeedNode(
+        c.variablePdaSeedNode(
           "uuid",
-          k.fixedSizeTypeNode(k.bytesTypeNode(), 32),
+          c.fixedSizeTypeNode(c.bytesTypeNode(), 32),
           "UUID of the whitelist",
         ),
       ],
@@ -69,15 +69,15 @@ kinobi.update(
     whitelistV2: {
       size: 239,
       seeds: [
-        k.constantPdaSeedNodeFromString("utf8", "whitelist"),
-        k.variablePdaSeedNode(
+        c.constantPdaSeedNodeFromString("utf8", "whitelist"),
+        c.variablePdaSeedNode(
           "namespace",
-          k.publicKeyTypeNode(),
+          c.publicKeyTypeNode(),
           "The namespace address",
         ),
-        k.variablePdaSeedNode(
+        c.variablePdaSeedNode(
           "uuid",
-          k.fixedSizeTypeNode(k.bytesTypeNode(), 32),
+          c.fixedSizeTypeNode(c.bytesTypeNode(), 32),
           "UUID of the whitelist",
         ),
       ],
@@ -90,41 +90,41 @@ kinobi.update(
 );
 
 // Set default values for instruction accounts.
-kinobi.update(
-  k.setInstructionAccountDefaultValuesVisitor([
+codama.update(
+  c.setInstructionAccountDefaultValuesVisitor([
     {
       account: "mintProof",
       ignoreIfOptional: true,
-      defaultValue: k.pdaValueNode("mintProofV2"),
+      defaultValue: c.pdaValueNode("mintProofV2"),
     },
     {
       account: "whitelist",
       ignoreIfOptional: true,
-      defaultValue: k.pdaValueNode("whitelistV2"),
+      defaultValue: c.pdaValueNode("whitelistV2"),
     },
     {
       account: "whitelistAuthority",
-      defaultValue: k.pdaValueNode("authority"),
+      defaultValue: c.pdaValueNode("authority"),
     },
   ]),
 );
 
 // Remove WhitelistType and MintProofType from tree so clients don't render it.
-kinobi.update(
-  k.deleteNodesVisitor([
+codama.update(
+  c.deleteNodesVisitor([
     "[definedTypeNode]whitelistType",
     "[definedTypeNode]mintProofType",
   ]),
 );
 
 // Override whitelist default resolvers to V1 for V1 ixs.
-kinobi.update(
-  k.updateInstructionsVisitor({
+codama.update(
+  c.updateInstructionsVisitor({
     initUpdateWhitelist: {
       accounts: {
         whitelist: {
-          defaultValue: k.pdaValueNode("whitelist", [
-            k.pdaSeedValueNode("uuid", k.argumentValueNode("uuid")),
+          defaultValue: c.pdaValueNode("whitelist", [
+            c.pdaSeedValueNode("uuid", c.argumentValueNode("uuid")),
           ]),
         },
       },
@@ -132,9 +132,9 @@ kinobi.update(
     initUpdateMintProof: {
       accounts: {
         mintProof: {
-          defaultValue: k.pdaValueNode("mintProof", [
-            k.pdaSeedValueNode("mint", k.accountValueNode("mint")),
-            k.pdaSeedValueNode("whitelist", k.accountValueNode("whitelist")),
+          defaultValue: c.pdaValueNode("mintProof", [
+            c.pdaSeedValueNode("mint", c.accountValueNode("mint")),
+            c.pdaSeedValueNode("whitelist", c.accountValueNode("whitelist")),
           ]),
         },
       },
@@ -143,11 +143,11 @@ kinobi.update(
 );
 
 // Debug print the tree.
-// kinobi.accept(k.consoleLogVisitor(k.getDebugStringVisitor({ indent: true })));
+// codama.accept(c.consoleLogVisitor(c.getDebugStringVisitor({ indent: true })));
 
 // Render JavaScript.
 const jsClient = path.join(__dirname, "..", "clients", "js");
-kinobi.accept(
+codama.accept(
   renderJavaScriptVisitor(path.join(jsClient, "src", "generated"), {
     prettier: require(path.join(jsClient, ".prettierrc.json")),
   }),
@@ -155,7 +155,7 @@ kinobi.accept(
 
 // Render Rust.
 const rustClient = path.join(__dirname, "..", "clients", "rust");
-kinobi.accept(
+codama.accept(
   renderRustVisitor(path.join(rustClient, "src", "generated"), {
     formatCode: true,
     crateFolder: rustClient,
