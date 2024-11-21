@@ -1,6 +1,6 @@
 {
   "name": "@tensor-foundation/whitelist",
-  "version": "0.3.0",
+  "version": "1.0.0-beta.1",
   "description": "Verify your collection on-chain",
   "sideEffects": false,
   "module": "./dist/src/index.mjs",
@@ -37,18 +37,18 @@
   "author": "Tensor Protocol Foundation <maintainers@tensor.foundation>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@coral-xyz/anchor-errors": "^0.30.1",
-    "@solana/web3.js": "2.0.0-preview.3"
+    "@solana/web3.js": "^2.0.0"
   },
   "devDependencies": {
     "@ava/typescript": "^4.1.0",
+    "@coral-xyz/anchor-errors": "^0.30.1",
     "@noble/hashes": "^1.4.0",
-    "@solana/errors": "2.0.0-preview.3",
+    "@solana/errors": "^2.0.0",
     "@solana/eslint-config-solana": "^3.0.0",
-    "@solana/webcrypto-ed25519-polyfill": "2.0.0-preview.3",
-    "@tensor-foundation/mpl-core": "^0.3.0",
-    "@tensor-foundation/mpl-token-metadata": "^0.4.0",
-    "@tensor-foundation/test-helpers": "^0.4.0",
+    "@solana/webcrypto-ed25519-polyfill": "^2.0.0",
+    "@tensor-foundation/mpl-core": "1.0.0-beta.1",
+    "@tensor-foundation/mpl-token-metadata": "1.0.0-beta.1",
+    "@tensor-foundation/test-helpers": "1.0.0-beta.1",
     "@types/node": "^20.14.12",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -79,5 +79,5 @@
       }
     }
   },
-  "packageManager": "pnpm@9.1.0"
+  "packageManager": "pnpm@9.14.0"
 }
