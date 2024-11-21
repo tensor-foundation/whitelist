@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@solana/web3.js':
-        specifier: 2.0.0
+        specifier: ^2.0.0
         version: 2.0.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.2)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
     devDependencies:
       '@ava/typescript':
@@ -22,13 +22,13 @@ importers:
         specifier: ^1.4.0
         version: 1.5.0
       '@solana/errors':
-        specifier: ^2.0.0-rc.1
-        version: 2.0.0-rc.1(typescript@5.6.2)
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.6.2)
       '@solana/eslint-config-solana':
         specifier: ^3.0.0
         version: 3.0.4(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.2))(eslint-plugin-jest@27.9.0(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint-plugin-react-hooks@4.6.2(eslint@8.57.1))(eslint-plugin-simple-import-sort@12.1.1(eslint@8.57.1))(eslint-plugin-sort-keys-fix@1.1.2)(eslint-plugin-typescript-sort-keys@3.2.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
       '@solana/webcrypto-ed25519-polyfill':
-        specifier: 2.0.0
+        specifier: ^2.0.0
         version: 2.0.0(typescript@5.6.2)
       '@tensor-foundation/mpl-core':
         specifier: 1.0.0-beta.1

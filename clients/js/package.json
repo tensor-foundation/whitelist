@@ -37,15 +37,15 @@
   "author": "Tensor Protocol Foundation <maintainers@tensor.foundation>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@solana/web3.js": "2.0.0"
+    "@solana/web3.js": "^2.0.0"
   },
   "devDependencies": {
     "@ava/typescript": "^4.1.0",
     "@coral-xyz/anchor-errors": "^0.30.1",
     "@noble/hashes": "^1.4.0",
-    "@solana/errors": "^2.0.0-rc.1",
+    "@solana/errors": "^2.0.0",
     "@solana/eslint-config-solana": "^3.0.0",
-    "@solana/webcrypto-ed25519-polyfill": "2.0.0",
+    "@solana/webcrypto-ed25519-polyfill": "^2.0.0",
     "@tensor-foundation/mpl-core": "1.0.0-beta.1",
     "@tensor-foundation/mpl-token-metadata": "1.0.0-beta.1",
     "@tensor-foundation/test-helpers": "1.0.0-beta.1",
