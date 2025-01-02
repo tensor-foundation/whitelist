@@ -18,6 +18,7 @@ pub const WHITELIST_V2_BASE_SIZE: usize =
     + 32  // update_authority
     + 32  // namespace
     + 32  // freeze_authority
+    + 4   // conditions vector length bytes
 ;
 
 /// Maximum number of conditions allowed in a whitelist.
@@ -92,24 +93,28 @@ impl WhitelistV2 {
             throw_err!(ErrorCode::TooManyConditions);
         }
 
-        // Only one merkle proof per whitelist allowed.
-        let merkle_proofs = conditions
-            .iter()
-            .filter(|c| c.mode == Mode::MerkleTree)
-            .count();
+        // Track the first merkle proof index and count them in one pass
+        let mut merkle_proof_count = 0;
+        let mut first_merkle_index = None;
 
-        if merkle_proofs > 1 {
+        for (i, condition) in conditions.iter().enumerate() {
+            if condition.mode == Mode::MerkleTree {
+                merkle_proof_count += 1;
+                if first_merkle_index.is_none() {
+                    first_merkle_index = Some(i);
+                }
+            }
+        }
+
+        if merkle_proof_count > 1 {
             throw_err!(ErrorCode::TooManyMerkleProofs);
         }
 
-        // Ensure the merkle proof is the first item in the vector, if it exists.
-        if let Some(index) = conditions
-            .iter()
-            .enumerate()
-            .find(|(_, c)| c.mode == Mode::MerkleTree)
-            .map(|(index, _)| index)
-        {
-            conditions.rotate_left(index);
+        // Rotate if we found a merkle proof that wasn't first
+        if let Some(index) = first_merkle_index {
+            if index > 0 {
+                conditions.rotate_left(index);
+            }
         }
 
         Ok(())

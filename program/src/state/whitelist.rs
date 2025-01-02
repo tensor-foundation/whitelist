@@ -160,13 +160,13 @@ impl Whitelist {
         collection: Option<Collection>,
         creators: Option<Vec<Creator>>,
     ) -> Result<()> {
-        //Priority 1: Merkle proof (because we manually control this = highest priority)
+        // Priority 1: Merkle proof (because we manually control this = highest priority)
         if self.root_hash != ZERO_ARRAY {
             // TODO: currently unsupported for tcomp
             throw_err!(ErrorCode::FailedMerkleProofVerification);
         }
 
-        //Priority 2: VOC
+        // Priority 2: VOC
         if self.voc.is_some() {
             match collection {
                 Some(collection) => {
@@ -187,7 +187,7 @@ impl Whitelist {
             return Ok(());
         }
 
-        //Priority 3: FVC
+        // Priority 3: FVC
         if self.fvc.is_some() {
             match creators {
                 Some(creators) => {

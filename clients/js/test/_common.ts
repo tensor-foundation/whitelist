@@ -29,7 +29,7 @@ import {
 } from '../src/index.js';
 
 export const MAX_PROOF_LENGTH = 28;
-
+export const MINT_PROOF_V2_SIZE = 945;
 export const CURRENT_WHITELIST_VERSION = 1;
 export const SLOT_DELAY = 100;
 
