@@ -89,7 +89,16 @@ pub fn verify_whitelist_v2(
     mint: &Pubkey,
     metadata_opt: Option<&AccountInfo>,
 ) -> Result<()> {
-    let full_merkle_proof = if let Some(mint_proof_info) = &mint_proof_opt {
+    let full_merkle_proof = if whitelist
+        .conditions
+        .iter()
+        .any(|c| c.mode == Mode::MerkleTree)
+    {
+        // Must have a mint proof account.
+        require!(mint_proof_opt.is_some(), ErrorCode::MissingMintProof);
+
+        let mint_proof_info = mint_proof_opt.unwrap();
+
         let mint_proof_type =
             assert_decode_mint_proof_generic(whitelist_pubkey, mint, mint_proof_info)?;
 
