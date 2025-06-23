@@ -31,9 +31,7 @@ export const TENSOR_WHITELIST_PROGRAM_ADDRESS =
 export enum TensorWhitelistAccount {
   Authority,
   MintProofV2,
-  MintProof,
   WhitelistV2,
-  Whitelist,
 }
 
 export function identifyTensorWhitelistAccount(
@@ -66,34 +64,12 @@ export function identifyTensorWhitelistAccount(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([227, 131, 106, 240, 190, 48, 219, 228])
-      ),
-      0
-    )
-  ) {
-    return TensorWhitelistAccount.MintProof;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
         new Uint8Array([136, 184, 45, 191, 85, 203, 191, 119])
       ),
       0
     )
   ) {
     return TensorWhitelistAccount.WhitelistV2;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([204, 176, 52, 79, 146, 121, 54, 247])
-      ),
-      0
-    )
-  ) {
-    return TensorWhitelistAccount.Whitelist;
   }
   throw new Error(
     'The provided account could not be identified as a tensorWhitelist account.'

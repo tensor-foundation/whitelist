@@ -6,13 +6,9 @@
 //!
 
 pub(crate) mod r#authority;
-pub(crate) mod r#mint_proof;
 pub(crate) mod r#mint_proof_v2;
-pub(crate) mod r#whitelist;
 pub(crate) mod r#whitelist_v2;
 
 pub use self::r#authority::*;
-pub use self::r#mint_proof::*;
 pub use self::r#mint_proof_v2::*;
-pub use self::r#whitelist::*;
 pub use self::r#whitelist_v2::*;

@@ -21,25 +21,17 @@ codama.update(
   }),
 );
 
+// rm mintProofV1 / whitelistV1 accounts from rendering
+codama.update(
+  c.deleteNodesVisitor([
+    "[accountNode]mintProof",
+    "[accountNode]whitelist",
+  ]),
+);
+
 // Update accounts.
 codama.update(
   c.updateAccountsVisitor({
-    mintProof: {
-      size: 28,
-      seeds: [
-        c.constantPdaSeedNodeFromString("utf8", "mint_proof"),
-        c.variablePdaSeedNode(
-          "mint",
-          c.publicKeyTypeNode(),
-          "The address of the mint account",
-        ),
-        c.variablePdaSeedNode(
-          "whitelist",
-          c.publicKeyTypeNode(),
-          "The address of the whitelist pda",
-        ),
-      ],
-    },
     mintProofV2: {
       size: 945,
       seeds: [
@@ -53,16 +45,6 @@ codama.update(
           "whitelist",
           c.publicKeyTypeNode(),
           "The address of the whitelist pda",
-        ),
-      ],
-    },
-    whitelist: {
-      size: 238,
-      seeds: [
-        c.variablePdaSeedNode(
-          "uuid",
-          c.fixedSizeTypeNode(c.bytesTypeNode(), 32),
-          "UUID of the whitelist",
         ),
       ],
     },
@@ -115,31 +97,6 @@ codama.update(
     "[definedTypeNode]whitelistType",
     "[definedTypeNode]mintProofType",
   ]),
-);
-
-// Override whitelist default resolvers to V1 for V1 ixs.
-codama.update(
-  c.updateInstructionsVisitor({
-    initUpdateWhitelist: {
-      accounts: {
-        whitelist: {
-          defaultValue: c.pdaValueNode("whitelist", [
-            c.pdaSeedValueNode("uuid", c.argumentValueNode("uuid")),
-          ]),
-        },
-      },
-    },
-    initUpdateMintProof: {
-      accounts: {
-        mintProof: {
-          defaultValue: c.pdaValueNode("mintProof", [
-            c.pdaSeedValueNode("mint", c.accountValueNode("mint")),
-            c.pdaSeedValueNode("whitelist", c.accountValueNode("whitelist")),
-          ]),
-        },
-      },
-    },
-  }),
 );
 
 // Debug print the tree.
