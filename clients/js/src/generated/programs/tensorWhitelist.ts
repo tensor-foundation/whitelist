@@ -17,15 +17,10 @@ import {
   type ParsedCloseMintProofV2Instruction,
   type ParsedCloseWhitelistV2Instruction,
   type ParsedCreateWhitelistV2Instruction,
-  type ParsedFreezeWhitelistInstruction,
   type ParsedFreezeWhitelistV2Instruction,
   type ParsedInitUpdateAuthorityInstruction,
-  type ParsedInitUpdateMintProofInstruction,
   type ParsedInitUpdateMintProofV2Instruction,
-  type ParsedInitUpdateWhitelistInstruction,
   type ParsedReallocAuthorityInstruction,
-  type ParsedReallocWhitelistInstruction,
-  type ParsedUnfreezeWhitelistInstruction,
   type ParsedUnfreezeWhitelistV2Instruction,
   type ParsedUpdateWhitelistV2Instruction,
 } from '../instructions';
@@ -106,13 +101,8 @@ export function identifyTensorWhitelistAccount(
 }
 
 export enum TensorWhitelistInstruction {
-  FreezeWhitelist,
   InitUpdateAuthority,
-  InitUpdateMintProof,
-  InitUpdateWhitelist,
   ReallocAuthority,
-  ReallocWhitelist,
-  UnfreezeWhitelist,
   CreateWhitelistV2,
   CloseWhitelistV2,
   UpdateWhitelistV2,
@@ -130,17 +120,6 @@ export function identifyTensorWhitelistInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([248, 112, 12, 150, 175, 238, 38, 184])
-      ),
-      0
-    )
-  ) {
-    return TensorWhitelistInstruction.FreezeWhitelist;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
         new Uint8Array([53, 144, 79, 150, 196, 110, 22, 55])
       ),
       0
@@ -152,56 +131,12 @@ export function identifyTensorWhitelistInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([30, 77, 123, 9, 191, 37, 52, 159])
-      ),
-      0
-    )
-  ) {
-    return TensorWhitelistInstruction.InitUpdateMintProof;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([255, 1, 192, 134, 111, 49, 212, 131])
-      ),
-      0
-    )
-  ) {
-    return TensorWhitelistInstruction.InitUpdateWhitelist;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
         new Uint8Array([128, 120, 16, 197, 85, 34, 2, 91])
       ),
       0
     )
   ) {
     return TensorWhitelistInstruction.ReallocAuthority;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([173, 147, 168, 152, 181, 46, 55, 60])
-      ),
-      0
-    )
-  ) {
-    return TensorWhitelistInstruction.ReallocWhitelist;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([215, 119, 9, 92, 160, 139, 226, 253])
-      ),
-      0
-    )
-  ) {
-    return TensorWhitelistInstruction.UnfreezeWhitelist;
   }
   if (
     containsBytes(
@@ -289,26 +224,11 @@ export type ParsedTensorWhitelistInstruction<
   TProgram extends string = 'TL1ST2iRBzuGTqLn1KXnGdSnEow62BzPnGiqyRXhWtW',
 > =
   | ({
-      instructionType: TensorWhitelistInstruction.FreezeWhitelist;
-    } & ParsedFreezeWhitelistInstruction<TProgram>)
-  | ({
       instructionType: TensorWhitelistInstruction.InitUpdateAuthority;
     } & ParsedInitUpdateAuthorityInstruction<TProgram>)
   | ({
-      instructionType: TensorWhitelistInstruction.InitUpdateMintProof;
-    } & ParsedInitUpdateMintProofInstruction<TProgram>)
-  | ({
-      instructionType: TensorWhitelistInstruction.InitUpdateWhitelist;
-    } & ParsedInitUpdateWhitelistInstruction<TProgram>)
-  | ({
       instructionType: TensorWhitelistInstruction.ReallocAuthority;
     } & ParsedReallocAuthorityInstruction<TProgram>)
-  | ({
-      instructionType: TensorWhitelistInstruction.ReallocWhitelist;
-    } & ParsedReallocWhitelistInstruction<TProgram>)
-  | ({
-      instructionType: TensorWhitelistInstruction.UnfreezeWhitelist;
-    } & ParsedUnfreezeWhitelistInstruction<TProgram>)
   | ({
       instructionType: TensorWhitelistInstruction.CreateWhitelistV2;
     } & ParsedCreateWhitelistV2Instruction<TProgram>)

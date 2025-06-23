@@ -16,7 +16,6 @@ jobs:
       matrix:
         node:
           - glob: tests/twhitelist/whitelist.test.ts
-          - glob: tests/twhitelist/mint_proof.test.ts
           - glob: tests/twhitelist/merkle_tree.test.ts
 
     steps:

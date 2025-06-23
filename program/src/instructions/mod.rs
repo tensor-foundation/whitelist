@@ -1,18 +1,8 @@
-mod freeze_whitelist;
 mod init_update_authority;
-mod init_update_mint_proof;
-mod init_update_whitelist;
 mod realloc_authority;
-mod realloc_whitelist;
-mod unfreeze_whitelist;
 
-pub use freeze_whitelist::*;
 pub use init_update_authority::*;
-pub use init_update_mint_proof::*;
-pub use init_update_whitelist::*;
 pub use realloc_authority::*;
-pub use realloc_whitelist::*;
-pub use unfreeze_whitelist::*;
 
 // V2
 mod close_mint_proof_v2;
