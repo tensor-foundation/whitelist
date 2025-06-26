@@ -33,11 +33,6 @@ pub mod whitelist_program {
 
     use super::*;
 
-    /// Freeze a whitelist so that an extra signature is required to update it.
-    pub fn freeze_whitelist(ctx: Context<FreezeWhitelist>) -> Result<()> {
-        instructions::process_freeze_whitelist(ctx)
-    }
-
     /// Initialize or update the whitelist singleton authority.
     pub fn init_update_authority(
         ctx: Context<InitUpdateAuthority>,
@@ -47,39 +42,9 @@ pub mod whitelist_program {
         instructions::process_init_update_authority(ctx, new_cosigner, new_owner)
     }
 
-    /// Initialize or update a mint proof.
-    pub fn init_update_mint_proof(
-        ctx: Context<InitUpdateMintProof>,
-        proof: Vec<[u8; 32]>,
-    ) -> Result<()> {
-        instructions::process_init_update_mint_proof(ctx, proof)
-    }
-
-    /// Initialize or update a whitelist.
-    pub fn init_update_whitelist(
-        ctx: Context<InitUpdateWhitelist>,
-        uuid: [u8; 32],
-        root_hash: Option<[u8; 32]>,
-        name: Option<[u8; 32]>,
-        voc: Option<Pubkey>,
-        fvc: Option<Pubkey>,
-    ) -> Result<()> {
-        instructions::process_init_update_whitelist(ctx, uuid, root_hash, name, voc, fvc)
-    }
-
     /// Reallocate space on the whitelist authority singleton.
     pub fn realloc_authority(ctx: Context<ReallocAuthority>) -> Result<()> {
         instructions::process_realloc_authority(ctx)
-    }
-
-    /// Reallocate space on the whitelist.
-    pub fn realloc_whitelist(ctx: Context<ReallocWhitelist>) -> Result<()> {
-        instructions::process_realloc_whitelist(ctx)
-    }
-
-    /// Unfreeze a whitelist so that only one signature is required to update it.
-    pub fn unfreeze_whitelist(ctx: Context<UnfreezeWhitelist>) -> Result<()> {
-        instructions::process_unfreeze_whitelist(ctx)
     }
 
     /* ------Whitelist V2------ */

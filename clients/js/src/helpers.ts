@@ -4,7 +4,6 @@ import {
   getAddressDecoder,
   getAddressEncoder,
 } from '@solana/web3.js';
-import { WhitelistSeeds, findWhitelistPda } from './generated';
 
 export type NumberData = number[] | Uint8Array | Buffer;
 
@@ -29,12 +28,3 @@ export const bufferToCollId = (buffer: number[]) => {
     16
   )}-${raw.slice(16, 20)}-${raw.slice(20)}`;
 };
-
-export async function getWhitelistFromCollId(collId: string): Promise<Address> {
-  const uuid = collIdToBuffer(collId);
-  const whitelistSeeds: WhitelistSeeds = {
-    uuid: uuid,
-  };
-  const [whitelistPda] = await findWhitelistPda(whitelistSeeds);
-  return whitelistPda;
-}
